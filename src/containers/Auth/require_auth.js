@@ -1,13 +1,20 @@
 import React, { Component } from 'react';
 import { graphql } from 'react-apollo';
 import curentUserQuery from './queries/CurentUser';
-import { hashHistory } from 'react-router';
+import PropTypes from 'prop-types';
+import {
+  withRouter
+} from 'react-router-dom';
 
 export default (WrappedComponent) => {
   class RequireAuth extends Component {
+    static propTypes = {
+      history: PropTypes.object
+    };
+
     componentWillUpdate({ data: { user, loading } }) {
       if (!loading && !user) {
-        hashHistory.push('/signin');
+        this.props.history.push('/signin');
       }
     }
 
@@ -16,5 +23,5 @@ export default (WrappedComponent) => {
     }
   }
 
-  return graphql(curentUserQuery, { options: { fetchPolicy: 'network-only' } })(RequireAuth);
+  return withRouter(graphql(curentUserQuery, { options: { fetchPolicy: 'network-only' } })(RequireAuth));
 };

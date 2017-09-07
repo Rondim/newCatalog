@@ -2,18 +2,36 @@
  * Created by xax on 23.02.2017.
  */
 import React, { Component } from 'react';
-import { hashHistory } from 'react-router';
 import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import query from './queries/CurentUser';
 import mutation from './mutations/SigninUser';
 import Loading from '../../components/Loading';
+import {
+  withRouter
+} from 'react-router-dom';
+import { withStyles } from 'material-ui/styles';
+import { InputLabel } from 'material-ui/Input';
+import { FormControl } from 'material-ui/Form';
+import { Button, Typography, Input } from 'material-ui';
 
+
+const styles = theme => ({
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  formControl: {
+    margin: theme.spacing.unit,
+  },
+});
 
 class Signin extends Component {
   static propTypes = {
     mutate: PropTypes.func.isRequired,
-    data: PropTypes.object.isRequired
+    data: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
+    classes: PropTypes.object.isRequired
   };
 
   state = {
@@ -24,7 +42,7 @@ class Signin extends Component {
 
   componentWillUpdate(nextProps) {
     if (!this.props.data.user && nextProps.data.user) {
-      hashHistory.push('/');
+      this.props.history.push('/');
     }
   }
 
@@ -36,7 +54,7 @@ class Signin extends Component {
       });
       this.setState({ errors: [] });
       localStorage.setItem('token', response.data.signinUser.token);
-      hashHistory.push('/');
+      this.props.history.push('/');
     } catch (res) {
       const errors = res.graphQLErrors.map(err => err.message);
       this.setState({ errors });
@@ -44,53 +62,48 @@ class Signin extends Component {
   };
 
   render() {
-    if (this.props.data.loading) {
+    const { classes, data: { loading } } = this.props;
+    if (loading) {
       return (<Loading />);
     }
     return (
       <form
-        className="form-horizontal col-sm-6 col-sm-offset-3"
+        className={classes.container}
         role="form"
         onSubmit={this.signinUser}
       >
-        <div className="form-group">
-          <label htmlFor="email" className="col-sm-2 control-label">Email</label>
-          <div className="col-sm-10">
-            <input
-              id="email"
-              className="form-control"
-              placeholder="Email"
-              value={this.state.email}
-              onChange={ev => this.setState({ email: ev.target.value })}
-            />
-          </div>
-        </div>
-        <div className="form-group">
-          <label htmlFor="password" className="col-sm-2 control-label">Password</label>
-          <div className="col-sm-10">
-            <input
-              id="password"
-              placeholder="Password"
-              className="form-control"
-              type="password"
-              value={this.state.password}
-              onChange={ev => this.setState({ password: ev.target.value })}
-            />
-          </div>
-        </div>
-        <div className="errors">
+        <FormControl className={classes.formControl}>
+          <InputLabel htmlFor="email">Email</InputLabel>
+          <Input
+            id="email"
+            value={this.state.email}
+            onChange={ev => this.setState({ email: ev.target.value })}
+          />
+        </FormControl>
+        <FormControl className={classes.formControl}>
+          <InputLabel htmlFor="password">Password</InputLabel>
+          <Input
+            id="password"
+            type="password"
+            value={this.state.password}
+            onChange={ev => this.setState({ password: ev.target.value })}
+          />
+        </FormControl>
+        <div>
           {this.state.errors.map(err =>
-            <div className="col-sm-offset-2 col-sm-10 alert alert-danger" role="alert" key={err}>
+            <Typography color='accent' key={err}>
               {err}
-            </div>
+            </Typography>
           )}
         </div>
-        <button className="btn btn-primary col-sm-12">Submit</button>
+        <Button type="submit" raised color="primary" className={classes.button}>
+          Submit
+        </Button>
       </form>
     );
   }
 }
 
-export default graphql(query)(
-  graphql(mutation)(Signin)
+export default withRouter(withStyles(styles)(graphql(query)(
+  graphql(mutation)(Signin)))
 );
