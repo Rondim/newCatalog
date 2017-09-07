@@ -1,12 +1,14 @@
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';
 
-import Catalog from './components/Catalog';
+import Catalog from './containers/Catalog';
 import Signin from './containers/Auth/signin';
 import requireAuth from './containers/Auth/require_auth';
+import NavBar from './components/NavBar';
 
 const App = () => (
     <div className="App">
+      <NavBar />
       <Switch>
         <Route exact path="/" component={requireAuth(Catalog)} />
         <Route path="/signin" component={Signin} />

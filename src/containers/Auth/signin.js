@@ -69,7 +69,6 @@ class Signin extends Component {
     return (
       <form
         className={classes.container}
-        role="form"
         onSubmit={this.signinUser}
       >
         <FormControl className={classes.formControl}>

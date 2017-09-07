@@ -17,13 +17,13 @@ const Sidebar = (props) => {
       })}
     </div>
   );
-}
+};
 
 Sidebar.propTypes = {
   sidebarItems: PropTypes.array.isRequired,
   handleFilterClick: PropTypes.func.isRequired,
   // from styles
-  classes: PropTypes.object
+  classes: PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(Sidebar);

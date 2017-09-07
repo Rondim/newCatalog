@@ -2,36 +2,44 @@
  * Created by xax on 24.02.2017.
  */
 import React, { Component } from 'react';
-import { NavItem } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
 import { graphql } from 'react-apollo';
-import query from './queries/CurentUser';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { hashHistory, withRouter } from 'react-router';
+import {
+  withRouter
+} from 'react-router-dom';
+import { Button } from 'material-ui';
+
+import query from './queries/CurentUser';
+import { signoutUser } from './actions';
 
 class AuthNav extends Component {
   static propTypes = {
-    data: PropTypes.object.isRequired
+    data: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
+    signoutUser: PropTypes.func.isRequired
   };
 
   logout = () => {
-    localStorage.clear();
-    hashHistory.push('/signin');
-    location.reload();
+    const { history, signoutUser } = this.props;
+    history.push('/signin');
+    signoutUser();
   };
 
   render() {
     const { loading, user } = this.props.data;
     if (loading) return <div />;
     return (user ?
-        <NavItem onClick={() => this.logout()}>
-          Выход
-        </NavItem> :
-        <LinkContainer to="/signin" activeHref="active">
-          <NavItem>Вход</NavItem>
-        </LinkContainer>
+      <Button color="contrast" onClick={() => this.logout()}>
+        Выход
+      </Button>:
+      <Button color="contrast" to="/signin">
+        Вход
+      </Button>
     );
   }
 }
 
-export default graphql(query)(withRouter(AuthNav));
+export default connect(null, { signoutUser })(
+  graphql(query)(withRouter(AuthNav))
+);

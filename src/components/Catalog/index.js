@@ -1,7 +1,7 @@
 import React from 'react';
 import { withStyles } from 'material-ui/styles';
-import Grid from 'material-ui/Grid';
-import Paper from 'material-ui/Paper';
+import { Paper, Grid } from 'material-ui';
+import PropTypes from 'prop-types';
 
 import ProductList from '../ProductList';
 import CatalogSidebar from '../../containers/CatalogSidebar';
@@ -17,7 +17,7 @@ const styles = theme => ({
 });
 
 function Catalog(props) {
-  const classes = props.classes;
+  const { classes } = props;
 
   return (
       <Grid container spacing={8} className={classes.root}>
@@ -35,5 +35,8 @@ function Catalog(props) {
   );
 }
 
+Catalog.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
 
 export default withStyles(styles)(Catalog);
