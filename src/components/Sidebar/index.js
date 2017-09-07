@@ -13,7 +13,7 @@ const Sidebar = (props) => {
       {sidebarItems.map(item => {
         return <SidebarFilter {...item}
           key={item.filterGroupId}
-          handleFilterClick={handleFilterClick}/>;
+          handleFilterClick={handleFilterClick} />;
       })}
     </div>
   );
