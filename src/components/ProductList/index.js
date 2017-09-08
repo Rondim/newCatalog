@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { withStyles } from 'material-ui/styles';
 import { Button, IconButton } from 'material-ui';
-import { GridList, GridListTile } from 'material-ui/GridList';
+import Grid from 'material-ui/Grid';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { KeyboardArrowLeft, KeyboardArrowRight } from 'material-ui-icons';
@@ -69,12 +69,6 @@ class ProductList extends Component {
     });
   };
 
-  /**
-   * Renders the component List.
-   *
-   * @memberof app.components.ProductList.render
-   * @return {string} - HTML markup for the component List
-   */
   renderPages() {
     const { count } = this.props;
     const max = count/8;
@@ -105,15 +99,19 @@ class ProductList extends Component {
         const { active, complited, img: { url }, id } = item;
         i++;
         if (i <= page * 8 && i > (page - 1) * 8) {
-          return (<ProductListItem
-            id={id}
-            active={active}
-            complited={complited}
-            key={id}
-            img={url}
-            handleSelect={this.onSelect}
-            disabled={!setActive}
-          />);
+          return (
+            <Grid item xs={3} key={id}>
+              <ProductListItem
+                id={id}
+                active={active}
+                complited={complited}
+                key={id}
+                img={url}
+                handleSelect={this.onSelect}
+                disabled={!setActive}
+              />
+            </Grid>
+        );
         }
       } else i++;
     });
@@ -128,20 +126,15 @@ class ProductList extends Component {
         tabIndex="1"
         onKeyDown={this.handleKeyDown}
       >
-        <GridList cellHeight={40} className={classes.gridList} cols={4}>
-          <GridListTile key="Subheader" cols={4} style={{ height: 'auto' }}>
-            <IconButton onClick={() => this.handleChangePage(false)}>
-              <KeyboardArrowLeft />
-            </IconButton>
-            <IconButton onClick={() => this.handleChangePage(true)}>
-              <KeyboardArrowRight />
-            </IconButton>
-          </GridListTile>
+        <IconButton onClick={() => this.handleChangePage(false)}>
+          <KeyboardArrowLeft />
+        </IconButton>
+        <IconButton onClick={() => this.handleChangePage(true)}>
+          <KeyboardArrowRight />
+        </IconButton>
+        <Grid container spacing={8}>
           {this.renderList()}
-          <GridListTile key="footer" cols={4} style={{ height: 'auto' }}>
-            {this.renderPages()}
-          </GridListTile>
-        </GridList>
+        </Grid>
       </div>
     );
   }
