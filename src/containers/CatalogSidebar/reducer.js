@@ -8,7 +8,6 @@ function catalogSidebarReducer(state = {}, action) {
       return getInitialState(sidebarConfigData);
     case FILTER_CLICKED:
       const newFiltersSelected = calcNewFiltersSelected(state, action.payload);
-      console.log(state);
       return { ...state, filtersSelected: newFiltersSelected };
     default:
       return state;
