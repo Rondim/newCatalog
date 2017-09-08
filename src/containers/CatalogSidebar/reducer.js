@@ -19,7 +19,7 @@ export default catalogSidebarReducer;
 function calcNewFiltersSelected(state, filterClicked) {
   const { filtersSelected } = state;
   const { filterGroupId, filterId } = filterClicked;
-  const newFiltersSelected = {...filtersSelected};
+  const newFiltersSelected = { ...filtersSelected };
   const haveChilds = !!state.dependencies[filterGroupId]['childs'];
   // Почистить детей
   if (haveChilds) {

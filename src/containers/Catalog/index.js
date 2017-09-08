@@ -58,25 +58,52 @@ export default connect(mapStateToProps)(
   graphql(FetchItems, {
   options({ filtersSelected }) {
     let manufacturer;
+    let itemType;
+    let itemSubtype;
+    let size;
     if (filtersSelected) {
       _.map(filtersSelected.Manufacturer, (value, key) => {
         manufacturer = value === 'selected' ? key : undefined;
+      });
+      _.map(filtersSelected.ItemType, (value, key) => {
+        itemType = value === 'selected' ? key : undefined;
+      });
+      _.map(filtersSelected.ItemSubtype, (value, key) => {
+        itemSubtype = value === 'selected' ? key : undefined;
+      });
+      _.map(filtersSelected.Size, (value, key) => {
+        size = value === 'selected' ? key : undefined;
       });
     }
     return {
       variables: {
         skippedItems: 0,
-        size: 8,
-        manufacturer
+        first: 8,
+        manufacturer,
+        itemType,
+        itemSubtype,
+        size
       },
       fetchPolicy: 'network-only',
     };
   },
   props({ data: { loading, allItems, fetchMore, _allItemsMeta }, ownProps: { filtersSelected } }) {
     let manufacturer;
+    let itemType;
+    let itemSubtype;
+    let size;
     if (filtersSelected) {
       _.map(filtersSelected.Manufacturer, (value, key) => {
         manufacturer = value === 'selected' ? key : undefined;
+      });
+      _.map(filtersSelected.ItemType, (value, key) => {
+        itemType = value === 'selected' ? key : undefined;
+      });
+      _.map(filtersSelected.ItemSubtype, (value, key) => {
+        itemSubtype = value === 'selected' ? key : undefined;
+      });
+      _.map(filtersSelected.Size, (value, key) => {
+        size = value === 'selected' ? key : undefined;
       });
     }
     return {
@@ -87,8 +114,11 @@ export default connect(mapStateToProps)(
         return fetchMore({
           variables: {
             skippedItems: (page-1)*8,
-            size: 8,
-            manufacturer
+            first: 8,
+            manufacturer,
+            itemType,
+            itemSubtype,
+            size
           },
           updateQuery: (previousResult, { fetchMoreResult }) => {
             if (!fetchMoreResult) {

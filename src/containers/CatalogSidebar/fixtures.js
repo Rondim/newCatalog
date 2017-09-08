@@ -5,73 +5,78 @@ export const sidebarConfigData = {
       type: 'filter',
       name: 'Производитель',
       multiselection: true,
-      filtersOrder: ['Sokolov', 'Delta']
+      filtersOrder: ['cj60vqm5zz3ub01780cy0aqgb', 'cj60vqu35z2up0145ub0ech5c']
     },
     'ItemType': {
       type: 'filter',
       name: 'Тип Изделия',
       multiselection: true,
-      filtersOrder: ['earrings', 'rings']
+      filtersOrder: ['cj5z4vhdragdw0176xte2m4xn', 'cj5z4vv8damg90163151q9526']
     },
     'ItemSubtype': {
       type: 'filter',
       name: 'Подтип изделия',
       multiselection: true,
-      filtersOrder: ['women', 'children', 'wedding', 'engagement']
+      filtersOrder: [
+        'cj60wxhrdj72p0103g7nmum3t',
+        'cj7cbcjgm1r9h0184xfv69f1h',
+        'cj7cbd0ui1r9t01849xaglep9',
+        'cj60wy6fzh5h20101xwfn6ha7'
+      ]
     },
     'Size': {
       type: 'filter',
       name: 'Размер',
       multiselection: true,
-      filtersOrder: ['s16', 's16_5']
+      filtersOrder: ['cj7cbgs7q1rd00184i71p8gsf', 'cj7cbgyxc1pz00115dsfmxaam']
     }
   },
   filters: {
-    Sokolov: {
+    cj60vqm5zz3ub01780cy0aqgb: {
       property: 'Manufacturer',
       name: 'Sokolov'
     },
-    Delta: {
+    cj60vqu35z2up0145ub0ech5c: {
       property: 'Manufacturer',
       name: 'Delta'
     },
-    earrings: {
+    cj5z4vhdragdw0176xte2m4xn: {
       property: 'ItemType',
       name: 'Серьги'
     },
-    rings: {
+    cj5z4vv8damg90163151q9526: {
       property: 'ItemType',
       name: 'Кольца'
     },
-    women: {
+    cj60wxhrdj72p0103g7nmum3t: {
       property: 'ItemSubtype',
       name: 'Женские',
-      dependentOn: { earrings: true }
+      dependentOn: { cj5z4vhdragdw0176xte2m4xn: true }
     },
-    children: {
+    cj7cbcjgm1r9h0184xfv69f1h: {
       property: 'ItemSubtype',
       name: 'Детские',
-      dependentOn: { earrings: true }
+      dependentOn: { cj5z4vhdragdw0176xte2m4xn: true }
     },
-    wedding: {
+    cj7cbd0ui1r9t01849xaglep9: {
       property: 'ItemSubtype',
       name: 'Обручальные',
-      dependentOn: { rings: true }
+      dependentOn: { cj5z4vv8damg90163151q9526: true }
     },
-    engagement: {
+    cj60wy6fzh5h20101xwfn6ha7: {
       property: 'ItemSubtype',
       name: 'Помолвочные',
-      dependentOn: { rings: true }
+      dependentOn: { cj5z4vv8damg90163151q9526: true }
     },
-    s16: {
+    cj7cbgs7q1rd00184i71p8gsf: {
       property: 'Size',
       name: '16',
-      dependentOn: { rings: true }
+      dependentOn: { cj5z4vv8damg90163151q9526: true }
     },
-    s16_5: {
+    cj7cbgyxc1pz00115dsfmxaam: {
       property: 'Size',
       name: '16.5',
-      dependentOn: { rings: true }
+      dependentOn: { cj5z4vv8damg90163151q9526: true }
     }
   },
   dependencies: {
