@@ -3,6 +3,8 @@ import { graphql } from 'react-apollo';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import { Paper, Grid } from 'material-ui';
+import { connect } from 'react-redux';
+import _ from 'lodash';
 
 import ProductList from '../../components/ProductList';
 import FetchItems from './queries/FetchItems';
@@ -46,17 +48,37 @@ Catalog.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default graphql(FetchItems, {
-  options(props) {
+const mapStateToProps = (state) => {
+  return {
+    filtersSelected: state.catalogSidebar.filtersSelected
+  };
+};
+
+export default connect(mapStateToProps)(
+  graphql(FetchItems, {
+  options({ filtersSelected }) {
+    let manufacturer;
+    if (filtersSelected) {
+      _.map(filtersSelected.Manufacturer, (value, key) => {
+        manufacturer = value === 'selected' ? key : undefined;
+      });
+    }
     return {
       variables: {
         skippedItems: 0,
         size: 8,
+        manufacturer
       },
       fetchPolicy: 'network-only',
     };
   },
-  props({ data: { loading, allItems, fetchMore, _allItemsMeta } }) {
+  props({ data: { loading, allItems, fetchMore, _allItemsMeta }, ownProps: { filtersSelected } }) {
+    let manufacturer;
+    if (filtersSelected) {
+      _.map(filtersSelected.Manufacturer, (value, key) => {
+        manufacturer = value === 'selected' ? key : undefined;
+      });
+    }
     return {
       loading,
       allItems,
@@ -65,7 +87,8 @@ export default graphql(FetchItems, {
         return fetchMore({
           variables: {
             skippedItems: (page-1)*8,
-            size: 8
+            size: 8,
+            manufacturer
           },
           updateQuery: (previousResult, { fetchMoreResult }) => {
             if (!fetchMoreResult) {
@@ -91,4 +114,4 @@ export default graphql(FetchItems, {
   },
 })(
   withStyles(styles)(Catalog)
-);
+));

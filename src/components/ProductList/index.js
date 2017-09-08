@@ -135,6 +135,7 @@ class ProductList extends Component {
         <Grid container spacing={8}>
           {this.renderList()}
         </Grid>
+        {this.renderPages()}
       </div>
     );
   }

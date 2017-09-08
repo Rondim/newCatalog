@@ -5,7 +5,7 @@ export const sidebarConfigData = {
       type: 'filter',
       name: 'Производитель',
       multiselection: true,
-      filtersOrder: ['sokolov', 'delta']
+      filtersOrder: ['Sokolov', 'Delta']
     },
     'ItemType': {
       type: 'filter',
@@ -27,11 +27,11 @@ export const sidebarConfigData = {
     }
   },
   filters: {
-    sokolov: {
+    Sokolov: {
       property: 'Manufacturer',
       name: 'Sokolov'
     },
-    delta: {
+    Delta: {
       property: 'Manufacturer',
       name: 'Delta'
     },
