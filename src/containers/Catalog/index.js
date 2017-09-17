@@ -21,8 +21,9 @@ const styles = theme => ({
   }
 });
 
-const Catalog = ({ loading, allItems, loadMoreItems, _allItemsMeta, classes }) => (
+const Catalog = ({ loading, allItems, loadMoreItems, _allItemsMeta, classes, sidebarConfigData }) => (
   <Grid container spacing={8} className={classes.root}>
+    {console.log(loading, sidebarConfigData)}
     <Grid item xs={9}>
       <Paper className={classes.paper}>
         <ProductList
@@ -34,7 +35,7 @@ const Catalog = ({ loading, allItems, loadMoreItems, _allItemsMeta, classes }) =
     </Grid>
     <Grid item xs={3}>
       <Paper className={classes.paper}>
-        <CatalogSidebar />
+        {!loading && <CatalogSidebar config={sidebarConfigData} />}
       </Paper>
     </Grid>
   </Grid>
@@ -45,6 +46,7 @@ Catalog.propTypes = {
   allItems: PropTypes.array,
   loadMoreItems: PropTypes.func,
   _allItemsMeta: PropTypes.object,
+  sidebarConfigData: PropTypes.object,
   classes: PropTypes.object.isRequired
 };
 
@@ -87,7 +89,7 @@ export default connect(mapStateToProps)(
       fetchPolicy: 'network-only',
     };
   },
-  props({ data: { loading, allItems, fetchMore, _allItemsMeta }, ownProps: { filtersSelected } }) {
+  props({ data: { loading, allItems, fetchMore, _allItemsMeta, allSidebarItemses }, ownProps: { filtersSelected } }) {
     let manufacturer;
     let itemType;
     let itemSubtype;
@@ -106,10 +108,12 @@ export default connect(mapStateToProps)(
         size = value === 'selected' ? key : undefined;
       });
     }
+    console.log(allSidebarItemses);
     return {
       loading,
       allItems,
       _allItemsMeta,
+      sidebarConfigData: dataToConfig(allSidebarItemses),
       loadMoreItems(page) {
         return fetchMore({
           variables: {
@@ -145,3 +149,47 @@ export default connect(mapStateToProps)(
 })(
   withStyles(styles)(Catalog)
 ));
+
+const dataToConfig = data => {
+  if (data) {
+    let config = {
+      order: [],
+      sidebarItems: {},
+      filters: {},
+      dependencies: {},
+      filtersSelected: {}
+    };
+    data.forEach(item => {
+      config.order[item.order] = item.id;
+      let filtersOrder = [];
+      config.dependencies[item.id] = {
+        childs: arrayToObject(item.childs),
+        parents: arrayToObject(item.parents)
+      };
+      config.filtersSelected[item.id] = {};
+      item.sidebarFilterses.forEach(filter => {
+        config.filters[filter.id] = {
+          property: filter.property.id,
+          name: filter.name,
+          dependentOn: arrayToObject(filter.dependentOn)
+        };
+        filtersOrder[filter.order] = filter.id;
+      });
+      config.sidebarItems[item.id] = {
+        type: item.type,
+        name: item.name,
+        multiselection: item.multiselection,
+        filtersOrder
+      };
+    });
+    return config;
+  }
+};
+
+const arrayToObject = (prop) => {
+  let result = {};
+  prop.forEach(depend => {
+    result[depend.id] = true;
+  });
+  return Object.keys(result).length ? result : false;
+};

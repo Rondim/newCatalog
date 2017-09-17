@@ -5,7 +5,8 @@ import { FILTER_CLICKED, INIT_SIDEBAR } from './constants';
 function catalogSidebarReducer(state = {}, action) {
   switch (action.type) {
     case INIT_SIDEBAR:
-      return getInitialState(sidebarConfigData);
+      console.log(action.payload);
+      return getInitialState(action.payload);
     case FILTER_CLICKED:
       const newFiltersSelected = calcNewFiltersSelected(state, action.payload);
       return { ...state, filtersSelected: newFiltersSelected };
@@ -42,6 +43,5 @@ function getInitialState(sidebarConfigData) {
   sidebarConfigData.order.forEach(propId => {
     filtersSelected[propId] = {};
   });
-  const initialState = { ...sidebarConfigData, filtersSelected };
-  return initialState;
+  return { ...sidebarConfigData, filtersSelected };
 }

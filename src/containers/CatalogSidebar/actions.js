@@ -7,8 +7,9 @@ export function filterClick(filterClicked) {
   };
 }
 
-export function initSidebar() {
+export function initSidebar(config) {
   return {
-    type: INIT_SIDEBAR
+    type: INIT_SIDEBAR,
+    payload: config
   };
 }

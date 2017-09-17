@@ -10,11 +10,12 @@ class CatalogSidebar extends Component {
   static propTypes = {
     initSidebar: PropTypes.func,
     filterClick: PropTypes.func,
-    sidebarItems: PropTypes.array
+    sidebarItems: PropTypes.array,
+    config: PropTypes.object
   };
 
   componentDidMount() {
-    this.props.initSidebar();
+    this.props.initSidebar(this.props.config);
   }
 
   handleFilterClick = (filterGroupId, filterId) => {

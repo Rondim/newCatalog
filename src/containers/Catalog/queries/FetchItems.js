@@ -26,5 +26,29 @@ export default gql`
         url
       }
     }
+    allSidebarItemses {
+      id
+      name
+      order
+      type
+      multiselection
+      childs{
+        id
+      }
+      parents{
+        id
+      }
+      sidebarFilterses{
+        id
+        name
+        order
+        property{
+          id
+        }
+        dependentOn{
+          id
+        }
+      }
+    }
   }
 `;
