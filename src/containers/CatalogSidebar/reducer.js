@@ -5,7 +5,6 @@ import { FILTER_CLICKED, INIT_SIDEBAR } from './constants';
 function catalogSidebarReducer(state = {}, action) {
   switch (action.type) {
     case INIT_SIDEBAR:
-      console.log(action.payload);
       return getInitialState(action.payload);
     case FILTER_CLICKED:
       const newFiltersSelected = calcNewFiltersSelected(state, action.payload);

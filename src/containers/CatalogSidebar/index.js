@@ -15,6 +15,7 @@ class CatalogSidebar extends Component {
   };
 
   componentDidMount() {
+    console.log(this.props.config);
     this.props.initSidebar(this.props.config);
   }
 
