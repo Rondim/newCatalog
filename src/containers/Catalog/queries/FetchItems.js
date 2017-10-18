@@ -64,6 +64,7 @@ export const FetchItemsOptions = {
         };
       });
     }
+    filter.AND.push({ valid: true });
     return {
       variables: {
         skippedItems: 0,
@@ -90,6 +91,7 @@ export const FetchItemsOptions = {
         };
       });
     }
+    filter.AND.push({ valid: true });
     return {
       loading,
       allItems,

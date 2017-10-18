@@ -96,7 +96,7 @@ class ProductList extends Component {
     if (items.length === 0) return <Loading />;
     return _.map(items, item => {
       if (item) {
-        const { active, complited, img: { url }, id } = item;
+        const { active, complited, img, id } = item;
         i++;
         if (i <= page * 8 && i > (page - 1) * 8) {
           return (
@@ -106,7 +106,7 @@ class ProductList extends Component {
                 active={active}
                 complited={complited}
                 key={id}
-                img={url}
+                img={img.url || 'https://hyperallergic.com/wp-content/uploads/2015/11/Allais_blacksquare-HOME.jpg'}
                 handleSelect={this.onSelect}
                 disabled={!setActive}
               />
