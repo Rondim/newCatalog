@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { HashRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
 import { ApolloProvider } from 'react-apollo';
 import registerServiceWorker from './registerServiceWorker'; // Пока не знаю зачем
 import injectTapEventPlugin from 'react-tap-event-plugin'; // Для тача MaterilUI

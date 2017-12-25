@@ -27,7 +27,7 @@ const styles = theme => ({
 
 class ProductList extends Component {
   static propTypes = {
-    items: PropTypes.array.isRequired,
+    instances: PropTypes.array.isRequired,
     setActive: PropTypes.func,
     fetchMore: PropTypes.func,
     count: PropTypes.number,
@@ -52,7 +52,7 @@ class ProductList extends Component {
   };
 
   handleChangePage = (forward, page) => {
-    const { count, fetchMore, items } = this.props;
+    const { count, fetchMore, instances } = this.props;
     this.setState(prevState => {
       if (page) {
         fetchMore(page);
@@ -60,9 +60,9 @@ class ProductList extends Component {
       }
       if (forward) {
         fetchMore(prevState.page + 1);
-        if (prevState.page < count/8) return { page: prevState.page + 1 };
+        if (prevState.page < count/24) return { page: prevState.page + 1 };
       } else if (prevState.page > 1) {
-        !items[(prevState.page-2)*8] && fetchMore(prevState.page - 1);
+        !instances[(prevState.page-2)*24] && fetchMore(prevState.page - 1);
         return { page: prevState.page - 1 };
       }
       return { page: prevState.page };
@@ -71,7 +71,7 @@ class ProductList extends Component {
 
   renderPages() {
     const { count } = this.props;
-    const max = count/8;
+    const max = count/24;
     let pages = [];
     for (let i = 0; i < max; i++) {
       pages.push(i + 1);
@@ -90,23 +90,23 @@ class ProductList extends Component {
   }
 
   renderList() {
-    const { items, setActive } = this.props;
+    const { instances, setActive } = this.props;
     const { page } = this.state;
     let i = 0;
-    if (items.length === 0) return <Loading />;
-    return _.map(items, item => {
-      if (item) {
-        const { active, complited, img, id } = item;
+    if (instances.length === 0) return <Loading />;
+    return _.map(instances, instance => {
+      if (instance) {
+        const { active, complited, item, id } = instance;
         i++;
-        if (i <= page * 8 && i > (page - 1) * 8) {
+        if (i <= page * 24 && i > (page - 1) * 24) {
           return (
-            <Grid item xs={3} key={id}>
+            <Grid item xs={2} key={id}>
               <ProductListItem
                 id={id}
                 active={active}
                 complited={complited}
                 key={id}
-                img={img.url || 'https://hyperallergic.com/wp-content/uploads/2015/11/Allais_blacksquare-HOME.jpg'}
+                img={item.img.url || 'https://hyperallergic.com/wp-content/uploads/2015/11/Allais_blacksquare-HOME.jpg'}
                 handleSelect={this.onSelect}
                 disabled={!setActive}
               />
@@ -132,7 +132,7 @@ class ProductList extends Component {
         <IconButton onClick={() => this.handleChangePage(true)}>
           <KeyboardArrowRight />
         </IconButton>
-        <Grid container spacing={8}>
+        <Grid container spacing={24}>
           {this.renderList()}
         </Grid>
         {this.renderPages()}

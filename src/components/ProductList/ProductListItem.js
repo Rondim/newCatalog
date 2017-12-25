@@ -6,9 +6,9 @@ const ProductListItem = ({ active, complited, handleSelect, img, id, disabled })
   let complitedClass = complited ? 'complited' : '';
   activeClass = !disabled && !active && !complited ? 'bad' : activeClass;
   return (
-    <div cols={1} className={`product_item ${complitedClass} ${activeClass}`}>
+    <div className={`product_item ${complitedClass} ${activeClass}`}>
       <a href="#" onClick={handleSelect}>
-        <img src={img} id={id} width={190} height={190} />
+        <img src={img} id={id} width='100%' height='100%' />
       </a>
     </div>
   );

@@ -5,32 +5,24 @@ import { withStyles } from 'material-ui/styles';
 import { Paper, Grid } from 'material-ui';
 import { connect } from 'react-redux';
 
-import ProductList from '../../components/ProductList';
-import { FetchItems, FetchItemsOptions } from './queries/FetchItems';
+import { fetchConfig, fetchConfigOptions } from './queries/fetchConfig';
 import CatalogSidebar from '../CatalogSidebar';
+import CatalogProductList from '../CatalogProductList';
 
 
 const styles = theme => ({
   root: {
     margin: [0, 'auto'],
-    width: 1024,
+    width: '80%',
   },
   paper: {
     textAlign: 'center'
   }
 });
 
-const Catalog = ({ loading, allItems, loadMoreItems, _allItemsMeta, classes, sidebarConfigData }) => (
+const Catalog = ({ loading, classes, sidebarConfigData, filtersSelected }) => (
   <Grid container spacing={8} className={classes.root}>
-    <Grid item xs={9}>
-      <Paper className={classes.paper}>
-        <ProductList
-          count={(_allItemsMeta && _allItemsMeta.count) || 0}
-          items={loading ? [] : allItems }
-          fetchMore={loadMoreItems}
-        />
-      </Paper>
-    </Grid>
+    <CatalogProductList mapTypes={sidebarConfigData && sidebarConfigData.mapTypes} filtersSelected={filtersSelected} />
     <Grid item xs={3}>
       <Paper className={classes.paper}>
         {sidebarConfigData && <CatalogSidebar config={sidebarConfigData} />}
@@ -41,9 +33,7 @@ const Catalog = ({ loading, allItems, loadMoreItems, _allItemsMeta, classes, sid
 
 Catalog.propTypes = {
   loading: PropTypes.bool,
-  allItems: PropTypes.array,
-  loadMoreItems: PropTypes.func,
-  _allItemsMeta: PropTypes.object,
+  filtersSelected: PropTypes.object,
   sidebarConfigData: PropTypes.object,
   classes: PropTypes.object.isRequired
 };
@@ -55,6 +45,6 @@ const mapStateToProps = (state) => {
 };
 
 export default connect(mapStateToProps)(
-  graphql(FetchItems, FetchItemsOptions)(
+  graphql(fetchConfig, fetchConfigOptions)(
   withStyles(styles)(Catalog)
 ));

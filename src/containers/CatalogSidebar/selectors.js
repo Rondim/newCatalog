@@ -42,7 +42,7 @@ export const sidebarItemsSelector = (state) => {
         return Object.keys(filters[filterId]['dependentOn']).some(parentId => {
           return filtersSelected[parentProp][parentId];
         });
-      })
+      });
       return isParentSelected;
     });
     return filteredFilterIds.map(filterId => {
@@ -50,7 +50,7 @@ export const sidebarItemsSelector = (state) => {
         filterId,
         filterName: filters[filterId]['name'],
         selection: filtersSelected[propId][filterId] || 'notSelected'
-      }
+      };
     });
   }
 };
