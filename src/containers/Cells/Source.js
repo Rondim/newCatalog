@@ -3,17 +3,6 @@ import PropTypes from 'prop-types';
 import { DragSource } from 'react-dnd';
 import _ from 'lodash';
 
-const boxSource = {
-  beginDrag(props) {
-    return {
-      source: props
-    };
-  },
-};
-
-@DragSource('instance', boxSource, connect => ({
-  connectDragSource: connect.dragSource(),
-}))
 class Source extends Component {
   static propTypes = {
     connectDragSource: PropTypes.func,
@@ -24,12 +13,13 @@ class Source extends Component {
     size: PropTypes.string,
     department: PropTypes.string,
     quantity: PropTypes.number,
-    onSelect: PropTypes.func
+    onSelect: PropTypes.func,
+    startDrag: PropTypes.func
   };
   static defaultProps = {};
 
   render() {
-    const { connectDragSource, style, url, size, department, quantity } = this.props;
+    const { style, url, size, department, quantity, startDrag, row, column, id } = this.props;
     const resStyle = {
       width: parseInt(style.width)-3,
       height: parseInt(style.height)-3,
@@ -37,8 +27,10 @@ class Source extends Component {
     if (url) {
       resStyle.backgroundImage = `url(${url})`;
       resStyle.backgroundSize = style.width;
-      return connectDragSource(
+      return (
         <div
+          onDragStart={() => startDrag(id)}
+          draggable
           style={resStyle}
         >
           <div style={{ backgroundColor: 'black', color: 'white', left: 2, position: 'absolute' }}>{size}</div>

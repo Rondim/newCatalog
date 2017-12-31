@@ -1,25 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { DropTarget } from 'react-dnd';
 
 import Instance from './Source';
-import detectDragModifierKeys from './detectDragModififerKeys';
 
-const boxTarget = {
-  drop(props, monitor) {
-    const hasDroppedOnChild = monitor.didDrop();
-    if (hasDroppedOnChild) {
-      return;
-    }
-    props.onDrop(monitor.getItem(), props);
-  },
-};
-
-@DropTarget(['instance'], boxTarget, (connect, monitor) => ({
-  connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver(),
-  isOverCurrent: monitor.isOver({ shallow: true }),
-}))
 class Cell extends Component {
   static propTypes = {
     isOverCurrent: PropTypes.bool,
@@ -29,7 +12,8 @@ class Cell extends Component {
     onSelect: PropTypes.func,
     row: PropTypes.number,
     column: PropTypes.number,
-    active: PropTypes.bool
+    active: PropTypes.bool,
+    url: PropTypes.string
   };
   static defaultProps = {};
 
@@ -38,18 +22,25 @@ class Cell extends Component {
     onSelect(ev, row, column);
   };
 
+  iAmHere = ev => {
+    const { row, column, onDrop } = this.props;
+    onDrop(row, column);
+  };
+
+  preventDefault = (ev) => {
+    ev.preventDefault();
+  };
+
   render() {
     const {
-      isOverCurrent,
-      connectDropTarget,
-      style
+      style,
+      url
     } = this.props;
     let resStyle = { ...style };
-    resStyle.backgroundColor = isOverCurrent && 'grey';
     resStyle.borderStyle = 'solid';
-    return connectDropTarget(
-      <div style={resStyle} onClick={this.handleSelect} >
-        <Instance {...this.props} />
+    return (
+      <div style={resStyle} onClick={this.handleSelect} onDrop={this.iAmHere} onDragOver={this.preventDefault}>
+        {url && <Instance {...this.props} />}
       </div>
     );
   }

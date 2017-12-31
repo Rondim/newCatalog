@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import { Grid, AutoSizer } from 'react-virtualized';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { graphql, compose } from 'react-apollo';
@@ -20,6 +19,7 @@ import updateCells from './subscriptions/updateCells';
 import Loading from '../../components/Loading';
 import Toolbar from './Toolbar';
 import { notification } from '../Notificator/actions';
+import Sheet from './Sheet';
 
 const sheet = 'cjbnm5axu1kdt01475y4ak9lz';
 
@@ -75,7 +75,6 @@ const sheet = 'cjbnm5axu1kdt01475y4ak9lz';
   graphql(removeCell, { name: 'removeCell' }),
   graphql(removeZone, { name: 'removeZone' }),
 )
-@DragDropContext(HTML5Backend)
 class Cells extends Component {
   static propTypes = {
     setPosition: PropTypes.func,
@@ -97,21 +96,24 @@ class Cells extends Component {
     counter: false,
     selectedCells: [],
     selectedGroupCells: null,
-    selectedZone: null
+    selectedZone: null,
+    i: undefined,
+    j: undefined
   };
 
   componentWillMount() {
     this.props.subscribeToCells();
   }
 
-  onDrop = async ({ source: { id } }, { row, column }) => {
-    this.props.setPosition({ variables: { id, row, column }, optimisticResponse: {
+  onDrop = async (i, j) => {
+    const { dragItem: id } = this.state;
+    this.props.setPosition({ variables: { id, row: i, column: j }, optimisticResponse: {
         __typename: 'Mutation',
         updateCell: {
           __typename: 'cells',
           id,
-          i: row,
-          j: column
+          i,
+          j
         }
       } }).then(() => this.setState(prevState => ({ counter: !prevState.counter })));
     this.setState(prevState => ({ counter: !prevState.counter }));
@@ -309,10 +311,11 @@ class Cells extends Component {
         style={style}
         row={rowIndex}
         column={columnIndex}
-        onDrop={this.onDrop}
         id={data ? data.id : null}
         onSelect={this.handleSelectCell}
         onKeyDown={this.handleKeyDown}
+        startDrag={(id) => this.setState({ dragItem: id })}
+        onDrop={this.onDrop}
       />
     );
   };
@@ -324,26 +327,12 @@ class Cells extends Component {
     return (
       <Row style={{ flex: '1', height: '100%' }}>
         <Col>
-          <div tabIndex="0" onKeyDown={this.handleKeyDown} style={{ flex: '1', height: '100%' }}>
-            <AutoSizer defaultHeight={600}>
-              {({ height, width }) => (
-              <Grid
-                cellRenderer={this.cellRenderer}
-                columnCount={200}
-                columnWidth={100}
-                height={height}
-                rowCount={300}
-                rowHeight={100}
-                width={width}
-                counter={counter}
-                count={_allCellsMeta.count}
-                overscanColumnCount={50}
-                overscanRowCount={50}
-                scrollingResetTimeInterval={10}
-              />
-                )}
-            </AutoSizer>
-          </div>
+          <Sheet
+            counter={counter}
+            count={_allCellsMeta.count}
+            cellRenderer={this.cellRenderer}
+            onKeyDown={this.handleKeyDown}
+          />
         </Col>
         <Col xs='auto'>
           <Toolbar onLoad={this.handleLoad} />
