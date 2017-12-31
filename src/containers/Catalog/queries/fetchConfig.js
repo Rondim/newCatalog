@@ -34,8 +34,10 @@ export const fetchConfig = gql`
 export const fetchConfigOptions = {
   props({ data: { loading, allSidebarItems } }) {
     return {
-      loading,
-      sidebarConfigData: dataToConfig(allSidebarItems),
+      data: {
+        loading,
+        sidebarConfigData: dataToConfig(allSidebarItems),
+      }
     };
   },
 };

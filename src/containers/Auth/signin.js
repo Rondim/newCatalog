@@ -46,11 +46,12 @@ class Signin extends Component {
     }
   }
 
-  signinUser = async () => {
+  signinUser = async (ev) => {
+    ev.preventDefault();
     const { email, password } = this.state;
     try {
       const response = await this.props.mutate({
-        variables: { email, password }
+        variables: { auth: { email, password } }
       });
       this.setState({ errors: [] });
       localStorage.setItem('token', response.data.signinUser.token);

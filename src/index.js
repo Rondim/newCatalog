@@ -2,12 +2,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ApolloProvider } from 'react-apollo';
+import { Provider } from 'react-redux';
+
 import registerServiceWorker from './registerServiceWorker'; // Пока не знаю зачем
 import injectTapEventPlugin from 'react-tap-event-plugin'; // Для тача MaterilUI
 import { client, store } from './store';
 import { AUTH_USER } from './containers/Auth/actions/types';
 
 import App from './App';
+import 'bootstrap/dist/css/bootstrap.css';
+import './index.css';
 
 injectTapEventPlugin(); // Чтобы не было задержки при клике в мобилках
 
@@ -19,10 +23,12 @@ if (token) {
 }
 
 ReactDOM.render(
-  <ApolloProvider store={store} client={client}>
-    <Router>
-      <App />
-    </Router>
+  <ApolloProvider client={client}>
+    <Provider store={store}>
+      <Router>
+        <App />
+      </Router>
+    </Provider>
   </ApolloProvider>
 , document.getElementById('root'));
 

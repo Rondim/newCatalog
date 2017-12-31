@@ -1,37 +1,57 @@
-import { ApolloClient, createNetworkInterface } from 'react-apollo';
 import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
+import { HttpLink } from 'apollo-link-http';
+import { ApolloClient } from 'apollo-client';
+import { InMemoryCache } from 'apollo-cache-inmemory';
+import { onError } from 'apollo-link-error';
+import { setContext } from 'apollo-link-context';
 import ReduxPromise from 'redux-promise';
 import reduxThunk from 'redux-thunk';
+import { split } from 'apollo-link';
+import { WebSocketLink } from 'apollo-link-ws';
+import { getMainDefinition } from 'apollo-utilities';
 import { devToolsEnhancer } from 'redux-devtools-extension';
 import catalogSidebarReducer from './containers/CatalogSidebar/reducer';
+import notifyReducer from './containers/Notificator/reducer';
 import { UNAUTH_USER } from './containers/Auth/actions/types';
+import { sendNotification } from './containers/Notificator/actions';
+import _ from 'lodash';
+import { ROOT_URL, WS_URL } from './constants';
 
+const httpLink = new HttpLink({ uri: ROOT_URL });
 
-const networkInterface = createNetworkInterface({
-  uri: 'https://api.graph.cool/simple/v1/cj5tpc7zsj16i012285uxa6j5'
+const wsLink = new WebSocketLink({
+  uri: WS_URL,
+  options: {
+    reconnect: true,
+    connectionParams: {
+      authorization: `Bearer ${localStorage.getItem('token') || null}`,
+    },
+  }
 });
-networkInterface.use([{
-  applyMiddleware(req, next) {
-    if (!req.options.headers) {
-      req.options.headers = {};
-    }
 
-    // get the authentication token from local storage if it exists
-    if (localStorage.getItem('token')) {
-      req.options.headers.authorization = `Bearer ${localStorage.getItem('token')}`;
-    }
-    next();
+const splittedLink = split(
+  // split based on operation type
+  ({ query }) => {
+    const { kind, operation } = getMainDefinition(query);
+    return kind === 'OperationDefinition' && operation === 'subscription';
   },
-}]);
+  wsLink,
+  httpLink,
+);
 
-export const client = new ApolloClient({
-  dataIdFromObject: o => o.id,
-  networkInterface
+const cache = new InMemoryCache({
+  dataIdFromObject: o => o.id
 });
+
+const middlewareLink = setContext(() => ({
+  headers: {
+    authorization: `Bearer ${localStorage.getItem('token') || null}`,
+  }
+}));
 
 const appReducer = combineReducers({
   catalogSidebar: catalogSidebarReducer,
-  apollo: client.reducer()
+  notify: notifyReducer,
 });
 
 const reducers = (state, action) => {
@@ -41,6 +61,16 @@ const reducers = (state, action) => {
   return appReducer(state, action);
 };
 
+const errorLink = onError(({ networkError, graphQLErrors }) => {
+  if (networkError && networkError.statusCode === 401) {
+    localStorage.removeItem('token');
+  }
+  const error = _.get(graphQLErrors, '[0].message');
+  if (error) {
+    sendNotification(store.dispatch, 'danger', error);
+  }
+});
+
 export const store = createStore(
   reducers,
   {},
@@ -48,8 +78,14 @@ export const store = createStore(
     applyMiddleware(
       ReduxPromise,
       reduxThunk,
-      client.middleware()
     ),
     devToolsEnhancer()
   )
 );
+
+const link = errorLink.concat(middlewareLink.concat(splittedLink));
+
+export const client = new ApolloClient({
+  link,
+  cache
+});

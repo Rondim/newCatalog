@@ -20,7 +20,7 @@ const styles = theme => ({
   }
 });
 
-const Catalog = ({ loading, classes, sidebarConfigData, filtersSelected }) => (
+const Catalog = ({ classes, data: { sidebarConfigData, loading }, filtersSelected }) => (
   <Grid container spacing={8} className={classes.root}>
     <CatalogProductList mapTypes={sidebarConfigData && sidebarConfigData.mapTypes} filtersSelected={filtersSelected} />
     <Grid item xs={3}>
@@ -32,9 +32,11 @@ const Catalog = ({ loading, classes, sidebarConfigData, filtersSelected }) => (
 );
 
 Catalog.propTypes = {
-  loading: PropTypes.bool,
   filtersSelected: PropTypes.object,
-  sidebarConfigData: PropTypes.object,
+  data: PropTypes.shape({
+    loading: PropTypes.bool,
+    sidebarConfigData: PropTypes.object
+  }),
   classes: PropTypes.object.isRequired
 };
 
