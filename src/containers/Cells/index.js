@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import { DragDropContext } from 'react-dnd';
-import HTML5Backend from 'react-dnd-html5-backend';
 import { graphql, compose } from 'react-apollo';
 import { connect } from 'react-redux';
 import { Row, Col } from 'reactstrap';
@@ -107,16 +105,18 @@ class Cells extends Component {
 
   onDrop = async (i, j) => {
     const { dragItem: id } = this.state;
-    this.props.setPosition({ variables: { id, row: i, column: j }, optimisticResponse: {
-        __typename: 'Mutation',
-        updateCell: {
-          __typename: 'cells',
-          id,
-          i,
-          j
-        }
-      } }).then(() => this.setState(prevState => ({ counter: !prevState.counter })));
-    this.setState(prevState => ({ counter: !prevState.counter }));
+    if (i && j) {
+      this.props.setPosition({ variables: { id, row: i, column: j }, optimisticResponse: {
+          __typename: 'Mutation',
+          updateCell: {
+            __typename: 'cells',
+            id,
+            i,
+            j
+          }
+        } }).then(() => this.setState(prevState => ({ counter: !prevState.counter })));
+      this.setState(prevState => ({ counter: !prevState.counter }));
+    }
   };
 
   handleSelectCell = (ev, i, j) => {
@@ -314,7 +314,7 @@ class Cells extends Component {
         id={data ? data.id : null}
         onSelect={this.handleSelectCell}
         onKeyDown={this.handleKeyDown}
-        startDrag={(id) => this.setState({ dragItem: id })}
+        startDrag={(id, i, j) => this.setState({ dragItem: id, i, j })}
         onDrop={this.onDrop}
       />
     );

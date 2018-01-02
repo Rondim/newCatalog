@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { DragSource } from 'react-dnd';
-import _ from 'lodash';
 
 class Source extends Component {
   static propTypes = {
@@ -29,7 +27,7 @@ class Source extends Component {
       resStyle.backgroundSize = style.width;
       return (
         <div
-          onDragStart={() => startDrag(id)}
+          onDragStart={() => startDrag(id, row, column)}
           draggable
           style={resStyle}
         >

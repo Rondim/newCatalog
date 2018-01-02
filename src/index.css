@@ -1,5 +1,9 @@
 #root{
     height: 100vh;
+    font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 0.9rem;
+    color: rgba(36, 36, 41, 0.78);
+    background-color: rgba(163, 181, 209, 0.18);
 }
 .App{
     height: 100%;

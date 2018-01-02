@@ -23,8 +23,8 @@ class Cell extends Component {
   };
 
   iAmHere = ev => {
-    const { row, column, onDrop } = this.props;
-    onDrop(row, column);
+    const { row, column, onDrop, url } = this.props;
+    if (!url) onDrop(row, column);
   };
 
   preventDefault = (ev) => {

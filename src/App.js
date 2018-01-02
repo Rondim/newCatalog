@@ -4,13 +4,15 @@ import { Route, Switch } from 'react-router-dom';
 import Catalog from './containers/Catalog';
 import Signin from './containers/Auth/signin';
 import requireAuth from './containers/Auth/require_auth';
-import NavBar from './components/NavBar';
 import Cells from './containers/Cells';
 import Notificator from './containers/Notificator';
+import Navigation from './containers/Navigation';
 
 const App = () => (
     <div className="App">
-      <NavBar />
+      <div>
+        <Navigation />
+      </div>
       <Notificator />
       <Switch>
         <Route exact path="/" component={requireAuth(Catalog)} />

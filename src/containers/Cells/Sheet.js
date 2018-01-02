@@ -7,7 +7,7 @@ class Sheet extends Component {
   static defaultProps = {};
 
   render() {
-    const { count, counter, cellRenderer, connectDropTarget, onKeyDown } = this.props;
+    const { count, counter, cellRenderer, onKeyDown } = this.props;
     return (
       <div tabIndex="0" onKeyDown={onKeyDown} style={{ flex: '1', height: '100%' }}>
         <AutoSizer defaultHeight={600}>
