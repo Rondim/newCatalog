@@ -170,7 +170,6 @@ class Toolbar extends Component {
     const { config: { sidebarConfigData, loading }, filtersSelected, classes, mode,
       filters: { loading: fLoading } } = this.props;
     if (loading) return <Loading />;
-    console.log(sidebarConfigData.filters);
     return (
       <div>
         <Nav tabs>

@@ -41,7 +41,6 @@ const calcNewFiltersSelectedForSetter = ({ someFilters, everyFilters, sidebarCon
     // Почистить детей
     if (haveChilds) {
       const childIds = Object.keys(state.dependencies[property.id]['childs']);
-      console.log(childIds);
       childIds.forEach(childId => filtersSelected[childId] = null);
     }
   });

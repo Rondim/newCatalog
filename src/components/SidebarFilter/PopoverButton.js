@@ -16,7 +16,6 @@ class PopoverButton extends Component {
     const buttonStyle = selection === 'selected' ?
       classes.buttonSelected : selection === 'selectedNotByAll' ?
       classes.buttonSelectedNotByAll : classes.buttonNotSelected;
-    console.log(filterColor);
     return ([<Button
       key='button'
       disableRipple
