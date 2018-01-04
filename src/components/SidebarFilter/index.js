@@ -21,8 +21,12 @@ class SidebarFilter extends Component {
   onMouseLeave = () => {
     this.setState({ popoverShow: false });
   };
+  onAdd = (name, color) => {
+    const { filters, filterGroupId, onCreateFilter } = this.props;
+    onCreateFilter(name, color, filterGroupId, filters.length);
+  };
   render() {
-    const { classes, buttonDisplayText, filters, isActive } = this.props;
+    const { classes, buttonDisplayText, filters, isActive, onCreateFilter } = this.props;
     return (
       <div className={classes.root}
         onMouseEnter={this.onMouseEnter}
@@ -39,6 +43,7 @@ class SidebarFilter extends Component {
           popoverShow={isActive && this.state.popoverShow}
           filters={filters}
           onClick={this.onClick}
+          onAdd={onCreateFilter ? this.onAdd: undefined}
         />
       </div>
     );
@@ -52,6 +57,7 @@ SidebarFilter.propTypes = {
   handleFilterClick: PropTypes.func.isRequired,
   isActive: PropTypes.bool,
   defaultShow: PropTypes.bool,
+  onCreateFilter: PropTypes.func,
   // From withStyles
   classes: PropTypes.object.isRequired
 };

@@ -6,10 +6,11 @@ import compose from 'recompose/compose';
 import pure from 'recompose/pure';
 import Paper from 'material-ui/Paper';
 import PopoverButton from './PopoverButton';
+import AddFilter from './AddFilter';
 
 const Popover = (props) => {
   if (!props.popoverShow) return null;
-  const { filters, onClick, classes } = props;
+  const { filters, onClick, classes, onAdd } = props;
   return (
       <Paper className={classes.popover}>
         {filters.map(filter => {
@@ -19,6 +20,9 @@ const Popover = (props) => {
             onClick={onClick}
           />;
         })}
+        {onAdd &&
+          <AddFilter classes={classes} onAdd={onAdd} />
+        }
       </Paper>
   );
 };
@@ -28,7 +32,8 @@ Popover.propTypes = {
   filters: PropTypes.array.isRequired,
   onClick: PropTypes.func.isRequired,
   // from styles
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  onAdd: PropTypes.func
 };
 
 export default compose(

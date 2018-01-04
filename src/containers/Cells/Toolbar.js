@@ -15,6 +15,7 @@ import fetchFilters from './queries/fetchFilters';
 import { availabilityByFilter } from './queries/fetchAvailabilitiesCount';
 import setFilter from './mutations/setFilter';
 import unsetFilter from './mutations/unsetFilter';
+import createFilter from './mutations/createFilter';
 import Loading from '../../components/Loading';
 import CountAvailabilitiesForLoad from './CountAvailabilitiesForLoad';
 import { instanceSelect } from '../CatalogSidebar/actions';
@@ -76,6 +77,7 @@ const calcFilterVariables = (selectedCells) => {
   @compose(
     graphql(setFilter, { name: 'setFilter' }),
     graphql(unsetFilter, { name: 'unsetFilter' }),
+    graphql(createFilter, { name: 'createFilter' })
   )
 class Toolbar extends Component {
   static propTypes = {
@@ -94,6 +96,7 @@ class Toolbar extends Component {
     changeMode: PropTypes.func,
     onLoad: PropTypes.func,
     instanceSelect: PropTypes.func,
+    createFilter: PropTypes.func,
     filtersSelected: PropTypes.object,
     classes: PropTypes.object,
     selectedCells: PropTypes.array
@@ -149,6 +152,13 @@ class Toolbar extends Component {
     }
   };
 
+  handleCreateFilter = (name, color, propertyId, order) => {
+    this.props.createFilter({ variables: { name, propertyId, order, color },
+      refetchQueries: [{
+        query: fetchConfig
+      }]
+    });
+  };
 
   handleClick = () => {
     const { filtersSelected, onLoad, config: { sidebarConfigData } } = this.props;
@@ -160,6 +170,7 @@ class Toolbar extends Component {
     const { config: { sidebarConfigData, loading }, filtersSelected, classes, mode,
       filters: { loading: fLoading } } = this.props;
     if (loading) return <Loading />;
+    console.log(sidebarConfigData.filters);
     return (
       <div>
         <Nav tabs>
@@ -194,9 +205,11 @@ class Toolbar extends Component {
           <TabPane tabId="setter">
             <Paper className={classes.paper}>
               { fLoading && mode === 'setter' ? <Loading /> :
-                <SetterSidebar config={sidebarConfigData} filterSet={this.filterSet} />}
+                <SetterSidebar
+                  config={sidebarConfigData}
+                  filterSet={this.filterSet}
+                  onCreateFilter={this.handleCreateFilter} />}
             </Paper>
-            <Button>Set</Button>
           </TabPane>
         </TabContent>
       </div>
