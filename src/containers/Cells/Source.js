@@ -19,8 +19,8 @@ class Source extends Component {
   render() {
     const { style, url, size, department, quantity, startDrag, row, column, id } = this.props;
     const resStyle = {
-      width: parseInt(style.width)-3,
-      height: parseInt(style.height)-3,
+      width: '100%',
+      height: '100%'
     };
     if (url) {
       resStyle.backgroundImage = `url(${url})`;

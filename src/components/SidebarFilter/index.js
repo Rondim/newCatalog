@@ -10,17 +10,17 @@ import Popover from './Popover';
 class SidebarFilter extends Component {
   state = {
     popoverShow: this.props.defaultShow || false
-  }
+  };
   onClick = (filterId) => {
     const { filterGroupId } = this.props;
     this.props.handleFilterClick(filterGroupId, filterId);
-  }
+  };
   onMouseEnter = () => {
     this.setState({ popoverShow: true });
-  }
+  };
   onMouseLeave = () => {
     this.setState({ popoverShow: false });
-  }
+  };
   render() {
     const { classes, buttonDisplayText, filters, isActive } = this.props;
     return (
@@ -30,9 +30,10 @@ class SidebarFilter extends Component {
       >
         <Button
           disableRipple
-          className={isActive ? classes.mainButton : classes.mainButtonDisabled}
+          className={ classes[buttonDisplayText.className] ? classes[buttonDisplayText.className] :
+            isActive ? classes.mainButton : classes.mainButtonDisabled }
         >
-          {buttonDisplayText}
+          {buttonDisplayText.text}
         </Button>
         <Popover
           popoverShow={isActive && this.state.popoverShow}
@@ -46,7 +47,7 @@ class SidebarFilter extends Component {
 
 SidebarFilter.propTypes = {
   filters: PropTypes.array.isRequired,
-  buttonDisplayText: PropTypes.string.isRequired,
+  buttonDisplayText: PropTypes.object.isRequired,
   filterGroupId: PropTypes.string.isRequired,
   handleFilterClick: PropTypes.func.isRequired,
   isActive: PropTypes.bool,

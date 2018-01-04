@@ -11,6 +11,7 @@ import { WebSocketLink } from 'apollo-link-ws';
 import { getMainDefinition } from 'apollo-utilities';
 import { devToolsEnhancer } from 'redux-devtools-extension';
 import catalogSidebarReducer from './containers/CatalogSidebar/reducer';
+import setterSidebarReducer from './containers/SetterSidebar/reducer';
 import notifyReducer from './containers/Notificator/reducer';
 import { UNAUTH_USER } from './containers/Auth/actions/types';
 import { sendNotification } from './containers/Notificator/actions';
@@ -51,6 +52,7 @@ const middlewareLink = setContext(() => ({
 
 const appReducer = combineReducers({
   catalogSidebar: catalogSidebarReducer,
+  setterSidebar: setterSidebarReducer,
   notify: notifyReducer,
 });
 

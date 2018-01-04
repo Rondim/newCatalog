@@ -10,7 +10,7 @@ import PopoverButton from './PopoverButton';
 const Popover = (props) => {
   if (!props.popoverShow) return null;
   const { filters, onClick, classes } = props;
-  return  (
+  return (
       <Paper className={classes.popover}>
         {filters.map(filter => {
           return <PopoverButton

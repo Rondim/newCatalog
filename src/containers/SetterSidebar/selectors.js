@@ -45,7 +45,7 @@ export const sidebarItemsSelector = (state) => {
       if (!parents) return true;
       const isParentSelected = Object.keys(parents).some(parentProp => {
         return Object.keys(filters[filterId]['dependentOn']).some(parentId => {
-          return filtersSelected[parentProp][parentId];
+          return filtersSelected[parentProp][parentId] === 'selected';
         });
       });
       return isParentSelected;

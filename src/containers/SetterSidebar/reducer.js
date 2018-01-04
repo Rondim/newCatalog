@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { FILTER_CLICKED, INIT_SIDEBAR, INSTANCE_SELECTED } from './constants';
 
 
-function catalogSidebarReducer(state = {}, action) {
+function setterSidebarReducer(state = {}, action) {
   switch (action.type) {
     case INIT_SIDEBAR:
       return getInitialState(action.payload);
@@ -21,20 +21,29 @@ function catalogSidebarReducer(state = {}, action) {
     }
 }
 
-export default catalogSidebarReducer;
+export default setterSidebarReducer;
 
 const calcNewFiltersSelectedForSetter = ({ someFilters, everyFilters, sidebarConfigData }) => {
   let state = getInitialState(sidebarConfigData);
   let filtersSelected = { ...state.filtersSelected };
   const onlySomeFilters = _.differenceWith(someFilters, everyFilters, _.isEqual);
   onlySomeFilters.forEach(({ id, property }) => {
+    // const haveChilds = !!state.dependencies[property.id]['childs'];
+    // Почистить детей
+    /*if (haveChilds) {
+      const childIds = Object.keys(state.dependencies[property.id]['childs']);
+      childIds.forEach(childId => filtersSelected[childId] = {});
+    }*/
+    filtersSelected[property.id][id] = 'selectedNotByAll';
+  });
+  onlySomeFilters.forEach(({ id, property }) => {
     const haveChilds = !!state.dependencies[property.id]['childs'];
     // Почистить детей
     if (haveChilds) {
       const childIds = Object.keys(state.dependencies[property.id]['childs']);
-      childIds.forEach(childId => filtersSelected[childId] = {});
+      console.log(childIds);
+      childIds.forEach(childId => filtersSelected[childId] = null);
     }
-    filtersSelected[property.id][id] = 'selectedNotByAll';
   });
   everyFilters.forEach(({ id, property }) => {
     const haveChilds = !!state.dependencies[property.id]['childs'];
@@ -66,7 +75,6 @@ function calcNewFiltersSelected(state, filterClicked) {
   } else {
     newFiltersSelected[filterGroupId][filterId] = 'selected';
   }
-
   return newFiltersSelected;
 }
 

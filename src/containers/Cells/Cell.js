@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
+import { observer } from 'mobx-react';
 
 import Instance from './Source';
 
-class Cell extends Component {
+@observer class Cell extends Component {
   static propTypes = {
     isOverCurrent: PropTypes.bool,
     connectDropTarget: PropTypes.func,
@@ -12,14 +14,20 @@ class Cell extends Component {
     onSelect: PropTypes.func,
     row: PropTypes.number,
     column: PropTypes.number,
-    active: PropTypes.bool,
-    url: PropTypes.string
+    active: PropTypes.number,
+    url: PropTypes.string,
+    aId: PropTypes.string
   };
   static defaultProps = {};
 
+  shouldComponentUpdate(nextProps, nextState, nextContext) {
+    return nextProps.active !== this.props.active || nextProps.aId !== this.props.aId;
+  }
+
   handleSelect = ev => {
-    const { row, column, onSelect } = this.props;
-    onSelect(ev, row, column);
+    const { row, column, onSelect, aId } = this.props;
+    this.setState({ active: true });
+    onSelect(ev, row, column, aId);
   };
 
   iAmHere = ev => {

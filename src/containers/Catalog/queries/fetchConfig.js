@@ -42,7 +42,7 @@ export const fetchConfigOptions = {
   },
 };
 
-const dataToConfig = data => {
+export const dataToConfig = data => {
   if (data) {
     let config = {
       order: [],

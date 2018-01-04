@@ -93,7 +93,7 @@ class ProductList extends Component {
     const { instances, setActive } = this.props;
     const { page } = this.state;
     let i = 0;
-    if (instances.length === 0) return <Loading />;
+    if (!instances || instances.length === 0) return <Loading />;
     return _.map(instances, instance => {
       if (instance) {
         const { active, complited, item, id } = instance;

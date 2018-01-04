@@ -32,8 +32,7 @@ export const fetchInstancesOptions = {
         skippedItems: 0,
         first: 24,
         filter
-      },
-      fetchPolicy: 'network-only',
+      }
     };
   },
   props({ data: { loading, allInstances, fetchMore, _allInstancesMeta, allSidebarItems },

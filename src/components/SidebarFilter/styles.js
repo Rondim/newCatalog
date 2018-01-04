@@ -10,23 +10,31 @@ const styles = {
   },
   buttonSelected: {
     extend: 'button',
-    background: {
-      color: 'green'
-    },
+    backgroundColor: 'green',
     '&:hover': {
       backgroundColor: 'green'
     }
   },
   buttonSelectedNotByAll: {
     extend: 'button',
-    background: {
-      color: 'orange'
-    }
+    backgroundColor: 'orange'
   },
   mainButton: {
     width: '100%',
     left: 0,
     right: 0
+  },
+  mainButtonSelectedNotByAll: {
+    width: '100%',
+    left: 0,
+    right: 0,
+    color: 'orange'
+  },
+  mainButtonSelected: {
+    width: '100%',
+    left: 0,
+    right: 0,
+    color: 'green'
   },
   mainButtonDisabled: {
     extend: 'mainButton',

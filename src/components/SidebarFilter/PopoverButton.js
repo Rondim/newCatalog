@@ -9,7 +9,7 @@ import Button from 'material-ui/Button';
 class PopoverButton extends Component {
   onClick = () => {
     this.props.onClick(this.props.filter.filterId);
-  }
+  };
   render() {
     const { filter: { filterName, selection }, classes } = this.props;
     // Сделать лучше switch
@@ -35,7 +35,7 @@ PopoverButton.propTypes = {
   onClick: PropTypes.func.isRequired,
   // from withStyles
   classes: PropTypes.object.isRequired
-}
+};
 
 export default compose(
   withStyles(styles),

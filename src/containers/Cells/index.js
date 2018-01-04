@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { graphql, compose } from 'react-apollo';
 import { connect } from 'react-redux';
 import { Row, Col } from 'reactstrap';
+import { Grid, AutoSizer } from 'react-virtualized';
 
 import 'react-virtualized/styles.css';
 import Cell from './Cell';
@@ -17,7 +18,6 @@ import updateCells from './subscriptions/updateCells';
 import Loading from '../../components/Loading';
 import Toolbar from './Toolbar';
 import { notification } from '../Notificator/actions';
-import Sheet from './Sheet';
 
 const sheet = 'cjbnm5axu1kdt01475y4ak9lz';
 
@@ -96,12 +96,22 @@ class Cells extends Component {
     selectedGroupCells: null,
     selectedZone: null,
     i: undefined,
-    j: undefined
+    j: undefined,
+    mode: 'loader'
   };
 
   componentWillMount() {
     this.props.subscribeToCells();
   }
+
+  componentWillUpdate(nextProps, nextState, nextContext) {
+    console.log((new Date()).getMilliseconds());
+  }
+
+  componentDidUpdate(prevProps, prevState, prevContext) {
+    console.log((new Date()).getMilliseconds());
+  }
+
 
   onDrop = async (i, j) => {
     const { dragItem: id } = this.state;
@@ -119,7 +129,7 @@ class Cells extends Component {
     }
   };
 
-  handleSelectCell = (ev, i, j) => {
+  handleSelectCell = (ev, i, j, aId) => {
     const { allZones } = this.props.data;
     if (ev.metaKey) {
       this.setState(prevState => {
@@ -129,7 +139,7 @@ class Cells extends Component {
           selectedCells.splice(find, 1);
           return { selectedCells, counter: !prevState.counter, selectedGroupCells: null };
         }
-        selectedCells.push({ i, j });
+        selectedCells.push(aId ? { i, j, aId } : { i, j });
         return { selectedCells, counter: !prevState.counter, selectedGroupCells: null };
       });
     } else if (ev.shiftKey) {
@@ -160,8 +170,9 @@ class Cells extends Component {
         return { selectedZone, counter: !prevState.counter };
       });
     } else {
+      const selectedCells = aId ? [{ i, j, aId }] : [{ i, j }];
       this.setState(prevState => ({
-        selectedCells: [{ i, j }],
+        selectedCells,
         counter: !prevState.counter,
         selectedGroupCells: null,
         selectedZone: null
@@ -214,12 +225,12 @@ class Cells extends Component {
   };
 
   cellRenderer = ({ columnIndex, key, rowIndex, style }) => {
-    const { loading, allCells, allZones } = this.props.data;
+    const { allCells, allZones } = this.props.data;
     const { selectedCells, selectedGroupCells, selectedZone } = this.state;
     const data = _.find(allCells, o => o.i===rowIndex && o.j ===columnIndex);
-    if (loading) return <Loading />;
     let zoneLeft, zoneRight, zoneTop, zoneBottom;
     let activeLeft, activeRight, activeTop, activeBottom;
+    let newStyle = { ...style };
     allZones.forEach(zone => {
       zoneLeft = zone.j0 === columnIndex
         && zone.i0 <= rowIndex && zone.i1 >= rowIndex || zoneLeft;
@@ -250,92 +261,115 @@ class Cells extends Component {
         && selectedZone.j0 <= columnIndex && selectedZone.j1 >= columnIndex || activeBottom;
     }
     if (active || activeLeft && !zoneLeft) {
-      style.borderLeftWidth = '3px';
-      style.borderLeftColor = '#5baaff';
+      newStyle.borderLeftWidth = '3px';
+      newStyle.borderLeftColor = '#5baaff';
     } else if (activeLeft && zoneLeft) {
-      style.borderLeftWidth = '3px';
-      style.borderLeftColor = '#00ff05';
+      newStyle.borderLeftWidth = '3px';
+      newStyle.borderLeftColor = '#00ff05';
     } else if (zoneLeft) {
-      style.borderLeftWidth = '3px';
-      style.borderLeftColor = '#00ffd3';
+      newStyle.borderLeftWidth = '3px';
+      newStyle.borderLeftColor = '#00ffd3';
     } else {
-      style.borderLeftWidth = '1px';
-      style.borderLeftColor = 'grey';
+      newStyle.borderLeftWidth = '1px';
+      newStyle.borderLeftColor = 'grey';
     }
     if (active || activeRight && !zoneRight) {
-      style.borderRightWidth = '3px';
-      style.borderRightColor = '#5baaff';
+      newStyle.borderRightWidth = '3px';
+      newStyle.borderRightColor = '#5baaff';
     } else if (activeRight && zoneRight) {
-      style.borderRightWidth = '3px';
-      style.borderRightColor = '#00ff05';
+      newStyle.borderRightWidth = '3px';
+      newStyle.borderRightColor = '#00ff05';
     } else if (zoneRight) {
-      style.borderRightWidth = '3px';
-      style.borderRightColor = '#00ffd3';
+      newStyle.borderRightWidth = '3px';
+      newStyle.borderRightColor = '#00ffd3';
     } else {
-      style.borderRightWidth = '1px';
-      style.borderRightColor = 'grey';
+      newStyle.borderRightWidth = '1px';
+      newStyle.borderRightColor = 'grey';
     }
     if (active || activeTop && !zoneTop) {
-      style.borderTopWidth = '3px';
-      style.borderTopColor = '#5baaff';
+      newStyle.borderTopWidth = '3px';
+      newStyle.borderTopColor = '#5baaff';
     } else if (activeTop && zoneTop) {
-      style.borderTopWidth = '3px';
-      style.borderTopColor = '#00ff05';
+      newStyle.borderTopWidth = '3px';
+      newStyle.borderTopColor = '#00ff05';
     } else if (zoneTop) {
-      style.borderTopWidth = '3px';
-      style.borderTopColor = '#00ffd3';
+      newStyle.borderTopWidth = '3px';
+      newStyle.borderTopColor = '#00ffd3';
     } else {
-      style.borderTopWidth = '1px';
-      style.borderTopColor = 'grey';
+      newStyle.borderTopWidth = '1px';
+      newStyle.borderTopColor = 'grey';
     }
     if (active || activeBottom && !zoneBottom) {
-      style.borderBottomWidth = '3px';
-      style.borderBottomColor = '#5baaff';
+      newStyle.borderBottomWidth = '3px';
+      newStyle.borderBottomColor = '#5baaff';
     } else if (activeBottom && zoneBottom) {
-      style.borderBottomWidth = '3px';
-      style.borderBottomColor = '#00ff05';
+      newStyle.borderBottomWidth = '3px';
+      newStyle.borderBottomColor = '#00ff05';
     } else if (zoneBottom) {
-      style.borderBottomWidth = '3px';
-      style.borderBottomColor = '#00ffd3';
+      newStyle.borderBottomWidth = '3px';
+      newStyle.borderBottomColor = '#00ffd3';
     } else {
-      style.borderBottomWidth = '1px';
-      style.borderBottomColor = 'grey';
+      newStyle.borderBottomWidth = '1px';
+      newStyle.borderBottomColor = 'grey';
     }
     return (
       <Cell
         key={key}
+        active={active && 1 || activeLeft && 1 || activeRight && 1 || activeBottom && 1 || activeTop && 1 ||
+        zoneLeft && 2 || zoneBottom && 2 || zoneTop && 2 || zoneRight && 2}
         url={data && data.availability.instance && data.availability.instance.item.img.url}
         size={data && data.availability.instance && data.availability.instance.size.name}
         department={data && data.availability.department[0].name}
         quantity={data && data.availability.quantity}
-        style={style}
+        aId = {data && data.availability.id || null}
+        style={newStyle}
         row={rowIndex}
         column={columnIndex}
         id={data ? data.id : null}
-        onSelect={this.handleSelectCell}
         onKeyDown={this.handleKeyDown}
         startDrag={(id, i, j) => this.setState({ dragItem: id, i, j })}
         onDrop={this.onDrop}
+        onSelect={this.handleSelectCell}
+
       />
     );
   };
 
   render() {
-    const { counter } = this.state;
+    const { counter, mode, selectedCells } = this.state;
     const { loading, _allCellsMeta } = this.props.data;
     if (loading) return <Loading />;
     return (
       <Row style={{ flex: '1', height: '100%' }}>
         <Col>
-          <Sheet
-            counter={counter}
-            count={_allCellsMeta.count}
-            cellRenderer={this.cellRenderer}
-            onKeyDown={this.handleKeyDown}
-          />
+          <div tabIndex="0" onKeyDown={this.onKeyDown} style={{ flex: '1', height: '100%' }}>
+            <AutoSizer defaultHeight={600}>
+              {({ height, width }) => (
+                <Grid
+                  cellRenderer={this.cellRenderer}
+                  columnCount={200}
+                  columnWidth={100}
+                  height={height}
+                  rowCount={300}
+                  rowHeight={100}
+                  width={width}
+                  count={_allCellsMeta.count}
+                  overscanColumnCount={16}
+                  overscanRowCount={12}
+                  scrollingResetTimeInterval={10}
+                  counter={counter}
+                />
+              )}
+            </AutoSizer>
+          </div>
         </Col>
         <Col xs='auto'>
-          <Toolbar onLoad={this.handleLoad} />
+          <Toolbar
+            onLoad={this.handleLoad}
+            mode={mode}
+            changeMode={mode => this.setState({ mode })}
+            selectedCells={ selectedCells }
+          />
         </Col>
       </Row>
     );
