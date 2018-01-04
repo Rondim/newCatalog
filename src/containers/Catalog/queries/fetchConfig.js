@@ -20,6 +20,7 @@ export const fetchConfig = gql`
         id
         name
         order
+        color
         property{
           id
         }
@@ -65,6 +66,7 @@ export const dataToConfig = data => {
         config.filters[filter.id] = {
           property: filter.property.id,
           name: filter.name,
+          color: filter.color,
           dependentOn: arrayToObject(filter.dependentOn)
         };
         filtersOrder[filter.order] = filter.id;

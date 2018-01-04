@@ -11,18 +11,24 @@ class PopoverButton extends Component {
     this.props.onClick(this.props.filter.filterId);
   };
   render() {
-    const { filter: { filterName, selection }, classes } = this.props;
+    const { filter: { filterName, filterColor, selection }, classes } = this.props;
     // Сделать лучше switch
     const buttonStyle = selection === 'selected' ?
       classes.buttonSelected : selection === 'selectedNotByAll' ?
       classes.buttonSelectedNotByAll : classes.buttonNotSelected;
-    return (<Button
+    console.log(filterColor);
+    return ([<Button
+      key='button'
       disableRipple
       className={buttonStyle}
       onClick={this.onClick}
       >
       {filterName}
-    </Button>);
+    </Button>,
+    <div
+      key='color'
+      style={ { backgroundColor: filterColor, width: '20px', height: '20px', display: 'inline-block' } }
+    />]);
   }
 }
 

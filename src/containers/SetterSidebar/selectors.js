@@ -53,6 +53,7 @@ export const sidebarItemsSelector = (state) => {
     return filteredFilterIds.map(filterId => {
       return {
         filterId,
+        filterColor: filters[filterId]['color'],
         filterName: filters[filterId]['name'],
         selection: filtersSelected[propId][filterId] || 'notSelected'
       };
