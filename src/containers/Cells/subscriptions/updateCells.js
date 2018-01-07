@@ -17,6 +17,11 @@ export default gql`
             id
             name
           }
+          tags: sidebarFilters(filter: {property: {name: "Tags"}}){
+            id
+            name
+            color
+          }
           quantity
           instance{
             id

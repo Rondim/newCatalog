@@ -44,6 +44,7 @@ const sheet = 'cjbnm5axu1kdt01475y4ak9lz';
             let { count } = prev._allCellsMeta;
             let allCells = [...prev.allCells];
             let index;
+            console.log(node, mutation);
             switch (mutation) {
               case 'DELETED':
                 index = _.findIndex(allCells, o => o.id === previousValues.id);
@@ -319,6 +320,7 @@ class Cells extends Component {
         url={data && data.availability.instance && data.availability.instance.item.img.url}
         size={data && data.availability.instance && data.availability.instance.size.name}
         department={data && data.availability.department[0].name}
+        tags={data && data.availability.tags}
         quantity={data && data.availability.quantity}
         aId = {data && data.availability.id || null}
         instId = {data && data.availability.instance.id || null}
@@ -331,7 +333,6 @@ class Cells extends Component {
         startDrag={(id, i, j) => this.setState({ dragItem: id, i, j })}
         onDrop={this.onDrop}
         onSelect={this.handleSelectCell}
-
       />
     );
   };
@@ -370,6 +371,7 @@ class Cells extends Component {
             mode={mode}
             changeMode={mode => this.setState({ mode })}
             selectedCells={ selectedCells }
+            sheet={sheet}
           />
         </Col>
       </Row>

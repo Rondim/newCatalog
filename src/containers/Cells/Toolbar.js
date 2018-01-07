@@ -19,6 +19,7 @@ import createFilter from './mutations/createFilter';
 import Loading from '../../components/Loading';
 import CountAvailabilitiesForLoad from './CountAvailabilitiesForLoad';
 import { instanceSelect } from '../CatalogSidebar/actions';
+import query from './queries/fetchCells';
 
 const styles = theme => ({
   root: {
@@ -105,6 +106,7 @@ class Toolbar extends Component {
     onLoad: PropTypes.func,
     instanceSelect: PropTypes.func,
     createFilter: PropTypes.func,
+    sheet: PropTypes.string,
     filtersSelected: PropTypes.object,
     classes: PropTypes.object,
     selectedCells: PropTypes.array
@@ -133,7 +135,7 @@ class Toolbar extends Component {
       config: { sidebarConfigData: { mapTypes } },
       filters: { someFilters },
       setFilterToAvail, setFilterToInstance, setFilterToItem, unsetFilterToAvail, unsetFilterToInstance,
-      unsetFilterToItem } = this.props;
+      unsetFilterToItem, sheet } = this.props;
     let needUncheck;
     const { relation } = _.find(mapTypes, o => o.id ===filterGroupId);
     let unsetFilter;
@@ -163,6 +165,9 @@ class Toolbar extends Component {
         refetchQueries: [{
           query: fetchFilters,
           variables
+        }, {
+          query,
+          variables: { sheet }
         }]
       };
     };
@@ -170,7 +175,8 @@ class Toolbar extends Component {
       await Promise.all(ids.map(id => {
         return unsetFilter(options(id));
       }));
-    } else if ((needUncheck = _.filter(someFilters, o => o.property.id === filterGroupId)).length) {
+    } else if ((needUncheck = _.filter(someFilters, o => o.property.id === filterGroupId)).length &&
+      filterGroupId !== 'cjc047oph4wps01966w0ux0xn') {
       // снятие фильтра если нет мультиселекта и выставление нового
       await Promise.all(ids.map(async id => {
         await Promise.all(needUncheck.map(({ id: filterId }) => {

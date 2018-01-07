@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import TagsOnCell from './TagsOnCell';
 
 class Source extends Component {
   static propTypes = {
@@ -10,6 +11,7 @@ class Source extends Component {
     column: PropTypes.number,
     size: PropTypes.string,
     department: PropTypes.string,
+    tags: PropTypes.array,
     quantity: PropTypes.number,
     onSelect: PropTypes.func,
     startDrag: PropTypes.func,
@@ -18,11 +20,12 @@ class Source extends Component {
   static defaultProps = {};
 
   render() {
-    const { style, url, size, department, quantity, startDrag, row, column, id } = this.props;
+    const { style, url, size, department, quantity, startDrag, row, column, id, tags } = this.props;
     const resStyle = {
       width: '100%',
       height: '100%'
     };
+    if (tags.length > 0) console.log(tags);
     if (url) {
       resStyle.backgroundImage = `url(${url})`;
       resStyle.backgroundSize = style.width;
@@ -43,6 +46,7 @@ class Source extends Component {
             bottom: 0,
             position: 'absolute'
           }}>{quantity}</div>}
+          { !!tags.length && <TagsOnCell tags={tags} /> }
         </div>);
     }
     return <div style={resStyle} />;
