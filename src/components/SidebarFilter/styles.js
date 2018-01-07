@@ -9,8 +9,8 @@ const styles = {
     extend: 'button'
   },
   buttonSelected: {
-    extend: 'button',
-    backgroundColor: 'green',
+    'extend': 'button',
+    'backgroundColor': 'green',
     '&:hover': {
       backgroundColor: 'green'
     }

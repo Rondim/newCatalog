@@ -30,10 +30,6 @@ const calcNewFiltersSelectedForSetter = ({ someFilters, everyFilters, sidebarCon
   onlySomeFilters.forEach(({ id, property }) => {
     // const haveChilds = !!state.dependencies[property.id]['childs'];
     // Почистить детей
-    /*if (haveChilds) {
-      const childIds = Object.keys(state.dependencies[property.id]['childs']);
-      childIds.forEach(childId => filtersSelected[childId] = {});
-    }*/
     filtersSelected[property.id][id] = 'selectedNotByAll';
   });
   onlySomeFilters.forEach(({ id, property }) => {

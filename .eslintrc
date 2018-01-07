@@ -57,6 +57,9 @@
     "localStorage": true,
     "document": true,
     "location": true,
-    "window": true
+    "window": true,
+    "navigator": true,
+    "URL": true,
+    "fetch": true
   }
 }

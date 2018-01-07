@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import _ from 'lodash';
 import { observer } from 'mobx-react';
 
 import Instance from './Source';
@@ -16,7 +15,9 @@ import Instance from './Source';
     column: PropTypes.number,
     active: PropTypes.number,
     url: PropTypes.string,
-    aId: PropTypes.string
+    aId: PropTypes.string,
+    instId: PropTypes.string,
+    itemId: PropTypes.string
   };
   static defaultProps = {};
 
@@ -25,9 +26,9 @@ import Instance from './Source';
   }
 
   handleSelect = ev => {
-    const { row, column, onSelect, aId } = this.props;
+    const { row, column, onSelect, aId, instId, itemId } = this.props;
     this.setState({ active: true });
-    onSelect(ev, row, column, aId);
+    onSelect(ev, row, column, aId, instId, itemId);
   };
 
   iAmHere = ev => {

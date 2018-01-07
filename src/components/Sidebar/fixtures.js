@@ -8,8 +8,6 @@ export const data = {
   ]
 };
 
-
-
 const sidebarConfig = [
   {
     type: 'filter',

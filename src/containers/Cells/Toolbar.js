@@ -13,8 +13,8 @@ import SetterSidebar from '../SetterSidebar';
 import { fetchConfig, dataToConfig } from '../Catalog/queries/fetchConfig';
 import fetchFilters from './queries/fetchFilters';
 import { availabilityByFilter } from './queries/fetchAvailabilitiesCount';
-import setFilter from './mutations/setFilter';
-import unsetFilter from './mutations/unsetFilter';
+import { setFilterToAvail, setFilterToInstance, setFilterToItem } from './mutations/setFilter';
+import { unsetFilterToAvail, unsetFilterToInstance, unsetFilterToItem } from './mutations/unsetFilter';
 import createFilter from './mutations/createFilter';
 import Loading from '../../components/Loading';
 import CountAvailabilitiesForLoad from './CountAvailabilitiesForLoad';
@@ -75,8 +75,12 @@ const calcFilterVariables = (selectedCells) => {
   })
 )
   @compose(
-    graphql(setFilter, { name: 'setFilter' }),
-    graphql(unsetFilter, { name: 'unsetFilter' }),
+    graphql(setFilterToItem, { name: 'setFilterToItem' }),
+    graphql(unsetFilterToItem, { name: 'unsetFilterToItem' }),
+    graphql(setFilterToInstance, { name: 'setFilterToInstance' }),
+    graphql(unsetFilterToInstance, { name: 'unsetFilterToInstance' }),
+    graphql(setFilterToAvail, { name: 'setFilterToAvail' }),
+    graphql(unsetFilterToAvail, { name: 'unsetFilterToAvail' }),
     graphql(createFilter, { name: 'createFilter' })
   )
 class Toolbar extends Component {
@@ -90,8 +94,12 @@ class Toolbar extends Component {
       someFilters: PropTypes.array,
       everyFilters: PropTypes.array
     }),
-    setFilter: PropTypes.func,
-    unsetFilter: PropTypes.func,
+    setFilterToItem: PropTypes.func,
+    unsetFilterToItem: PropTypes.func,
+    setFilterToInstance: PropTypes.func,
+    unsetFilterToInstance: PropTypes.func,
+    setFilterToAvail: PropTypes.func,
+    unsetFilterToAvail: PropTypes.func,
     mode: PropTypes.string,
     changeMode: PropTypes.func,
     onLoad: PropTypes.func,
@@ -121,12 +129,37 @@ class Toolbar extends Component {
   }
 
   filterSet = async ({ filterGroupId, filterId }) => {
-    const { selectedCells, filters: { someFilters }, setFilter, unsetFilter } = this.props;
+    const { selectedCells,
+      config: { sidebarConfigData: { mapTypes } },
+      filters: { someFilters },
+      setFilterToAvail, setFilterToInstance, setFilterToItem, unsetFilterToAvail, unsetFilterToInstance,
+      unsetFilterToItem } = this.props;
     let needUncheck;
+    const { relation } = _.find(mapTypes, o => o.id ===filterGroupId);
+    let unsetFilter;
+    let setFilter;
+    let ids;
+    switch ( relation ) {
+      case 'Item':
+        unsetFilter = unsetFilterToItem;
+        setFilter = setFilterToItem;
+        ids = selectedCells.map(({ itemId }) => itemId);
+        break;
+      case 'Instance':
+        unsetFilter = unsetFilterToInstance;
+        setFilter = setFilterToInstance;
+        ids = selectedCells.map(({ instId }) => instId);
+        break;
+      case 'Availability':
+        unsetFilter = unsetFilterToAvail;
+        setFilter = setFilterToAvail;
+        ids = selectedCells.map(({ aId }) => aId);
+        break;
+    }
     const variables = calcFilterVariables(selectedCells);
-    const options = (aId) => {
+    const options = (id) => {
       return {
-        variables: { filterId, aId },
+        variables: { filterId, id },
         refetchQueries: [{
           query: fetchFilters,
           variables
@@ -134,20 +167,20 @@ class Toolbar extends Component {
       };
     };
     if (_.find(someFilters, o => o.id === filterId && o.property.id === filterGroupId)) {
-      await Promise.all(selectedCells.map(({ aId }) => {
-        return unsetFilter(options(aId));
+      await Promise.all(ids.map(id => {
+        return unsetFilter(options(id));
       }));
     } else if ((needUncheck = _.filter(someFilters, o => o.property.id === filterGroupId)).length) {
       // снятие фильтра если нет мультиселекта и выставление нового
-      await Promise.all(selectedCells.map(async ({ aId }) => {
-        await Promise.all(needUncheck.map(({ id }) => {
-          unsetFilter({ variables: { filterId: id, aId } });
+      await Promise.all(ids.map(async id => {
+        await Promise.all(needUncheck.map(({ id: filterId }) => {
+          unsetFilter({ variables: { filterId, id } });
         }));
-        await setFilter(options(aId));
+        await setFilter(options(id));
       }));
     } else {
-      await Promise.all(selectedCells.map(({ aId }) => {
-        return setFilter(options(aId));
+      await Promise.all(ids.map(id => {
+        return setFilter(options(id));
       }));
     }
   };

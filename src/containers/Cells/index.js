@@ -104,15 +104,6 @@ class Cells extends Component {
     this.props.subscribeToCells();
   }
 
-  componentWillUpdate(nextProps, nextState, nextContext) {
-    console.log((new Date()).getMilliseconds());
-  }
-
-  componentDidUpdate(prevProps, prevState, prevContext) {
-    console.log((new Date()).getMilliseconds());
-  }
-
-
   onDrop = async (i, j) => {
     const { dragItem: id } = this.state;
     if (i && j) {
@@ -129,7 +120,7 @@ class Cells extends Component {
     }
   };
 
-  handleSelectCell = (ev, i, j, aId) => {
+  handleSelectCell = (ev, i, j, aId, instId, itemId) => {
     const { allZones } = this.props.data;
     if (ev.metaKey) {
       this.setState(prevState => {
@@ -139,7 +130,7 @@ class Cells extends Component {
           selectedCells.splice(find, 1);
           return { selectedCells, counter: !prevState.counter, selectedGroupCells: null };
         }
-        selectedCells.push(aId ? { i, j, aId } : { i, j });
+        selectedCells.push(aId ? { i, j, aId, instId, itemId } : { i, j });
         return { selectedCells, counter: !prevState.counter, selectedGroupCells: null };
       });
     } else if (ev.shiftKey) {
@@ -170,7 +161,7 @@ class Cells extends Component {
         return { selectedZone, counter: !prevState.counter };
       });
     } else {
-      const selectedCells = aId ? [{ i, j, aId }] : [{ i, j }];
+      const selectedCells = aId ? [{ i, j, aId, instId, itemId }] : [{ i, j }];
       this.setState(prevState => ({
         selectedCells,
         counter: !prevState.counter,
@@ -192,6 +183,7 @@ class Cells extends Component {
   handleKeyDown = async (ev) => {
     const { selectedZone, selectedCells, selectedGroupCells } = this.state;
     const { removeCell, removeZone, data: { allCells } } = this.props;
+    console.log(ev.keyCode);
     if (ev.keyCode===82 && ev.altKey && selectedZone) {
       await this.props.refreshZone({
         variables: { zoneId: selectedZone.id }
@@ -228,9 +220,16 @@ class Cells extends Component {
     const { allCells, allZones } = this.props.data;
     const { selectedCells, selectedGroupCells, selectedZone } = this.state;
     const data = _.find(allCells, o => o.i===rowIndex && o.j ===columnIndex);
-    let zoneLeft, zoneRight, zoneTop, zoneBottom;
-    let activeLeft, activeRight, activeTop, activeBottom;
+    let zoneLeft;
+    let zoneRight;
+    let zoneTop;
+    let zoneBottom;
+    let activeLeft;
+    let activeRight;
+    let activeTop;
+    let activeBottom;
     let newStyle = { ...style };
+    data && !data.availability.instance.item.img && console.log(data.id);
     allZones.forEach(zone => {
       zoneLeft = zone.j0 === columnIndex
         && zone.i0 <= rowIndex && zone.i1 >= rowIndex || zoneLeft;
@@ -322,6 +321,8 @@ class Cells extends Component {
         department={data && data.availability.department[0].name}
         quantity={data && data.availability.quantity}
         aId = {data && data.availability.id || null}
+        instId = {data && data.availability.instance.id || null}
+        itemId = {data && data.availability.instance.item.id || null}
         style={newStyle}
         row={rowIndex}
         column={columnIndex}
@@ -342,7 +343,7 @@ class Cells extends Component {
     return (
       <Row style={{ flex: '1', height: '100%' }}>
         <Col>
-          <div tabIndex="0" onKeyDown={this.onKeyDown} style={{ flex: '1', height: '100%' }}>
+          <div tabIndex="0" onKeyDown={this.handleKeyDown} style={{ flex: '1', height: '100%' }}>
             <AutoSizer defaultHeight={600}>
               {({ height, width }) => (
                 <Grid

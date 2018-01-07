@@ -5,6 +5,7 @@ import styles from './styles';
 import compose from 'recompose/compose';
 import pure from 'recompose/pure';
 import Button from 'material-ui/Button';
+import { Row } from 'reactstrap';
 
 class PopoverButton extends Component {
   onClick = () => {
@@ -16,18 +17,23 @@ class PopoverButton extends Component {
     const buttonStyle = selection === 'selected' ?
       classes.buttonSelected : selection === 'selectedNotByAll' ?
       classes.buttonSelectedNotByAll : classes.buttonNotSelected;
-    return ([<Button
-      key='button'
-      disableRipple
-      className={buttonStyle}
-      onClick={this.onClick}
-      >
-      {filterName}
-    </Button>,
-    <div
-      key='color'
-      style={ { backgroundColor: filterColor, width: '20px', height: '20px', display: 'inline-block' } }
-    />]);
+    return (
+      <Row style={{ width: '80%', margin: 'auto' }}>
+        <Button
+          key='button'
+          disableRipple
+          className={`${buttonStyle} col`}
+          onClick={this.onClick}
+          >
+          {filterName}
+        </Button>
+        { filterColor && <div
+          key='color'
+          className='col-xs-1'
+          style={ { backgroundColor: filterColor, width: '20px', height: '20px', display: 'inline-block' } }
+        />}
+      </Row>
+    );
   }
 }
 

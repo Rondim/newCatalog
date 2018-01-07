@@ -1,5 +1,4 @@
 import gql from 'graphql-tag';
-import _ from 'lodash';
 
 export const fetchConfig = gql`
   query {

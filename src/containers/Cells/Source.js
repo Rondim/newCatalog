@@ -12,7 +12,8 @@ class Source extends Component {
     department: PropTypes.string,
     quantity: PropTypes.number,
     onSelect: PropTypes.func,
-    startDrag: PropTypes.func
+    startDrag: PropTypes.func,
+    id: PropTypes.string
   };
   static defaultProps = {};
 
