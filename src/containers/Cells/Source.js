@@ -25,7 +25,6 @@ class Source extends Component {
       width: '100%',
       height: '100%'
     };
-    if (tags.length > 0) console.log(tags);
     if (url) {
       resStyle.backgroundImage = `url(${url})`;
       resStyle.backgroundSize = style.width;

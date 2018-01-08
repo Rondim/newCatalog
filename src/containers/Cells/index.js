@@ -31,8 +31,14 @@ const sheet = 'cjbnm5axu1kdt01475y4ak9lz';
     };
   }),
   props: props => {
+    let data = { ...props.data };
+    if (!props.data.loading) {
+      let _allCellsMeta = { ...props.data._allCellsMeta };
+      _allCellsMeta.count = props.data._allCellsMeta.count + Math.random();
+      data._allCellsMeta = _allCellsMeta;
+    }
     return {
-      data: props.data,
+      data: Object.assign({}, data),
       subscribeToCells: params => {
         return props.data.subscribeToMore({
           document: updateCells,
@@ -44,7 +50,6 @@ const sheet = 'cjbnm5axu1kdt01475y4ak9lz';
             let { count } = prev._allCellsMeta;
             let allCells = [...prev.allCells];
             let index;
-            console.log(node, mutation);
             switch (mutation) {
               case 'DELETED':
                 index = _.findIndex(allCells, o => o.id === previousValues.id);
@@ -211,9 +216,13 @@ class Cells extends Component {
               }
             });
           }
-        })).then(() => this.setState(prevState => ({ counter: !prevState.counter })));
+        })).then(() => this.rerenderCells);
       }
     }
+    this.setState(prevState => ({ counter: !prevState.counter }));
+  };
+
+  rerenderCells = () => {
     this.setState(prevState => ({ counter: !prevState.counter }));
   };
 

@@ -17,12 +17,15 @@ import Instance from './Source';
     url: PropTypes.string,
     aId: PropTypes.string,
     instId: PropTypes.string,
-    itemId: PropTypes.string
+    itemId: PropTypes.string,
+    tags: PropTypes.array
   };
   static defaultProps = {};
 
   shouldComponentUpdate(nextProps, nextState, nextContext) {
-    return nextProps.active !== this.props.active || nextProps.aId !== this.props.aId;
+    const tagsExp = nextProps.tags && !this.props.tags ||
+      nextProps.tags && nextProps.tags.length !== this.props.tags.length;
+    return nextProps.active !== this.props.active || nextProps.aId !== this.props.aId || !!tagsExp;
   }
 
   handleSelect = ev => {
