@@ -1,0 +1,26 @@
+mutation unsetFilterToAvail($id: ID!, $filterId: ID!){
+  removeFromAvailabilityOnSidebarFilter(availabilitiesAvailabilityId: $id,
+    sidebarFiltersSidebarFilterId: $filterId){
+    sidebarFiltersSidebarFilter{
+      id
+    }
+  }
+}
+
+mutation unsetFilterToInstance($id: ID!, $filterId: ID!){
+  removeFromSidebarFilterOnInstance(instancesInstanceId: $id,
+    sidebarFiltersSidebarFilterId: $filterId){
+    sidebarFiltersSidebarFilter{
+      id
+    }
+  }
+}
+
+mutation unsetFilterToItem($id: ID!, $filterId: ID!){
+  removeFromSidebarFiltersOnItem(itemsItemId: $id,
+    sidebarFiltersSidebarFilterId: $filterId){
+    sidebarFiltersSidebarFilter{
+      id
+    }
+  }
+}

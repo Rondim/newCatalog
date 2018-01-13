@@ -1,0 +1,24 @@
+subscription {
+  Zone{
+    mutation
+    node{
+      id
+      id,
+      i0,
+      j0,
+      i1,
+      j1,
+      filter
+    }
+    previousValues{
+      id
+      id,
+      i0,
+      j0,
+      i1,
+      j1,
+      filter
+    }
+    updatedFields
+  }
+}

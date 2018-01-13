@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import { Badge } from 'reactstrap';
 
-import { fetchCount, fetchCountOptions } from './queries/fetchAvailabilitiesCount';
+import { fetchCountOptions } from './queries/utils/fetchAvailabilitiesCount';
+import fetchCount from './queries/fetchAvailabilitiesCount.graphql';
 
 @graphql(fetchCount, fetchCountOptions)
 class CountAvailabilitiesForLoad extends Component {

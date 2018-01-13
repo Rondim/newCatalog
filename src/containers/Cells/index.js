@@ -8,22 +8,22 @@ import { Grid, AutoSizer } from 'react-virtualized';
 
 import 'react-virtualized/styles.css';
 import Cell from './Cell';
-import query from './queries/fetchCells';
-import setPosition from './mutations/setPosition';
-import removeCell from './mutations/removeCell';
-import removeZone from './mutations/removeZone';
-import createZone from './mutations/createZone';
-import refreshZone from './mutations/refreshZone';
-import updateCells from './subscriptions/updateCells';
+import query from './queries/fetchCells.graphql';
+import setPosition from './mutations/setPosition.graphql';
+import removeCell from './mutations/removeCell.graphql';
+import removeZone from './mutations/removeZone.graphql';
+import createZone from './mutations/createZone.graphql';
+import refreshZone from './mutations/refreshZone.graphql';
+import updateCells from './subscriptions/updateCells.graphql';
+import updateZones from './subscriptions/updateZones.graphql';
 import Loading from '../../components/Loading';
 import Toolbar from './Toolbar';
 import { notification } from '../Notificator/actions';
 
-const sheet = 'cjbnm5axu1kdt01475y4ak9lz';
-
 @connect(null, { notification })
 @graphql(query, {
   options: (props => {
+    const { id: sheet } = props.match.params;
     return {
       variables: {
         sheet
@@ -53,8 +53,10 @@ const sheet = 'cjbnm5axu1kdt01475y4ak9lz';
             switch (mutation) {
               case 'DELETED':
                 index = _.findIndex(allCells, o => o.id === previousValues.id);
-                allCells.splice(index, 1);
-                count--;
+                if (~index) {
+                  allCells.splice(index, 1);
+                  count--;
+                }
                 break;
               case 'CREATED':
                 allCells.push(node);
@@ -65,6 +67,35 @@ const sheet = 'cjbnm5axu1kdt01475y4ak9lz';
                 allCells[index] = node;
             }
             return Object.assign({}, prev, { allCells, _allCellsMeta: { count } });
+          }
+        });
+      },
+      subscribeToZones: params => {
+        return props.data.subscribeToMore({
+          document: updateZones,
+          updateQuery: (prev, { subscriptionData }) => {
+            if (!subscriptionData.data) {
+              return prev;
+            }
+            const { Zone: { mutation, previousValues, node } } = subscriptionData.data;
+            let { count } = prev._allCellsMeta;
+            let allZones = [...prev.allZones];
+            let index;
+            switch (mutation) {
+              case 'DELETED':
+                index = _.findIndex(allZones, o => o.id === previousValues.id);
+                allZones.splice(index, 1);
+                count--;
+                break;
+              case 'CREATED':
+                allZones.push(node);
+                count++;
+                break;
+              case 'UPDATED':
+                index = _.findIndex(allZones, o => o.id === previousValues.id);
+                allZones[index] = node;
+            }
+            return Object.assign({}, prev, { allZones, _allCellsMeta: { count } });
           }
         });
       }
@@ -86,7 +117,9 @@ class Cells extends Component {
     refreshZone: PropTypes.func,
     removeCell: PropTypes.func,
     subscribeToCells: PropTypes.func,
+    subscribeToZones: PropTypes.func,
     notification: PropTypes.func,
+    match: PropTypes.object,
     data: PropTypes.shape({
       loading: PropTypes.bool,
       allCells: PropTypes.array,
@@ -108,11 +141,12 @@ class Cells extends Component {
 
   componentWillMount() {
     this.props.subscribeToCells();
+    this.props.subscribeToZones();
   }
 
   onDrop = async (i, j) => {
     const { dragItem: id } = this.state;
-    if (i && j) {
+    if (i >=0 && j >=0) {
       this.props.setPosition({ variables: { id, row: i, column: j }, optimisticResponse: {
           __typename: 'Mutation',
           updateCell: {
@@ -124,6 +158,24 @@ class Cells extends Component {
         } }).then(() => this.setState(prevState => ({ counter: !prevState.counter })));
       this.setState(prevState => ({ counter: !prevState.counter }));
     }
+  };
+
+  selectorCells = () => {
+    const { selectedCells, selectedGroupCells } = this.state;
+    if (selectedGroupCells) {
+      return this.selectCellsByGroup().map(({ i, j, availability }) => {
+        return { i, j, aId: availability.id, instId: availability.instance.id, itemId: availability.instance.item.id };
+      });
+    }
+    return selectedCells;
+  };
+
+  selectCellsByGroup = () => {
+    const { selectedGroupCells: { i0, i1, j0, j1 } } = this.state;
+    const { allCells } = this.props.data;
+    return _.filter(allCells, ({ i, j })=> {
+      return i>=i0 && i<=i1 && j>=j0 && j<=j1;
+    });
   };
 
   handleSelectCell = (ev, i, j, aId, instId, itemId) => {
@@ -142,7 +194,7 @@ class Cells extends Component {
     } else if (ev.shiftKey) {
       this.setState(prevState => {
         let selectedCells = [...prevState.selectedCells];
-        if (!selectedCells.length) return { selectedCells: [{ i, j }] };
+        if (!selectedCells.length) return { selectedCells: [{ i, j, counter: !prevState.counter }] };
         const { i: iF, j: jF } = selectedCells[selectedCells.length -1];
         const i0 = iF < i ? iF : i;
         const j0 = jF < j ? jF : j;
@@ -178,6 +230,7 @@ class Cells extends Component {
   };
 
   handleLoad = async filter => {
+    const { id: sheet } = this.props.match.params;
     const res = await this.props.createZone({
       variables: { ...this.state.selectedGroupCells, filter, sheet }
     });
@@ -186,9 +239,30 @@ class Cells extends Component {
     });
   };
 
+  removeCell = id => {
+    const { id: sheet } = this.props.match.params;
+    this.props.removeCell({
+      variables: { id },
+      optimisticResponse: {
+        __typename: 'Mutation',
+        deleteCell: {
+          __typename: 'cell',
+          id,
+        }
+      },
+      update: (proxy, { data: { deleteCell } }) => {
+        const data = proxy.readQuery({ query, variables: { sheet } });
+        const index = _.findIndex(data.allCells, o => o.id === deleteCell.id);
+        if (~index) data.allCells.splice(index, 1);
+        data._allCellsMeta.count--;
+        proxy.writeQuery({ query, variables: { sheet }, data });
+      },
+    });
+  };
+
   handleKeyDown = async (ev) => {
     const { selectedZone, selectedCells, selectedGroupCells } = this.state;
-    const { removeCell, removeZone, data: { allCells } } = this.props;
+    const { removeZone, data: { allCells } } = this.props;
     console.log(ev.keyCode);
     if (ev.keyCode===82 && ev.altKey && selectedZone) {
       await this.props.refreshZone({
@@ -198,23 +272,16 @@ class Cells extends Component {
     } else if (ev.keyCode === 8 || ev.keyCode === 46) {
       if (selectedZone) {
         await removeZone({ variables: { id: selectedZone.id } });
-        this.setState(prevState => ({ counter: !prevState.counter }));
+        this.setState(prevState => ({ counter: !prevState.counter, selectedZone: null }));
       } else if (selectedGroupCells) {
-        console.log(selectedGroupCells);
+        const cells = this.selectCellsByGroup();
+        await Promise.all(cells.map(({ id }) => this.removeCell(id)))
+          .then(() => this.rerenderCells);
       } else if (selectedCells) {
         await Promise.all(selectedCells.map(({ i, j }) => {
           const cell = _.find(allCells, o=> o.i ===i && o.j===j);
           if (cell) {
-            return removeCell({
-              variables: { id: cell.id },
-              optimisticResponse: {
-                __typename: 'Mutation',
-                deleteCell: {
-                  __typename: 'cell',
-                  id: cell.id,
-                }
-              }
-            });
+            return this.removeCell(cell.id);
           }
         })).then(() => this.rerenderCells);
       }
@@ -347,7 +414,8 @@ class Cells extends Component {
   };
 
   render() {
-    const { counter, mode, selectedCells } = this.state;
+    const { counter, mode } = this.state;
+    const { id: sheet } = this.props.match.params;
     const { loading, _allCellsMeta } = this.props.data;
     if (loading) return <Loading />;
     return (
@@ -379,7 +447,7 @@ class Cells extends Component {
             onLoad={this.handleLoad}
             mode={mode}
             changeMode={mode => this.setState({ mode })}
-            selectedCells={ selectedCells }
+            selectedCells={ this.selectorCells() }
             sheet={sheet}
           />
         </Col>

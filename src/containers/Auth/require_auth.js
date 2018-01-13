@@ -9,7 +9,11 @@ import {
 export default (WrappedComponent) => {
   class RequireAuth extends Component {
     static propTypes = {
-      history: PropTypes.object
+      history: PropTypes.object,
+      data: PropTypes.shape({
+        user: PropTypes.object,
+        loading: PropTypes.bool
+      })
     };
 
     componentWillUpdate({ data: { user, loading } }) {
@@ -19,7 +23,9 @@ export default (WrappedComponent) => {
     }
 
     render() {
-      return <WrappedComponent {...this.props} />;
+      const { loading, user } = this.props.data;
+      if (loading) return <div />;
+      return <WrappedComponent {...this.props} user={user} />;
     }
   }
 

@@ -1,0 +1,3 @@
+mutation ($zoneId: ID!){
+    zoneRefresh(zoneId: $zoneId )
+}

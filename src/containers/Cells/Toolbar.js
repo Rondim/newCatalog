@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { TabContent, TabPane, Nav, NavItem, NavLink, Button } from 'reactstrap';
+import { TabContent, TabPane, Nav, NavItem, NavLink, Button, Row, Col } from 'reactstrap';
 import classnames from 'classnames';
 import { graphql, compose } from 'react-apollo';
 import { connect } from 'react-redux';
@@ -11,15 +11,16 @@ import _ from 'lodash';
 import CatalogSidebar from '../CatalogSidebar';
 import SetterSidebar from '../SetterSidebar';
 import { fetchConfig, dataToConfig } from '../Catalog/queries/fetchConfig';
-import fetchFilters from './queries/fetchFilters';
-import { availabilityByFilter } from './queries/fetchAvailabilitiesCount';
-import { setFilterToAvail, setFilterToInstance, setFilterToItem } from './mutations/setFilter';
-import { unsetFilterToAvail, unsetFilterToInstance, unsetFilterToItem } from './mutations/unsetFilter';
-import createFilter from './mutations/createFilter';
+import fetchFilters from './queries/fetchFilters.graphql';
+import { availabilityByFilter } from './queries/utils/fetchAvailabilitiesCount';
+import { setFilterToAvail, setFilterToInstance, setFilterToItem } from './mutations/setFilter.graphql';
+import { unsetFilterToAvail, unsetFilterToInstance, unsetFilterToItem } from './mutations/unsetFilter.graphql';
+import createFilter from './mutations/createFilter.graphql';
 import Loading from '../../components/Loading';
 import CountAvailabilitiesForLoad from './CountAvailabilitiesForLoad';
 import { instanceSelect } from '../CatalogSidebar/actions';
-import query from './queries/fetchCells';
+import query from './queries/fetchCells.graphql';
+import refreshAllZones from './mutations/refreshAllZones.graphql';
 
 const styles = theme => ({
   root: {
@@ -76,6 +77,7 @@ const calcFilterVariables = (selectedCells) => {
   })
 )
   @compose(
+    graphql(refreshAllZones, { name: 'refreshAllZones' }),
     graphql(setFilterToItem, { name: 'setFilterToItem' }),
     graphql(unsetFilterToItem, { name: 'unsetFilterToItem' }),
     graphql(setFilterToInstance, { name: 'setFilterToInstance' }),
@@ -101,6 +103,7 @@ class Toolbar extends Component {
     unsetFilterToInstance: PropTypes.func,
     setFilterToAvail: PropTypes.func,
     unsetFilterToAvail: PropTypes.func,
+    refreshAllZones: PropTypes.func,
     mode: PropTypes.string,
     changeMode: PropTypes.func,
     onLoad: PropTypes.func,
@@ -125,6 +128,7 @@ class Toolbar extends Component {
       config: { sidebarConfigData, loading: configLoading }, filters, instanceSelect } = nextProps;
     if (mode === 'setter' && !loading && !configLoading && selectedCells && selectedCells.length) {
       if ( !_.isEqual(filters, this.props.filters)) {
+        console.log(selectedCells);
         instanceSelect(someFilters, everyFilters, sidebarConfigData);
       }
     }
@@ -191,6 +195,11 @@ class Toolbar extends Component {
     }
   };
 
+  refreshAll = () => {
+    const { sheet, refreshAllZones } = this.props;
+    refreshAllZones({ variables: { sheetId: sheet } });
+  };
+
   handleCreateFilter = (name, color, propertyId, order) => {
     this.props.createFilter({ variables: { name, propertyId, order, color },
       refetchQueries: [{
@@ -234,11 +243,20 @@ class Toolbar extends Component {
             <Paper className={classes.paper}>
               <CatalogSidebar config={sidebarConfigData} />
             </Paper>
-            <CountAvailabilitiesForLoad
-              mapTypes={sidebarConfigData.mapTypes}
-              filtersSelected={filtersSelected}
-            />
-            <Button color='success' onClick={this.handleClick}>Load</Button>
+            <Row>
+              <Col>
+                <CountAvailabilitiesForLoad
+                  mapTypes={sidebarConfigData.mapTypes}
+                  filtersSelected={filtersSelected}
+                />
+              </Col>
+              <Col>
+                <Button color='success' onClick={this.handleClick}>Load</Button>
+              </Col>
+            </Row>
+            <Row><Col>
+              <Button color='success' onClick={this.refreshAll}>Refresh all zones</Button>
+            </Col></Row>
           </TabPane>
           <TabPane tabId="setter">
             <Paper className={classes.paper}>

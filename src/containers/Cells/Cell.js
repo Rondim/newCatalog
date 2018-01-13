@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { observer } from 'mobx-react';
 
 import Instance from './Source';
 
-@observer class Cell extends Component {
+class Cell extends Component {
   static propTypes = {
     isOverCurrent: PropTypes.bool,
     connectDropTarget: PropTypes.func,

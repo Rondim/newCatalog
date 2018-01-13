@@ -1,0 +1,3 @@
+mutation ($sheetId: ID!){
+  zoneRefreshAll(sheetId: $sheetId )
+}

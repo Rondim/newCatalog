@@ -10,12 +10,14 @@ import { split } from 'apollo-link';
 import { WebSocketLink } from 'apollo-link-ws';
 import { getMainDefinition } from 'apollo-utilities';
 import { devToolsEnhancer } from 'redux-devtools-extension';
+import _ from 'lodash';
+
 import catalogSidebarReducer from './containers/CatalogSidebar/reducer';
 import setterSidebarReducer from './containers/SetterSidebar/reducer';
 import notifyReducer from './containers/Notificator/reducer';
 import { UNAUTH_USER } from './containers/Auth/actions/types';
 import { sendNotification } from './containers/Notificator/actions';
-import _ from 'lodash';
+import popupReducer from './containers/Popup/reducer';
 import { ROOT_URL, WS_URL } from './constants';
 
 const httpLink = new HttpLink({ uri: ROOT_URL });
@@ -24,6 +26,7 @@ const wsLink = new WebSocketLink({
   uri: WS_URL,
   options: {
     reconnect: true,
+    timeout: 30000,
     connectionParams: {
       authorization: `Bearer ${localStorage.getItem('token') || null}`,
     },
@@ -54,6 +57,7 @@ const appReducer = combineReducers({
   catalogSidebar: catalogSidebarReducer,
   setterSidebar: setterSidebarReducer,
   notify: notifyReducer,
+  popup: popupReducer,
 });
 
 const reducers = (state, action) => {

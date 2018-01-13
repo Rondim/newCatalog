@@ -1,11 +1,13 @@
-import gql from 'graphql-tag';
-
-export default gql`
-  query ($sheet: ID!){
-    allCells(filter: { sheet: { id: $sheet } }){
+subscription {
+  Cell{
+    mutation
+    node{
       id
       i
       j
+      sheet{
+        id
+      }
       availability{
         id
         department: sidebarFilters(filter: {property: {name: "Магазин"}}){
@@ -34,16 +36,11 @@ export default gql`
         }
       }
     }
-    allZones(filter: { sheetList: { id: $sheet } }){
-      id,
-      i0,
-      j0,
-      i1,
-      j1,
-      filter
+    previousValues{
+      id
+      i
+      j
     }
-    _allCellsMeta(filter: { sheet: { id: $sheet } }){
-      count
-    }
+    updatedFields
   }
-`;
+}

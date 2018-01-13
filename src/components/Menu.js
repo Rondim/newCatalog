@@ -64,7 +64,7 @@ class Menu extends Component {
           <Nav className="mr-auto" navbar key="exc1C">
             <NavItem>
               <NavLinkStrap
-                onClick={() => history.push('/cells')}
+                onClick={() => history.push('/sheets')}
               >Сетки</NavLinkStrap>
             </NavItem>
           </Nav>,

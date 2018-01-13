@@ -1,0 +1,7 @@
+query ($filter: AvailabilityFilter){
+  _allAvailabilitiesMeta(
+    filter: $filter
+  ) {
+    count
+  }
+}

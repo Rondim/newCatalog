@@ -1,15 +1,4 @@
-import gql from 'graphql-tag';
-import _ from 'lodash';
-
-export const fetchCount = gql`
-    query ($filter: AvailabilityFilter){
-        _allAvailabilitiesMeta(
-            filter: $filter
-        ) {
-            count
-        }
-    }
-`;
+import _ from 'lodash-es';
 
 export const fetchCountOptions = {
   options({ filtersSelected, mapTypes }) {
@@ -58,4 +47,3 @@ export const availabilityByFilter = (filters, mapType) => {
   filterResult.AND.push({ instance });
   return filterResult;
 };
-
