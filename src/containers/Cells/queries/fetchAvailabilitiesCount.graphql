@@ -1,6 +1,6 @@
-query ($filter: AvailabilityFilter){
+query ($filter: AvailabilityInput){
   _allAvailabilitiesMeta(
-    filter: $filter
+    where: $filter
   ) {
     count
   }

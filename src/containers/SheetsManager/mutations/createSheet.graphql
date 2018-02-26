@@ -1,0 +1,11 @@
+mutation ($userIds: [ID!], $name: String!){
+  createSheetList(name: $name, userIds: $userIds){
+    id
+    name
+    users{
+      id
+      email
+    }
+  }
+}
+

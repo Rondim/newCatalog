@@ -33,9 +33,22 @@ class ProductList extends Component {
     count: PropTypes.number,
     classes: PropTypes.object.isRequired
   };
+
   state = {
-    page: 1
+    page: 1,
+    length: 0
   };
+
+  componentWillReceiveProps({ instances }) {
+    if (instances.length && instances.length !== this.props.instances.length) {
+      this.setState({ length: instances.length });
+    }
+  }
+
+
+  componentWillUpdate({ instances }, { page, length }) {
+    if (length < this.state.length) this.handleChangePage(null, 1);
+  }
 
   onSelect = (ev) => {
     const { setActive } = this.props;
@@ -94,6 +107,7 @@ class ProductList extends Component {
     const { page } = this.state;
     let i = 0;
     if (!instances || instances.length === 0) return <Loading />;
+    console.log(instances.length);
     return _.map(instances, instance => {
       if (instance) {
         const { active, complited, item, id } = instance;

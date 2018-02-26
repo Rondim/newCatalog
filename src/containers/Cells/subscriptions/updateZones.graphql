@@ -9,6 +9,9 @@ subscription {
       i1,
       j1,
       filter
+      sheetList{
+        id
+      }
     }
     previousValues{
       id

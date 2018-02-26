@@ -4,8 +4,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
-import query from './queries/CurentUser';
-import mutation from './mutations/SigninUser';
+import query from './queries/CurentUser.graphql';
+import mutation from './mutations/SigninUser.graphql';
 import Loading from '../../components/Loading';
 import {
   withRouter
@@ -51,10 +51,10 @@ class Signin extends Component {
     const { email, password } = this.state;
     try {
       const response = await this.props.mutate({
-        variables: { auth: { email, password } }
+        variables: { email, password }
       });
       this.setState({ errors: [] });
-      localStorage.setItem('token', response.data.signinUser.token);
+      localStorage.setItem('token', response.data.login.token);
       this.props.history.push('/');
     } catch (res) {
       const errors = res.graphQLErrors.map(err => err.message);

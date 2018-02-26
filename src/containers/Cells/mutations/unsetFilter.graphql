@@ -1,26 +1,17 @@
 mutation unsetFilterToAvail($id: ID!, $filterId: ID!){
-  removeFromAvailabilityOnSidebarFilter(availabilitiesAvailabilityId: $id,
-    sidebarFiltersSidebarFilterId: $filterId){
-    sidebarFiltersSidebarFilter{
-      id
-    }
+  removeProductObjFromSidebarFilter(availabilityId: $id, sidebarFilterId: $filterId){
+    id
   }
 }
 
 mutation unsetFilterToInstance($id: ID!, $filterId: ID!){
-  removeFromSidebarFilterOnInstance(instancesInstanceId: $id,
-    sidebarFiltersSidebarFilterId: $filterId){
-    sidebarFiltersSidebarFilter{
-      id
-    }
+  removeProductObjFromSidebarFilter(instanceId: $id, sidebarFilterId: $filterId){
+    id
   }
 }
 
 mutation unsetFilterToItem($id: ID!, $filterId: ID!){
-  removeFromSidebarFiltersOnItem(itemsItemId: $id,
-    sidebarFiltersSidebarFilterId: $filterId){
-    sidebarFiltersSidebarFilter{
-      id
-    }
+  removeProductObjFromSidebarFilter(itemId: $id, sidebarFilterId: $filterId){
+    id
   }
 }

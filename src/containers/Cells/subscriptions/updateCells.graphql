@@ -5,6 +5,7 @@ subscription {
       id
       i
       j
+      text
       sheet{
         id
       }
@@ -28,6 +29,10 @@ subscription {
           }
           item{
             img{
+              id
+              url
+            }
+            imgWebP{
               id
               url
             }

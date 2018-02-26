@@ -1,0 +1,14 @@
+query ($userId: ID!){
+  allSheets(userId: $userId){
+    id
+    name
+    users{
+      id
+      email
+    }
+  }
+  allUsers{
+    id
+    email
+  }
+}

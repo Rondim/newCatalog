@@ -1,0 +1,8 @@
+mutation ($id: ID!, $text: String){
+  updateCell(id: $id, text: $text){
+    id
+    i
+    j
+    text
+  }
+}

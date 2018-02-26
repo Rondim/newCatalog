@@ -8,14 +8,14 @@ import { Multiselect } from 'react-widgets';
 import _ from 'lodash';
 import 'react-widgets/dist/css/react-widgets.css';
 
-import query from './queries/fetchSheets';
+import query from './queries/fetchSheets.graphql';
 import Loading from '../../components/Loading';
 import { openPopup, closePopup } from '../Popup/actions';
-import createSheet from './mutations/createSheet';
-import removeSheet from './mutations/removeSheet';
-import updateSheet from './mutations/updateSheet';
-import shareSheet from './mutations/shareSheet';
-import removeShareFromSheet from './mutations/removeShareFromSheet';
+import createSheet from './mutations/createSheet.graphql';
+import removeSheet from './mutations/removeSheet.graphql';
+import updateSheet from './mutations/updateSheet.graphql';
+import shareSheet from './mutations/shareSheet.graphql';
+import removeShareFromSheet from './mutations/removeShareFromSheet.graphql';
 
 @graphql(query, {
   options(props) {
@@ -37,7 +37,7 @@ import removeShareFromSheet from './mutations/removeShareFromSheet';
 class SheetsManager extends Component {
   static propTypes = {
     data: PropTypes.shape({
-      allSheetLists: PropTypes.array,
+      allSheets: PropTypes.array,
       allUsers: PropTypes.array,
       loading: PropTypes.bool
     }),
@@ -134,9 +134,9 @@ class SheetsManager extends Component {
   };
 
   renderList() {
-    const { data: { allSheetLists }, user } = this.props;
+    const { data: { allSheets }, user } = this.props;
     const { edit, name } = this.state;
-    return allSheetLists.map( sheet => {
+    return allSheets && allSheets.map( sheet => {
       return (
         <tr key={sheet.id}>
           <th scope="row">

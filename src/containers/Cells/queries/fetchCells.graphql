@@ -1,15 +1,17 @@
 query ($sheet: ID!){
-  allCells(filter: { sheet: { id: $sheet } }){
+  allCells(sheetId: $sheet){
     id
     i
     j
+    text
     availability{
       id
-      department: sidebarFilters(filter: {property: {name: "Магазин"}}){
+      department: sidebarFilters(where: {property: {name: "Магазин"}}){
         id
         name
+        color
       }
-      tags: sidebarFilters(filter: {property: {name: "Tags"}}){
+      tags: sidebarFilters(where: {property: {name: "Tags"}}){
         id
         name
         color
@@ -17,7 +19,7 @@ query ($sheet: ID!){
       quantity
       instance{
         id
-        size: sidebarFilters(filter: {property: {name: "Размер"}}){
+        size: sidebarFilters(where: {property: {name: "Размер"}}){
           id
           name
         }
@@ -26,12 +28,16 @@ query ($sheet: ID!){
             id
             url
           }
+          imgWebP{
+            id
+            url
+          }
           id
         }
       }
     }
   }
-  allZones(filter: { sheetList: { id: $sheet } }){
+  allZones(sheetId: $sheet){
     id,
     i0,
     j0,
@@ -39,7 +45,7 @@ query ($sheet: ID!){
     j1,
     filter
   }
-  _allCellsMeta(filter: { sheet: { id: $sheet } }){
+  _allCellsMeta(sheetId: $sheet){
     count
   }
 }

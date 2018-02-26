@@ -1,0 +1,10 @@
+mutation ($id: ID!, $userId: ID!){
+  addToCellsOnUser(sheetId: $id, userId: $userId){
+    id
+    name
+    users{
+      id
+      email
+    }
+  }
+}

@@ -1,24 +1,16 @@
 query (
 $aIds: [ID!],
-$availabilitiesEvery: [SidebarFilterFilter!],
-$instancesEvery: [SidebarFilterFilter!],
-$itemsEvery: [SidebarFilterFilter!]
+$availabilitiesEvery: [SidebarFilterWhereInput!],
+$instancesEvery: [SidebarFilterWhereInput!],
+$itemsEvery: [SidebarFilterWhereInput!]
 ){
-    someFilters: allSidebarFilters(filter:{ OR: [
-        { availabilities_some: { id_in: $aIds }}
-        { instances_some: { availabilities_some: { id_in: $aIds } } },
-        { items_some: { instances_some: { availabilities_some: { id_in: $aIds } } } }
-    ]}){
+    someFilters(aIds: $aIds){
         id
         property{
             id
         }
     }
-    everyFilters: allSidebarFilters(filter:{ OR: [
-        { AND: $availabilitiesEvery },
-        { AND: $instancesEvery }
-        { AND: $itemsEvery }
-    ]}){
+    everyFilters(availabilitiesEvery: $availabilitiesEvery, instancesEvery: $instancesEvery, itemsEvery: $itemsEvery){
         id
         property{
             id

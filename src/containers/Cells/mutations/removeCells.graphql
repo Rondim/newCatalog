@@ -1,0 +1,3 @@
+mutation ($coords: [CoordInput!]!, $sheetId: ID!){
+  deleteManyCells(coords: $coords, sheetId: $sheetId)
+}

@@ -1,0 +1,10 @@
+mutation ($id: ID!, $userId: ID!){
+  removeFromCellsOnUser(sheetId: $id, userId: $userId){
+    id
+    name
+    users{
+      id
+      email
+    }
+  }
+}

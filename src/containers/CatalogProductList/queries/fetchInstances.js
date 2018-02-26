@@ -2,16 +2,14 @@ import gql from 'graphql-tag';
 import _ from 'lodash';
 
 export const fetchInstances = gql`
-  query FetchItems($skippedItems: Int, $first: Int, $filter: InstanceFilter){
-    _allInstancesMeta(
-        filter: $filter
-    ) {
+  query FetchItems($skippedItems: Int, $first: Int, $filter: InstanceWhereInput){
+    _allInstancesMeta (where: $filter){
       count
     }
     allInstances(
         first: $first,
         skip: $skippedItems,
-        filter: $filter
+        where: $filter
     ){
       id,
       item{

@@ -1,5 +1,5 @@
-mutation ($propertyId: ID!, $name: String!, $order: Int!, $color: String!){
-    createSidebarFilter(name: $name, propertyId: $propertyId, order: $order, color: $color){
+mutation ($propertyId: ID!, $name: String!, $color: String!){
+    createSidebarFilter(name: $name, propertyId: $propertyId, color: $color){
         id
         name
         order

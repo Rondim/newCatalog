@@ -1,0 +1,244 @@
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { Grid, AutoSizer } from 'react-virtualized';
+import _ from 'lodash';
+import { graphql, compose } from 'react-apollo';
+import { connect } from 'react-redux';
+
+import Loading from '../../components/Loading';
+import Cell from './Cell';
+
+import query from './queries/fetchCells.graphql';
+import removeCells from './mutations/removeCells.graphql';
+import removeZone from './mutations/removeZone.graphql';
+import refreshZone from './mutations/refreshZone.graphql';
+import createTextCell from './mutations/createTextCell.graphql';
+import updateTextCell from './mutations/updateTextCell.graphql';
+// import updateCells from './subscriptions/updateCells.graphql';
+// import updateZones from './subscriptions/updateZones.graphql';
+import { notification } from '../Notificator/actions';
+import { calcActive, calcStyle, checkWebpFeature } from './libs/calc';
+
+// import Zone from './libs/zone';
+// import CellObj from './libs/cellObj';
+
+@connect(null, { notification })
+@graphql(query, {
+    options: (({ sheet }) => {
+      return {
+        variables: {
+          sheet
+        }
+      };
+    })
+  }
+)
+@compose(
+  graphql(refreshZone, { name: 'refreshZone' }),
+  graphql(removeCells, { name: 'removeCells' }),
+  graphql(removeZone, { name: 'removeZone' }),
+  graphql(createTextCell, { name: 'createTextCell' }),
+  graphql(updateTextCell, { name: 'updateTextCell' })
+)
+class Sheet extends Component {
+  static propTypes = {
+    data: PropTypes.shape({
+      loading: PropTypes.bool,
+      allCells: PropTypes.array,
+      allZones: PropTypes.array,
+      _allCellsMeta: PropTypes.object
+    }),
+    sheet: PropTypes.string,
+    selectedCells: PropTypes.array,
+    selectedGroupCells: PropTypes.object,
+    selectedZone: PropTypes.object,
+    counter: PropTypes.bool,
+    onDrop: PropTypes.func,
+    notification: PropTypes.func,
+    refreshZone: PropTypes.func,
+    removeCells: PropTypes.func,
+    removeZone: PropTypes.func,
+    selectSomeCells: PropTypes.func,
+    selectOneCell: PropTypes.func,
+    selectManyCells: PropTypes.func,
+    selectZone: PropTypes.func,
+    onStartDrag: PropTypes.func,
+    createTextCell: PropTypes.func,
+    updateTextCell: PropTypes.func
+  };
+  static defaultProps = {};
+
+  componentWillMount() {
+    checkWebpFeature('lossy', (feature, res) => {
+      this.setState({ webp: res });
+    });
+  }
+
+  state={
+    ownCounter: false,
+    webp: false
+  };
+
+  rerenderCells = () => {
+    this.setState(prevState => ({ ownCounter: !prevState.ownCounter }));
+  };
+
+  handleSelectCell = (ev, i, j, aId, instId, itemId) => {
+    const { allZones, allCells } = this.props.data;
+    const { selectSomeCells, selectOneCell, selectManyCells, selectZone } = this.props;
+    if (ev.metaKey) {
+      selectSomeCells(i, j, aId, instId, itemId);
+    } else if (ev.shiftKey) {
+      selectManyCells(i, j, aId, instId, itemId, allCells);
+    } else if (ev.altKey) {
+      selectZone(allZones, i, j);
+    } else {
+      const selectedCells = aId ? [{ i, j, aId, instId, itemId }] : [{ i, j }];
+      selectOneCell(selectedCells);
+    }
+  };
+
+  handleKeyDown = async (ev) => {
+    const {
+      removeZone, selectedZone, selectedCells, selectedGroupCells, refreshZone, unselectZone, sheet
+    } = this.props;
+    if (ev.keyCode===82 && ev.altKey && selectedZone) {
+      await refreshZone({
+        variables: { zoneId: selectedZone.id },
+        refetchQueries: [{ query, variables: { sheet } }]
+      });
+      this.props.notification('success', 'Зона обновлена');
+    } else if (ev.keyCode === 8 || ev.keyCode === 46) {
+      if (selectedZone) {
+        await removeZone({ variables: { id: selectedZone.id } });
+        unselectZone();
+        this.rerenderCells();
+      } else if (selectedGroupCells) {
+        const cells = this.selectCellsByGroup();
+        await this.removeCells(cells.map(({ i, j }) => ({ i, j })), sheet);
+      } else if (selectedCells) {
+        await this.removeCells(selectedCells.map(({ i, j }) => ({ i, j })), sheet);
+      }
+    }
+    this.rerenderCells();
+  };
+
+  removeCells = async (coords, sheet) => {
+    await this.props.removeCells({
+      variables: { coords, sheetId: sheet },
+      refetchQueries: [{ query, variables: { sheet } }]
+    });
+  };
+
+  selectCellsByGroup = () => {
+    const { selectedGroupCells: { i0, i1, j0, j1 } } = this.props;
+    const { allCells } = this.props.data;
+    return _.filter(allCells, ({ i, j })=> {
+      return i>=i0 && i<=i1 && j>=j0 && j<=j1;
+    });
+  };
+
+  onChangeText = (text, i, j, id) => {
+    const { createTextCell, updateTextCell, sheet } = this.props;
+    if (id) {
+      updateTextCell({ variables: { id, text } });
+    } else {
+      createTextCell({ variables: { i, j, text, sheet } });
+    }
+  };
+
+  cellRenderer = ({ columnIndex, key, rowIndex, style }) => {
+    const { allCells, allZones } = this.props.data;
+    const { selectedCells, selectedGroupCells, selectedZone, onStartDrag } = this.props;
+    const { webp } = this.state;
+    const data = _.find(allCells, o => o.i===rowIndex && o.j ===columnIndex);
+    let zoneBorders = { left: undefined, right: undefined, top: undefined, bottom: undefined };
+    let activeBorders = { left: undefined, right: undefined, top: undefined, bottom: undefined };
+    let newStyle = { ...style };
+    typeof allZones === 'object' && allZones.forEach(zone => {
+      zoneBorders = calcActive(zone, columnIndex, rowIndex, zoneBorders);
+    });
+    activeBorders = calcActive(selectedGroupCells, columnIndex, rowIndex, activeBorders);
+    const active = !!_.find(selectedCells, o => o.i ===rowIndex && o.j === columnIndex);
+    activeBorders = selectedZone ? calcActive(selectedZone, columnIndex, rowIndex, activeBorders) : activeBorders;
+    const borderLeftStyle = calcStyle(active, activeBorders.left, zoneBorders.left);
+    newStyle.borderLeftWidth = borderLeftStyle.width;
+    newStyle.borderLeftColor = borderLeftStyle.color;
+    const borderRightStyle = calcStyle(active, activeBorders.right, zoneBorders.right);
+    newStyle.borderRightWidth = borderRightStyle.width;
+    newStyle.borderRightColor = borderRightStyle.color;
+    const borderTopStyle = calcStyle(active, activeBorders.top, zoneBorders.top);
+    newStyle.borderTopWidth = borderTopStyle.width;
+    newStyle.borderTopColor = borderTopStyle.color;
+    const borderBottomStyle = calcStyle(active, activeBorders.bottom, zoneBorders.bottom);
+    newStyle.borderBottomWidth = borderBottomStyle.width;
+    newStyle.borderBottomColor = borderBottomStyle.color;
+    const itemProps = {
+      url: _.get(data, 'availability.instance.item.img.url'),
+      urlWebp: webp && _.get(data, 'availability.instance.item.imgWebP.url'),
+      size: _.get(data, 'availability.instance.size[0].name'),
+      department: _.get(data, 'availability.department[0].name'),
+      tags: _.get(data, 'availability.tags'),
+      quantity: _.get(data, 'availability.quantity'),
+      aId: _.get(data, 'availability.id') || null,
+      instId: _.get(data, 'availability.instance.id') || null,
+      itemId: _.get(data, 'availability.instance.item.id') || null
+    };
+    try {
+      return (
+        <Cell
+          key={key}
+          id={data ? data.id : null}
+          active={active && 1 || activeBorders.left && 1 || activeBorders.right && 1 || activeBorders.bottom && 1 ||
+          activeBorders.top && 1 || zoneBorders.left && 2 || zoneBorders.right && 2 || zoneBorders.top && 2 ||
+          zoneBorders.bottom && 2}
+          { ...itemProps }
+          text={data && data.text}
+          style={newStyle}
+          row={rowIndex}
+          column={columnIndex}
+          onKeyDown={this.handleKeyDown}
+          startDrag={(id, i, j) => onStartDrag(id, i, j)}
+          onDrop={this.props.onDrop}
+          onSelect={this.handleSelectCell}
+          onChangeText={this.onChangeText}
+        />
+      );
+    } catch (err) {
+      console.error(err, data && data.id);
+    }
+  };
+
+  render() {
+    const { loading, _allCellsMeta } = this.props.data;
+    if (loading) return <Loading />;
+    console.log(_allCellsMeta.count);
+    const { counter } = this.props;
+    const { ownCounter } = this.state;
+    return (
+      <div tabIndex="0" onKeyDown={this.handleKeyDown} style={{ flex: '1', height: '100%' }}>
+        <AutoSizer defaultHeight={600}>
+          {({ height, width }) => (
+            <Grid
+              cellRenderer={this.cellRenderer}
+              columnCount={200}
+              columnWidth={100}
+              height={height}
+              rowCount={300}
+              rowHeight={100}
+              width={width}
+              count={_allCellsMeta.count}
+              overscanColumnCount={16}
+              overscanRowCount={12}
+              scrollingResetTimeInterval={10}
+              counter={counter}
+              ownCounter={ownCounter}
+            />
+          )}
+        </AutoSizer>
+      </div>
+    );
+  }
+}
+
+export default Sheet;

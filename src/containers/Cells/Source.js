@@ -7,6 +7,7 @@ class Source extends Component {
     connectDragSource: PropTypes.func,
     style: PropTypes.object,
     url: PropTypes.string,
+    urlWebp: PropTypes.string,
     row: PropTypes.number,
     column: PropTypes.number,
     size: PropTypes.string,
@@ -20,13 +21,15 @@ class Source extends Component {
   static defaultProps = {};
 
   render() {
-    const { style, url, size, department, quantity, startDrag, row, column, id, tags } = this.props;
+    const { style, url, size, department, quantity, startDrag, row, column, id, tags, urlWebp } = this.props;
     const resStyle = {
       width: '100%',
       height: '100%'
     };
     if (url) {
-      resStyle.backgroundImage = `url(${url})`;
+      const link = urlWebp ? `${urlWebp.replace('files.graph.cool', 'images.graph.cool/v1')}/img.webp` :
+        `${url.replace('files.graph.cool', 'images.graph.cool/v1')}/200x`;
+      resStyle.backgroundImage = `url(${link})`;
       resStyle.backgroundSize = style.width;
       return (
         <div

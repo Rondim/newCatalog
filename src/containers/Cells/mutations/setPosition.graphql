@@ -1,5 +1,5 @@
-mutation ($id: ID!, $row: Int!, $column: Int){
-    updateCell(id: $id, i: $row, j: $column){
+mutation ($id: ID!, $row: Int!, $column: Int!){
+    updateCell(id: $id, coord: { i: $row, j: $column }){
         id
         i
         j

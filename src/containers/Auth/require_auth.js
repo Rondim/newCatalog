@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { graphql } from 'react-apollo';
-import curentUserQuery from './queries/CurentUser';
+import curentUserQuery from './queries/CurentUser.graphql';
 import PropTypes from 'prop-types';
 import {
   withRouter
@@ -11,21 +11,21 @@ export default (WrappedComponent) => {
     static propTypes = {
       history: PropTypes.object,
       data: PropTypes.shape({
-        user: PropTypes.object,
+        me: PropTypes.object,
         loading: PropTypes.bool
       })
     };
 
-    componentWillUpdate({ data: { user, loading } }) {
-      if (!loading && !user) {
+    componentWillUpdate({ data: { me, loading } }) {
+      if (!loading && !me) {
         this.props.history.push('/signin');
       }
     }
 
     render() {
-      const { loading, user } = this.props.data;
+      const { loading, me } = this.props.data;
       if (loading) return <div />;
-      return <WrappedComponent {...this.props} user={user} />;
+      return <WrappedComponent {...this.props} user={me} />;
     }
   }
 

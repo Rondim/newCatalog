@@ -1,5 +1,5 @@
 mutation ($id: ID!){
-  deleteCell(id: $id){
+  deleteSheetList(id: $id){
     id
   }
 }

@@ -1,0 +1,11 @@
+mutation ($text: String, $i: Int!, $j: Int!, $sheet: ID!){
+  createCell(i: $i, j: $j, text: $text, sheetId: $sheet){
+    id
+    i
+    j
+    text
+    sheet{
+      id
+    }
+  }
+}

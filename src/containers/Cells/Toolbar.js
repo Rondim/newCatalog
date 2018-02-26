@@ -126,11 +126,13 @@ class Toolbar extends Component {
   componentWillReceiveProps(nextProps, nextContext) {
     const { mode, filters: { loading, someFilters, everyFilters }, selectedCells,
       config: { sidebarConfigData, loading: configLoading }, filters, instanceSelect } = nextProps;
-    if (mode === 'setter' && !loading && !configLoading && selectedCells && selectedCells.length) {
+    if (mode === 'setter' && !loading && !configLoading && selectedCells && _.get(selectedCells, '[0].aId')) {
       if ( !_.isEqual(filters, this.props.filters)) {
-        console.log(selectedCells);
         instanceSelect(someFilters, everyFilters, sidebarConfigData);
       }
+    }
+    if (this.props.mode === 'setter' && mode === 'loader') {
+      instanceSelect([], [], sidebarConfigData);
     }
   }
 

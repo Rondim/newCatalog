@@ -1,26 +1,17 @@
 mutation setFilterToAvail($id: ID!, $filterId: ID!){
-    addToAvailabilityOnSidebarFilter(availabilitiesAvailabilityId: $id,
-        sidebarFiltersSidebarFilterId: $filterId){
-        sidebarFiltersSidebarFilter{
-            id
-        }
+    addProductObjToSidebarFilter(availabilityId: $id, sidebarFilterId: $filterId){
+        id
     }
 }
 
 mutation setFilterToInstance($id: ID!, $filterId: ID!){
-    addToSidebarFilterOnInstance(instancesInstanceId: $id,
-        sidebarFiltersSidebarFilterId: $filterId){
-        sidebarFiltersSidebarFilter{
-            id
-        }
+    addProductObjToSidebarFilter(instanceId: $id, sidebarFilterId: $filterId){
+        id
     }
 }
 
 mutation setFilterToItem($id: ID!, $filterId: ID!){
-    addToSidebarFiltersOnItem(itemsItemId: $id,
-        sidebarFiltersSidebarFilterId: $filterId){
-        sidebarFiltersSidebarFilter{
-            id
-        }
+    addProductObjToSidebarFilter(itemId: $id, sidebarFilterId: $filterId){
+        id
     }
 }
