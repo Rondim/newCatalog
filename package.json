@@ -1,8 +1,8 @@
 {
-  "name": "dev",
+  "name": "userUI",
   "version": "0.1.0",
   "private": true,
-  "homepage": "http://sheets.zull.xax.cloud/",
+  "homepage": "http://sheets.zull.pro/",
   "dependencies": {
     "apollo-cache-inmemory": "^1.1.7",
     "apollo-client": "^2.2.2",
