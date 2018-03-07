@@ -107,7 +107,6 @@ class ProductList extends Component {
     const { page } = this.state;
     let i = 0;
     if (!instances || instances.length === 0) return <Loading />;
-    console.log(instances.length);
     return _.map(instances, instance => {
       if (instance) {
         const { active, complited, item, id } = instance;

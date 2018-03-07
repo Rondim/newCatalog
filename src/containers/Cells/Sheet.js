@@ -110,7 +110,7 @@ class Sheet extends Component {
       this.props.notification('success', 'Зона обновлена');
     } else if (ev.keyCode === 8 || ev.keyCode === 46) {
       if (selectedZone) {
-        await removeZone({ variables: { id: selectedZone.id } });
+        await removeZone({ variables: { id: selectedZone.id }, refetchQueries: [{ query, variables: { sheet } }] });
         unselectZone();
         this.rerenderCells();
       } else if (selectedGroupCells) {
