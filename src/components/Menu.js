@@ -86,12 +86,12 @@ class Menu extends Component {
           </Nav>]
         : [
           <Nav className="ml-auto" navbar key="login">
-            <LinkContainer to="/signin" className="hidden-sm-up">
+            <LinkContainer to="/signin" className="d-lg-none">
               <NavItem>
                 Вход
               </NavItem>
             </LinkContainer>
-            <LinkContainer to="/signin" className="hidden-xs-down">
+            <LinkContainer to="/signin" className="d-none d-lg-block">
               <NavItem>
                 <FontAwesome name="sign-in" size='2x' />
               </NavItem>

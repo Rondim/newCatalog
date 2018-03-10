@@ -13,7 +13,7 @@ import Popup from './containers/Popup';
 const App = () => (
     <div className="App">
       <div>
-        <Navigation />
+        <Navigation authenticated={!!localStorage.getItem('token')} />
       </div>
       <Popup />
       <Notificator />

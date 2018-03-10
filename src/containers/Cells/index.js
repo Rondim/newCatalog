@@ -51,20 +51,27 @@ class Cells extends Component {
             i,
             j
           }
-        } }).then(() => this.setState(prevState => ({ counter: !prevState.counter })));
-      this.setState(prevState => ({ counter: !prevState.counter }));
+        } });
     }
   };
 
   selectorCells = () => {
     const { selectedCells, selectedCellsByGroup } = this.state;
     if (selectedCellsByGroup) {
-      return selectedCellsByGroup.map(({ i, j, availability }) => {
-        return availability &&
-          { i, j, aId: availability.id, instId: availability.instance.id, itemId: availability.instance.item.id };
+      let array = [];
+      selectedCellsByGroup.forEach(({ i, j, availability }) => {
+        if (availability && availability.id) {
+          array.push({
+            i,
+            j,
+            aId: availability.id,
+            instId: availability.instance.id,
+            itemId: availability.instance.item.id
+          });
+        }
       });
-    }
-    return selectedCells;
+      return array;
+    } else return selectedCells;
   };
 
   handleLoad = async filter => {
@@ -81,7 +88,7 @@ class Cells extends Component {
   selectManyCells = (i, j, aId, instId, itemId, allCells) => {
     this.setState(prevState => {
       let selectedCells = [...prevState.selectedCells];
-      if (!selectedCells.length) return { selectedCells: [{ i, j, counter: !prevState.counter }] };
+      if (!selectedCells.length) return { selectedCells: [{ i, j }] };
       const { i: iF, j: jF } = selectedCells[selectedCells.length -1];
       const i0 = iF < i ? iF : i;
       const j0 = jF < j ? jF : j;
@@ -92,7 +99,6 @@ class Cells extends Component {
       });
       return {
         selectedCells: [],
-        counter: !prevState.counter,
         selectedGroupCells: { i0, i1, j0, j1 },
         selectedCellsByGroup
       };
@@ -105,17 +111,16 @@ class Cells extends Component {
       const find =_.findIndex(selectedCells, o => o.i === i && o.j === j);
       if (find !== -1) {
         selectedCells.splice(find, 1);
-        return { selectedCells, counter: !prevState.counter, selectedGroupCells: null };
+        return { selectedCells, selectedGroupCells: null };
       }
       selectedCells.push(aId ? { i, j, aId, instId, itemId } : { i, j });
-      return { selectedCells, counter: !prevState.counter, selectedGroupCells: null, selectedCellsByGroup: null };
+      return { selectedCells, selectedGroupCells: null, selectedCellsByGroup: null };
     });
   };
 
   selectOneCell = (selectedCells) => {
     this.setState(prevState => ({
       selectedCells,
-      counter: !prevState.counter,
       selectedGroupCells: null,
       selectedCellsByGroup: null,
       selectedZone: null
@@ -136,7 +141,7 @@ class Cells extends Component {
         }
         return true;
       });
-      return { selectedZone, counter: !prevState.counter };
+      return { selectedZone };
     });
   };
 
@@ -153,8 +158,7 @@ class Cells extends Component {
       mode,
       selectedCells,
       selectedGroupCells,
-      selectedZone,
-      counter
+      selectedZone
     } = this.state;
     const { id: sheet } = this.props.match.params;
     const sheetProps = {
@@ -168,7 +172,6 @@ class Cells extends Component {
       selectedCells,
       selectedGroupCells,
       selectedZone,
-      counter,
       sheet
     };
     return (

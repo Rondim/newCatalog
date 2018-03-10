@@ -1,5 +1,5 @@
-query ($sheet: ID!){
-  allCells(sheetId: $sheet){
+query ($sheet: ID!, $skip: Int){
+  allCells(sheetId: $sheet, skip: $skip){
     id
     i
     j

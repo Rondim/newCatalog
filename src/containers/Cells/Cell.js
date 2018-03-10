@@ -54,8 +54,8 @@ class Cell extends Component {
   };
 
   iAmHere = ev => {
-    const { row, column, onDrop, url } = this.props;
-    if (!url) onDrop(row, column);
+    const { row, column, onDrop, url, text } = this.props;
+    if (!url && !text) onDrop(row, column);
   };
 
   preventDefault = (ev) => {
@@ -67,7 +67,8 @@ class Cell extends Component {
     const { text } = this.state;
     !url && this.setState(({ edit }) => {
       if (edit) {
-        onChangeText(text, row, column, id);
+        const formatedText = text && text.trim() || '';
+        onChangeText(formatedText, row, column, id);
       }
       return { edit: !edit };
     });

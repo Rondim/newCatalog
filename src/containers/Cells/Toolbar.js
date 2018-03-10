@@ -131,6 +131,7 @@ class Toolbar extends Component {
         instanceSelect(someFilters, everyFilters, sidebarConfigData);
       }
     }
+
     if (this.props.mode === 'setter' && mode === 'loader') {
       instanceSelect([], [], sidebarConfigData);
     }

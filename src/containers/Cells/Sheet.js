@@ -46,13 +46,13 @@ class Sheet extends Component {
       loading: PropTypes.bool,
       allCells: PropTypes.array,
       allZones: PropTypes.array,
-      _allCellsMeta: PropTypes.object
+      _allCellsMeta: PropTypes.object,
+      fetchMore: PropTypes.func
     }),
     sheet: PropTypes.string,
     selectedCells: PropTypes.array,
     selectedGroupCells: PropTypes.object,
     selectedZone: PropTypes.object,
-    counter: PropTypes.bool,
     onDrop: PropTypes.func,
     notification: PropTypes.func,
     refreshZone: PropTypes.func,
@@ -74,13 +74,29 @@ class Sheet extends Component {
     });
   }
 
-  state={
-    ownCounter: false,
-    webp: false
-  };
+  componentWillReceiveProps(nextProps, nextContext) {
+    const { loading, _allCellsMeta, allCells, fetchMore } = nextProps.data;
+    const { sheet } = nextProps;
+    if (!loading) {
+      this._grid && this._grid.forceUpdate();
+      if (_allCellsMeta && allCells && _allCellsMeta.count > allCells.length) {
+        fetchMore({
+          query,
+          variables: { skip: allCells.length, sheet },
+          updateQuery: (previousResult, { fetchMoreResult }) => {
+            return {
+              ...previousResult,
+              allCells: [...previousResult.allCells, ...fetchMoreResult.allCells],
+              _allCellsMeta: fetchMoreResult._allCellsMeta
+            };
+          }
+        });
+      }
+    }
+  }
 
-  rerenderCells = () => {
-    this.setState(prevState => ({ ownCounter: !prevState.ownCounter }));
+  state={
+    webp: false
   };
 
   handleSelectCell = (ev, i, j, aId, instId, itemId) => {
@@ -112,7 +128,6 @@ class Sheet extends Component {
       if (selectedZone) {
         await removeZone({ variables: { id: selectedZone.id }, refetchQueries: [{ query, variables: { sheet } }] });
         unselectZone();
-        this.rerenderCells();
       } else if (selectedGroupCells) {
         const cells = this.selectCellsByGroup();
         await this.removeCells(cells.map(({ i, j }) => ({ i, j })), sheet);
@@ -120,7 +135,6 @@ class Sheet extends Component {
         await this.removeCells(selectedCells.map(({ i, j }) => ({ i, j })), sheet);
       }
     }
-    this.rerenderCells();
   };
 
   removeCells = async (coords, sheet) => {
@@ -141,7 +155,8 @@ class Sheet extends Component {
   onChangeText = (text, i, j, id) => {
     const { createTextCell, updateTextCell, sheet } = this.props;
     if (id) {
-      updateTextCell({ variables: { id, text } });
+      if (!text) this.removeCells([{ i, j }], sheet);
+      else updateTextCell({ variables: { id, text } });
     } else {
       createTextCell({ variables: { i, j, text, sheet } });
     }
@@ -210,11 +225,9 @@ class Sheet extends Component {
   };
 
   render() {
-    const { loading, _allCellsMeta } = this.props.data;
+    const { loading, _allCellsMeta, allCells } = this.props.data;
     if (loading) return <Loading />;
-    console.log(_allCellsMeta.count);
-    const { counter } = this.props;
-    const { ownCounter } = this.state;
+    console.log(_allCellsMeta.count, allCells.length);
     return (
       <div tabIndex="0" onKeyDown={this.handleKeyDown} style={{ flex: '1', height: '100%' }}>
         <AutoSizer defaultHeight={600}>
@@ -227,12 +240,10 @@ class Sheet extends Component {
               rowCount={300}
               rowHeight={100}
               width={width}
-              count={_allCellsMeta.count}
               overscanColumnCount={16}
               overscanRowCount={12}
               scrollingResetTimeInterval={10}
-              counter={counter}
-              ownCounter={ownCounter}
+              ref={ref => this._grid = ref}
             />
           )}
         </AutoSizer>
