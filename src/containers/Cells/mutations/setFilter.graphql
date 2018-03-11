@@ -1,17 +1,5 @@
-mutation setFilterToAvail($id: ID!, $filterId: ID!){
-    addProductObjToSidebarFilter(availabilityId: $id, sidebarFilterId: $filterId){
-        id
-    }
-}
-
-mutation setFilterToInstance($id: ID!, $filterId: ID!){
-    addProductObjToSidebarFilter(instanceId: $id, sidebarFilterId: $filterId){
-        id
-    }
-}
-
-mutation setFilterToItem($id: ID!, $filterId: ID!){
-    addProductObjToSidebarFilter(itemId: $id, sidebarFilterId: $filterId){
+mutation ($ids: [ID!], $filterId: ID!){
+    addProductObjToSidebarFilter(instanceIds: $ids, sidebarFilterId: $filterId){
         id
     }
 }

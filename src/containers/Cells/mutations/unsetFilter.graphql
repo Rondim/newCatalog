@@ -1,17 +1,5 @@
-mutation unsetFilterToAvail($id: ID!, $filterId: ID!){
-  removeProductObjFromSidebarFilter(availabilityId: $id, sidebarFilterId: $filterId){
-    id
-  }
-}
-
-mutation unsetFilterToInstance($id: ID!, $filterId: ID!){
-  removeProductObjFromSidebarFilter(instanceId: $id, sidebarFilterId: $filterId){
-    id
-  }
-}
-
-mutation unsetFilterToItem($id: ID!, $filterId: ID!){
-  removeProductObjFromSidebarFilter(itemId: $id, sidebarFilterId: $filterId){
+mutation ($ids: [ID!], $filterId: ID!){
+  removeProductObjFromSidebarFilter(instanceIds: $ids, sidebarFilterId: $filterId){
     id
   }
 }
