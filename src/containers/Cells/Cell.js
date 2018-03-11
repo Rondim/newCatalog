@@ -48,9 +48,9 @@ class Cell extends Component {
 
 
   handleSelect = ev => {
-    const { row, column, onSelect, aId, instId, itemId } = this.props;
+    const { row, column, onSelect, instId, itemId } = this.props;
     this.setState({ active: true });
-    onSelect(ev, row, column, aId, instId, itemId);
+    onSelect(ev, row, column, instId, itemId);
   };
 
   iAmHere = ev => {

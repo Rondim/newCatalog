@@ -17,7 +17,7 @@ import updateTextCell from './mutations/updateTextCell.graphql';
 // import updateCells from './subscriptions/updateCells.graphql';
 // import updateZones from './subscriptions/updateZones.graphql';
 import { notification } from '../Notificator/actions';
-import { calcActive, calcStyle, checkWebpFeature } from './libs/calc';
+import { calcActive, calcStyle, checkWebpFeature, getQuantity, getDepartments } from './libs/calc';
 
 // import Zone from './libs/zone';
 // import CellObj from './libs/cellObj';
@@ -78,7 +78,6 @@ class Sheet extends Component {
     const { loading, _allCellsMeta, allCells, fetchMore } = nextProps.data;
     const { sheet } = nextProps;
     if (!loading) {
-      this._grid && this._grid.forceUpdate();
       if (_allCellsMeta && allCells && _allCellsMeta.count > allCells.length) {
         fetchMore({
           query,
@@ -91,7 +90,7 @@ class Sheet extends Component {
             };
           }
         });
-      }
+      } else this._grid && this._grid.forceUpdate();
     }
   }
 
@@ -99,17 +98,17 @@ class Sheet extends Component {
     webp: false
   };
 
-  handleSelectCell = (ev, i, j, aId, instId, itemId) => {
+  handleSelectCell = (ev, i, j, instId, itemId) => {
     const { allZones, allCells } = this.props.data;
     const { selectSomeCells, selectOneCell, selectManyCells, selectZone } = this.props;
     if (ev.metaKey) {
-      selectSomeCells(i, j, aId, instId, itemId);
+      selectSomeCells(i, j, instId, itemId);
     } else if (ev.shiftKey) {
-      selectManyCells(i, j, aId, instId, itemId, allCells);
+      selectManyCells(i, j, instId, itemId, allCells);
     } else if (ev.altKey) {
       selectZone(allZones, i, j);
     } else {
-      const selectedCells = aId ? [{ i, j, aId, instId, itemId }] : [{ i, j }];
+      const selectedCells = instId ? [{ i, j, instId, itemId }] : [{ i, j }];
       selectOneCell(selectedCells);
     }
   };
@@ -167,6 +166,8 @@ class Sheet extends Component {
     const { selectedCells, selectedGroupCells, selectedZone, onStartDrag } = this.props;
     const { webp } = this.state;
     const data = _.find(allCells, o => o.i===rowIndex && o.j ===columnIndex);
+    const avails = _.get(data, 'instance.availabilities');
+
     let zoneBorders = { left: undefined, right: undefined, top: undefined, bottom: undefined };
     let activeBorders = { left: undefined, right: undefined, top: undefined, bottom: undefined };
     let newStyle = { ...style };
@@ -189,15 +190,14 @@ class Sheet extends Component {
     newStyle.borderBottomWidth = borderBottomStyle.width;
     newStyle.borderBottomColor = borderBottomStyle.color;
     const itemProps = {
-      url: _.get(data, 'availability.instance.item.img.url'),
-      urlWebp: webp && _.get(data, 'availability.instance.item.imgWebP.url'),
-      size: _.get(data, 'availability.instance.size[0].name'),
-      department: _.get(data, 'availability.department[0].name'),
-      tags: _.get(data, 'availability.tags'),
-      quantity: _.get(data, 'availability.quantity'),
-      aId: _.get(data, 'availability.id') || null,
-      instId: _.get(data, 'availability.instance.id') || null,
-      itemId: _.get(data, 'availability.instance.item.id') || null
+      url: _.get(data, 'instance.item.img.url'),
+      urlWebp: webp && _.get(data, 'instance.item.imgWebP.url'),
+      size: _.get(data, 'instance.size[0].name'),
+      departments: getDepartments(avails),
+      tags: _.get(data, 'instance.tags') || [],
+      quantity: getQuantity(avails),
+      instId: _.get(data, 'instance.id') || null,
+      itemId: _.get(data, 'instance.item.id') || null
     };
     try {
       return (
@@ -225,9 +225,8 @@ class Sheet extends Component {
   };
 
   render() {
-    const { loading, _allCellsMeta, allCells } = this.props.data;
+    const { loading } = this.props.data;
     if (loading) return <Loading />;
-    console.log(_allCellsMeta.count, allCells.length);
     return (
       <div tabIndex="0" onKeyDown={this.handleKeyDown} style={{ flex: '1', height: '100%' }}>
         <AutoSizer defaultHeight={600}>

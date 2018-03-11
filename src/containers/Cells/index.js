@@ -59,14 +59,13 @@ class Cells extends Component {
     const { selectedCells, selectedCellsByGroup } = this.state;
     if (selectedCellsByGroup) {
       let array = [];
-      selectedCellsByGroup.forEach(({ i, j, availability }) => {
-        if (availability && availability.id) {
+      selectedCellsByGroup.forEach(({ i, j, instance }) => {
+        if (instance && instance.id) {
           array.push({
             i,
             j,
-            aId: availability.id,
-            instId: availability.instance.id,
-            itemId: availability.instance.item.id
+            instId: instance.id,
+            itemId: instance.item.id
           });
         }
       });
@@ -85,7 +84,7 @@ class Cells extends Component {
     });
   };
 
-  selectManyCells = (i, j, aId, instId, itemId, allCells) => {
+  selectManyCells = (i, j, instId, itemId, allCells) => {
     this.setState(prevState => {
       let selectedCells = [...prevState.selectedCells];
       if (!selectedCells.length) return { selectedCells: [{ i, j }] };
@@ -105,7 +104,7 @@ class Cells extends Component {
     });
   };
 
-  selectSomeCell = (i, j, aId, instId, itemId) => {
+  selectSomeCell = (i, j, instId, itemId) => {
     this.setState(prevState => {
       let selectedCells = [...prevState.selectedCells];
       const find =_.findIndex(selectedCells, o => o.i === i && o.j === j);
@@ -113,7 +112,7 @@ class Cells extends Component {
         selectedCells.splice(find, 1);
         return { selectedCells, selectedGroupCells: null };
       }
-      selectedCells.push(aId ? { i, j, aId, instId, itemId } : { i, j });
+      selectedCells.push(instId ? { i, j, instId, itemId } : { i, j });
       return { selectedCells, selectedGroupCells: null, selectedCellsByGroup: null };
     });
   };
@@ -163,7 +162,7 @@ class Cells extends Component {
     const { id: sheet } = this.props.match.params;
     const sheetProps = {
       onDrop: this.onDrop,
-      selectSomeCell: this.selectSomeCell,
+      selectSomeCells: this.selectSomeCell,
       selectOneCell: this.selectOneCell,
       selectManyCells: this.selectManyCells,
       selectZone: this.selectZone,

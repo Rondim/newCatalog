@@ -35,3 +35,27 @@ export const checkWebpFeature = (feature, callback) => {
   };
   img.src = 'data:image/webp;base64,' + kTestImages[feature];
 };
+
+export const getQuantity = (avails) => {
+  let sum = 0;
+  avails && avails.forEach(({ quantity }) => {
+    sum += quantity;
+  });
+  return sum;
+};
+
+export const getTags = avails => {
+  let result = [];
+  avails && avails.forEach(({ tags }) => {
+    result = result.concat(tags);
+  });
+  return result;
+};
+
+export const getDepartments = avails => {
+  let result = [];
+  avails && avails.forEach(({ department }) => {
+    result = result.concat(department.map(({ name }) => name));
+  });
+  return result;
+};

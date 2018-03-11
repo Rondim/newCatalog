@@ -1,19 +1,18 @@
 query (
-$aIds: [ID!],
-$availabilitiesEvery: [SidebarFilterWhereInput!],
-$instancesEvery: [SidebarFilterWhereInput!],
-$itemsEvery: [SidebarFilterWhereInput!]
+$instIds: [ID!],
 ){
-    someFilters(aIds: $aIds){
+  filtersByInstanceIds(instIds: $instIds){
+    someFilters{
+      id
+      property{
         id
-        property{
-            id
-        }
+      }
     }
-    everyFilters(availabilitiesEvery: $availabilitiesEvery, instancesEvery: $instancesEvery, itemsEvery: $itemsEvery){
+    everyFilters{
+      id
+      property{
         id
-        property{
-            id
-        }
+      }
     }
+  }
 }

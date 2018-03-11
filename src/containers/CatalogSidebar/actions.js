@@ -14,7 +14,7 @@ export function initSidebar(config) {
   };
 }
 
-export function instanceSelect(someFilters, everyFilters, sidebarConfigData) {
+export function instanceSelect({ someFilters, everyFilters }, sidebarConfigData) {
   return {
     type: INSTANCE_SELECTED,
     payload: { someFilters, everyFilters, sidebarConfigData }

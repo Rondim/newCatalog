@@ -12,12 +12,12 @@ import CatalogSidebar from '../CatalogSidebar';
 import SetterSidebar from '../SetterSidebar';
 import { fetchConfig, dataToConfig } from '../Catalog/queries/fetchConfig';
 import fetchFilters from './queries/fetchFilters.graphql';
-import { availabilityByFilter } from './queries/utils/fetchAvailabilitiesCount';
+import { instanceByFilter } from './queries/utils/fetchInstancesCount';
 import { setFilterToAvail, setFilterToInstance, setFilterToItem } from './mutations/setFilter.graphql';
 import { unsetFilterToAvail, unsetFilterToInstance, unsetFilterToItem } from './mutations/unsetFilter.graphql';
 import createFilter from './mutations/createFilter.graphql';
 import Loading from '../../components/Loading';
-import CountAvailabilitiesForLoad from './CountAvailabilitiesForLoad';
+import CountInstancesForLoad from './CountInstancesForLoad';
 import { instanceSelect } from '../CatalogSidebar/actions';
 import query from './queries/fetchCells.graphql';
 import refreshAllZones from './mutations/refreshAllZones.graphql';
@@ -39,19 +39,17 @@ const mapStateToProps = (state) => {
 };
 
 const calcFilterVariables = (selectedCells) => {
-  let aIds = [];
-  let availabilitiesEvery = [];
+  let instIds = [];
   let instancesEvery = [];
   let itemsEvery = [];
-  selectedCells && selectedCells.forEach(({ aId }) => {
-    if (aId) {
-      aIds.push(aId);
-      availabilitiesEvery.push({ availabilities_some: { id: aId } });
-      instancesEvery.push({ instances_some: { availabilities_some: { id: aId } } });
-      itemsEvery.push({ items_some: { instances_some: { availabilities_some: { id: aId } } } });
+  selectedCells && selectedCells.forEach(({ instId }) => {
+    if (instId) {
+      instIds.push(instId);
+      instancesEvery.push({ instances_some: { id: { instId } } });
+      itemsEvery.push({ items_some: { instances_some: { id: instId } } });
     }
   });
-  return { aIds, availabilitiesEvery, instancesEvery, itemsEvery };
+  return { instIds, instancesEvery, itemsEvery };
 };
 
 @withStyles(styles)
@@ -124,23 +122,23 @@ class Toolbar extends Component {
   };
 
   componentWillReceiveProps(nextProps, nextContext) {
-    const { mode, filters: { loading, someFilters, everyFilters }, selectedCells,
+    const { mode, filters: { loading, filtersByInstanceIds }, selectedCells,
       config: { sidebarConfigData, loading: configLoading }, filters, instanceSelect } = nextProps;
-    if (mode === 'setter' && !loading && !configLoading && selectedCells && _.get(selectedCells, '[0].aId')) {
+    if (mode === 'setter' && !loading && !configLoading && selectedCells && _.get(selectedCells, '[0].instId')) {
       if ( !_.isEqual(filters, this.props.filters)) {
-        instanceSelect(someFilters, everyFilters, sidebarConfigData);
+        instanceSelect(filtersByInstanceIds, sidebarConfigData);
       }
     }
 
     if (this.props.mode === 'setter' && mode === 'loader') {
-      instanceSelect([], [], sidebarConfigData);
+      instanceSelect({ someFilters: [], everyFilters: [] }, sidebarConfigData);
     }
   }
 
   filterSet = async ({ filterGroupId, filterId }) => {
     const { selectedCells,
       config: { sidebarConfigData: { mapTypes } },
-      filters: { someFilters },
+      filters: { filtersByInstanceIds: { someFilters } },
       setFilterToAvail, setFilterToInstance, setFilterToItem, unsetFilterToAvail, unsetFilterToInstance,
       unsetFilterToItem, sheet } = this.props;
     let needUncheck;
@@ -213,7 +211,7 @@ class Toolbar extends Component {
 
   handleClick = () => {
     const { filtersSelected, onLoad, config: { sidebarConfigData } } = this.props;
-    const filters = availabilityByFilter(filtersSelected, sidebarConfigData.mapTypes);
+    const filters = instanceByFilter(filtersSelected, sidebarConfigData.mapTypes);
     onLoad(filters);
   };
 
@@ -248,7 +246,7 @@ class Toolbar extends Component {
             </Paper>
             <Row>
               <Col>
-                <CountAvailabilitiesForLoad
+                <CountInstancesForLoad
                   mapTypes={sidebarConfigData.mapTypes}
                   filtersSelected={filtersSelected}
                 />

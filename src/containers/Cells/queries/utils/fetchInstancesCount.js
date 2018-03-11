@@ -2,7 +2,7 @@ import _ from 'lodash-es';
 
 export const fetchCountOptions = {
   options({ filtersSelected, mapTypes }) {
-    const filter = availabilityByFilter(filtersSelected, mapTypes);
+    const filter = instanceByFilter(filtersSelected, mapTypes);
     return {
       variables: {
         filter
@@ -11,15 +11,15 @@ export const fetchCountOptions = {
   }
 };
 
-export const availabilityByFilter = (filters, mapType) => {
+export const instanceByFilter = (filters, mapType) => {
   let filterResult = {
-    AND: []
+    AND: [{ valid: true }]
   };
   let item = {
     AND: []
   };
-  let instance = {
-    AND: [{ valid: true }]
+  let availabilitiesSome = {
+    AND: []
   };
   if (filters) {
     _.forEach(filters, (filter, key) => {
@@ -37,13 +37,13 @@ export const availabilityByFilter = (filters, mapType) => {
       if (type === 'Item' && subfilter.OR.length) {
         item.AND.push(subfilter);
       } else if (type === 'Instance' && subfilter.OR.length) {
-        instance.AND.push(subfilter);
-      } else if (type === 'Availability' && subfilter.OR.length) {
         filterResult.AND.push(subfilter);
+      } else if (type === 'Availability' && subfilter.OR.length) {
+        availabilitiesSome.AND.push(subfilter);
       } else return null;
     });
   }
-  instance.AND.push({ item });
-  filterResult.AND.push({ instance });
+  filterResult.AND.push({ item });
+  filterResult.AND.push({ availabilities_some: availabilitiesSome });
   return filterResult;
 };
