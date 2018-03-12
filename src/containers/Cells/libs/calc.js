@@ -8,13 +8,15 @@ export const calcActive = (obj, i, j, { left, right, top, bottom }) => {
   return { left, right, top, bottom };
 };
 
-export const calcStyle = (active, activeBorder, zoneBorder) => {
-  if (active || activeBorder && !zoneBorder) {
+export const calcStyle = (active, activeBorder, loaderBorder, padBoarder) => {
+  if (active || activeBorder && !loaderBorder && !padBoarder) {
     return { width: '3px', color: '#5baaff' };
-  } else if (activeBorder && zoneBorder) {
+  } else if (activeBorder && (loaderBorder || padBoarder)) {
     return { width: '3px', color: '#00ff05' };
-  } else if (zoneBorder) {
+  } else if (loaderBorder) {
     return { width: '3px', color: '#00ffd3' };
+  } else if (padBoarder) {
+    return { width: '3px', color: '#ff00ec' };
   } else {
     return { width: '1px', color: 'grey' };
   }

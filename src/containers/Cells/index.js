@@ -79,7 +79,7 @@ class Cells extends Component {
       variables: { ...this.state.selectedGroupCells, filter, sheet }
     });
     await this.props.refreshZone({
-      variables: { zoneId: res.data.createZone.id },
+      variables: { zoneId: res.data.createZone.id, sheetId: sheet },
       refetchQueries: [{ query, variables: { sheet } }]
     });
   };
@@ -185,6 +185,7 @@ class Cells extends Component {
             changeMode={mode => this.setState({ mode })}
             selectedCells={ this.selectorCells() }
             sheet={sheet}
+            selectedGroupCells={selectedGroupCells}
           />
         </Col>
       </Row>

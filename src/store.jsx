@@ -2,6 +2,7 @@ import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
 import { HttpLink } from 'apollo-link-http';
 import { ApolloClient } from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
+import { Hermes } from 'apollo-cache-hermes';
 import { onError } from 'apollo-link-error';
 import { setContext } from 'apollo-link-context';
 import ReduxPromise from 'redux-promise';
@@ -43,9 +44,10 @@ const splittedLink = split(
   httpLink,
 );
 
-const cache = new InMemoryCache({
-  dataIdFromObject: o => o.id
-});
+const cache = localStorage.getItem('cache') === 'hermes' ? new Hermes() :
+  new InMemoryCache({
+    dataIdFromObject: o => o.id
+  });
 
 const middlewareLink = setContext(() => ({
   headers: {

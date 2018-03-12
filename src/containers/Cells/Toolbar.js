@@ -7,6 +7,8 @@ import { connect } from 'react-redux';
 import { withStyles } from 'material-ui/styles';
 import { Paper } from 'material-ui';
 import _ from 'lodash';
+import FontAwesomeIcon from '@fortawesome/react-fontawesome';
+import { faRedo, faExpand } from '@fortawesome/fontawesome-free-solid';
 
 import CatalogSidebar from '../CatalogSidebar';
 import SetterSidebar from '../SetterSidebar';
@@ -21,6 +23,7 @@ import CountInstancesForLoad from './CountInstancesForLoad';
 import { instanceSelect } from '../CatalogSidebar/actions';
 import query from './queries/fetchCells.graphql';
 import refreshAllZones from './mutations/refreshAllZones.graphql';
+import PadEditor from './PadEditor';
 
 const styles = theme => ({
   root: {
@@ -102,9 +105,15 @@ class Toolbar extends Component {
     sheet: PropTypes.string,
     filtersSelected: PropTypes.object,
     classes: PropTypes.object,
-    selectedCells: PropTypes.array
+    selectedCells: PropTypes.array,
+    selectedGroupCells: PropTypes.object
   };
   static defaultProps = {};
+
+  state={
+    redo: false,
+    expand: false
+  };
 
   toggle = tab => {
     const { mode, changeMode } = this.props;
@@ -181,7 +190,7 @@ class Toolbar extends Component {
   };
 
   render() {
-    const { config: { sidebarConfigData, loading }, filtersSelected, classes, mode,
+    const { config: { sidebarConfigData, loading }, filtersSelected, classes, mode, selectedGroupCells, sheet,
       filters: { loading: fLoading } } = this.props;
     if (loading) return <Loading />;
     return (
@@ -192,7 +201,27 @@ class Toolbar extends Component {
               className={classnames({ active: mode === 'loader' })}
               onClick={() => this.toggle('loader')}
             >
-              Loader
+              <FontAwesomeIcon
+                icon={faRedo}
+                size="lg"
+                spin={this.state.redo}
+                onMouseOver={() => this.setState({ redo: true })}
+                onMouseLeave={() => this.setState({ redo: false })}
+              />
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink
+              className={classnames({ active: mode === 'padCreator' })}
+              onClick={() => this.toggle('padCreator')}
+            >
+              <FontAwesomeIcon
+                icon={faExpand}
+                size="lg"
+                spin={this.state.expand}
+                onMouseOver={() => this.setState({ expand: true })}
+                onMouseLeave={() => this.setState({ expand: false })}
+              />
             </NavLink>
           </NavItem>
           <NavItem>
@@ -223,6 +252,15 @@ class Toolbar extends Component {
             <Row><Col>
               <Button color='success' onClick={this.refreshAll}>Refresh all zones</Button>
             </Col></Row>
+          </TabPane>
+          <TabPane tabId="padCreator">
+            <PadEditor
+              cells={selectedGroupCells}
+              sheet={sheet}
+              classes={classes.paper}
+              config={sidebarConfigData}
+              filters={filtersSelected}
+            />
           </TabPane>
           <TabPane tabId="setter">
             <Paper className={classes.paper}>

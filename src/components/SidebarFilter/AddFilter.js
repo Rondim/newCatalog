@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import FontAwesome from 'react-fontawesome';
+import FontAwesomeIcon from '@fortawesome/react-fontawesome';
+import { faPlus } from '@fortawesome/fontawesome-free-solid';
 import Button from 'material-ui/Button';
 import { Input } from 'reactstrap';
 import { CirclePicker } from 'react-color';
@@ -49,7 +50,7 @@ class AddFilter extends Component {
           className={classes.buttonNotSelected}
           onClick={this.onClickPlus}
         >
-          <FontAwesome name='plus' />
+          <FontAwesomeIcon icon={faPlus} />
         </Button>
       );
     } else if (!addColor) {

@@ -119,7 +119,7 @@ class Sheet extends Component {
     } = this.props;
     if (ev.keyCode===82 && ev.altKey && selectedZone) {
       await refreshZone({
-        variables: { zoneId: selectedZone.id },
+        variables: { zoneId: selectedZone.id, sheetId: sheet },
         refetchQueries: [{ query, variables: { sheet } }]
       });
       this.props.notification('success', 'Зона обновлена');
@@ -168,25 +168,32 @@ class Sheet extends Component {
     const data = _.find(allCells, o => o.i===rowIndex && o.j ===columnIndex);
     const avails = _.get(data, 'instance.availabilities');
 
-    let zoneBorders = { left: undefined, right: undefined, top: undefined, bottom: undefined };
+    let loaderBorders = { left: undefined, right: undefined, top: undefined, bottom: undefined };
+    let padBorders = { left: undefined, right: undefined, top: undefined, bottom: undefined };
     let activeBorders = { left: undefined, right: undefined, top: undefined, bottom: undefined };
     let newStyle = { ...style };
     typeof allZones === 'object' && allZones.forEach(zone => {
-      zoneBorders = calcActive(zone, columnIndex, rowIndex, zoneBorders);
+      switch (zone.type) {
+        case 'Loader':
+          loaderBorders = calcActive(zone, columnIndex, rowIndex, loaderBorders);
+          break;
+        case 'Pad':
+          padBorders = calcActive(zone, columnIndex, rowIndex, padBorders);
+      }
     });
     activeBorders = calcActive(selectedGroupCells, columnIndex, rowIndex, activeBorders);
     const active = !!_.find(selectedCells, o => o.i ===rowIndex && o.j === columnIndex);
     activeBorders = selectedZone ? calcActive(selectedZone, columnIndex, rowIndex, activeBorders) : activeBorders;
-    const borderLeftStyle = calcStyle(active, activeBorders.left, zoneBorders.left);
+    const borderLeftStyle = calcStyle(active, activeBorders.left, loaderBorders.left, padBorders.left);
     newStyle.borderLeftWidth = borderLeftStyle.width;
     newStyle.borderLeftColor = borderLeftStyle.color;
-    const borderRightStyle = calcStyle(active, activeBorders.right, zoneBorders.right);
+    const borderRightStyle = calcStyle(active, activeBorders.right, loaderBorders.right, padBorders.right);
     newStyle.borderRightWidth = borderRightStyle.width;
     newStyle.borderRightColor = borderRightStyle.color;
-    const borderTopStyle = calcStyle(active, activeBorders.top, zoneBorders.top);
+    const borderTopStyle = calcStyle(active, activeBorders.top, loaderBorders.top, padBorders.top);
     newStyle.borderTopWidth = borderTopStyle.width;
     newStyle.borderTopColor = borderTopStyle.color;
-    const borderBottomStyle = calcStyle(active, activeBorders.bottom, zoneBorders.bottom);
+    const borderBottomStyle = calcStyle(active, activeBorders.bottom, loaderBorders.bottom, padBorders.bottom);
     newStyle.borderBottomWidth = borderBottomStyle.width;
     newStyle.borderBottomColor = borderBottomStyle.color;
     const itemProps = {
@@ -205,8 +212,9 @@ class Sheet extends Component {
           key={key}
           id={data ? data.id : null}
           active={active && 1 || activeBorders.left && 1 || activeBorders.right && 1 || activeBorders.bottom && 1 ||
-          activeBorders.top && 1 || zoneBorders.left && 2 || zoneBorders.right && 2 || zoneBorders.top && 2 ||
-          zoneBorders.bottom && 2}
+          activeBorders.top && 1 || loaderBorders.left && 2 || loaderBorders.right && 2 || loaderBorders.top && 2 ||
+          loaderBorders.bottom && 2 || padBorders.left && 3 || padBorders.right && 3 || padBorders.top && 3 ||
+          padBorders.bottom && 3}
           { ...itemProps }
           text={data && data.text}
           style={newStyle}

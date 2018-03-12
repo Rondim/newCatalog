@@ -1,3 +1,3 @@
-mutation ($zoneId: ID!){
-    zoneRefresh(id: $zoneId )
+mutation ($zoneId: ID!, $sheetId: ID!){
+    zoneRefresh(id: $zoneId, sheetId: $sheetId )
 }

@@ -1,5 +1,5 @@
-mutation ($i0: Int!, $i1: Int!, $j0: Int!, $j1: Int!, $sheet: ID!, $filter: Json){
-  createZone(i0: $i0, i1: $i1, j0: $j0, j1: $j1, sheetId: $sheet, filter: $filter ){
+mutation ($i0: Int!, $i1: Int!, $j0: Int!, $j1: Int!, $sheet: ID!, $filter: Json, $name: String, $type: ZoneType){
+  createZone(i0: $i0, i1: $i1, j0: $j0, j1: $j1, sheetId: $sheet, filter: $filter, name: $name, type: $type ){
     id
   }
 }

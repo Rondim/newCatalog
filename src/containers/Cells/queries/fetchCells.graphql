@@ -44,6 +44,8 @@ query ($sheet: ID!, $skip: Int){
     i1,
     j1,
     filter
+    name
+    type
   }
   _allCellsMeta(sheetId: $sheet){
     count

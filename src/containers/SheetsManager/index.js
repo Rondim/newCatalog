@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Table, Button, Input } from 'reactstrap';
-import FontAwesome from 'react-fontawesome';
+import FontAwesomeIcon from '@fortawesome/react-fontawesome';
+import { faShare, faEdit, faPlus, faTrash } from '@fortawesome/fontawesome-free-solid';
 import { graphql, compose } from 'react-apollo';
 import { connect } from 'react-redux';
 import { Multiselect } from 'react-widgets';
@@ -156,16 +157,16 @@ class SheetsManager extends Component {
           </td>
           <td style={{ width: '150px' }}>
             <Button color='success' onClick={() => this.handleShare(sheet.users, sheet.id)}>
-              <FontAwesome name='share' />
+              <FontAwesomeIcon icon={faShare} />
             </Button>
             <Button color='info' onClick={() => this.setState(() => ({ edit: sheet.id, name: sheet.name }) )}>
-              <FontAwesome name='edit' />
+              <FontAwesomeIcon icon={faEdit} />
             </Button>
             <Button
               onClick={() => this.removeSheet(sheet.id, user.id)}
               color='danger'
             >
-              <FontAwesome name='trash' />
+              <FontAwesomeIcon icon={faTrash} />
             </Button>
           </td>
         </tr>
@@ -178,7 +179,7 @@ class SheetsManager extends Component {
     if (loading) return <Loading />;
     return (
       <div>
-        <Button onClick={this.handleCreateSheet} color='success'><FontAwesome name='plus' /></Button>
+        <Button onClick={this.handleCreateSheet} color='success'><FontAwesomeIcon icon={faPlus} /></Button>
         <Table striped hover>
           <thead>
           <tr>

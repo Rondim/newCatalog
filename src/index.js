@@ -21,8 +21,6 @@ if (token) {
   // we need update application state
   store.dispatch({ type: AUTH_USER });
 }
-import 'font-awesome/css/font-awesome.css';
-import 'font-awesome/fonts/fontawesome-webfont.woff2';
 
 ReactDOM.render(
   <ApolloProvider client={client}>

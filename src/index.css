@@ -11,3 +11,6 @@
 html{
     height: 100%;
 }
+.jumbotron {
+    background-color: white;
+}

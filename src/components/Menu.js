@@ -6,7 +6,8 @@ import PropTypes from 'prop-types';
 import {
   Nav, Navbar, NavbarBrand, NavItem, NavLink as NavLinkStrap, NavbarToggler, Collapse,
 } from 'reactstrap';
-import FontAwesome from 'react-fontawesome';
+import FontAwesomeIcon from '@fortawesome/react-fontawesome';
+import { faHome, faSignInAlt, faSignOutAlt, faToggleOff, faToggleOn } from '@fortawesome/fontawesome-free-solid';
 import { LinkContainer } from 'react-router-bootstrap';
 import {
   withRouter
@@ -49,6 +50,23 @@ class Menu extends Component {
     signoutUser();
   };
 
+  switchCache = () => {
+    const current = localStorage.getItem('cache');
+    console.log(current);
+    switch (current) {
+      case 'apollo':
+        localStorage.setItem('cache', 'hermes');
+        break;
+      case 'hermes':
+        localStorage.setItem('cache', 'apollo');
+        break;
+      case null:
+        localStorage.setItem('cache', 'hermes');
+        break;
+    }
+    location.reload(true);
+  };
+
   renderLinks() {
     const { authenticated, history } = this.props;
     return (
@@ -80,7 +98,7 @@ class Menu extends Component {
                 onClick={this.logout}
                 className="d-none d-lg-block"
               >
-                <FontAwesome name="sign-out" size='2x' />
+                <FontAwesomeIcon icon={faSignOutAlt} size='2x' />
               </NavLinkStrap>
             </NavItem>
           </Nav>]
@@ -93,7 +111,7 @@ class Menu extends Component {
             </LinkContainer>
             <LinkContainer to="/signin" className="d-none d-lg-block">
               <NavItem>
-                <FontAwesome name="sign-in" size='2x' />
+                <FontAwesomeIcon icon={faSignInAlt} size='2x' />
               </NavItem>
             </LinkContainer>
           </Nav>
@@ -106,8 +124,17 @@ class Menu extends Component {
       <Navbar color="dark" dark expand='lg'>
         <NavbarToggler onClick={this.toggle} />
         <NavbarBrand onClick={() => history.push('/')}>
-          <FontAwesome style={{ color: '#A3B5D1' }} name="home" size='2x' />
+          <FontAwesomeIcon style={{ color: '#A3B5D1' }} icon={faHome} size='2x' />
         </NavbarBrand>
+        <div style={{ color: 'white' }}>
+          Hermes
+          <FontAwesomeIcon
+            size='2x'
+            onClick={this.switchCache}
+            color={localStorage.getItem('cache') ==='apollo' ? 'green' : null}
+            icon={localStorage.getItem('cache') ==='apollo' ? faToggleOn : faToggleOff }
+          />
+        </div>
         <Collapse isOpen={this.state.isOpen} navbar>
           {this.renderLinks()}
         </Collapse>
