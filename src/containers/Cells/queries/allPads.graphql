@@ -1,0 +1,11 @@
+{
+  allPads{
+    id
+    name
+    type
+    size{
+      w
+      h
+    }
+  }
+}

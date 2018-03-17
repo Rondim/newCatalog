@@ -1,0 +1,12 @@
+mutation ($i: Int!, $j: Int!, $zoneId: ID!, $sheetId: ID!){
+  placeZoneOnSheet(i: $i, j: $j, zoneId: $zoneId, sheetId: $sheetId){
+    id,
+    i0,
+    j0,
+    i1,
+    j1,
+    filter
+    name
+    type
+  }
+}

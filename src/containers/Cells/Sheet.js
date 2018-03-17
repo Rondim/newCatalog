@@ -18,6 +18,7 @@ import updateTextCell from './mutations/updateTextCell.graphql';
 // import updateZones from './subscriptions/updateZones.graphql';
 import { notification } from '../Notificator/actions';
 import { calcActive, calcStyle, checkWebpFeature, getQuantity, getDepartments } from './libs/calc';
+import placeZoneOnSheet from './mutations/placeZoneOnSheet.graphql';
 
 // import Zone from './libs/zone';
 // import CellObj from './libs/cellObj';
@@ -38,7 +39,8 @@ import { calcActive, calcStyle, checkWebpFeature, getQuantity, getDepartments } 
   graphql(removeCells, { name: 'removeCells' }),
   graphql(removeZone, { name: 'removeZone' }),
   graphql(createTextCell, { name: 'createTextCell' }),
-  graphql(updateTextCell, { name: 'updateTextCell' })
+  graphql(updateTextCell, { name: 'updateTextCell' }),
+  graphql(placeZoneOnSheet, { name: 'placeZoneOnSheet' })
 )
 class Sheet extends Component {
   static propTypes = {
@@ -64,7 +66,8 @@ class Sheet extends Component {
     selectZone: PropTypes.func,
     onStartDrag: PropTypes.func,
     createTextCell: PropTypes.func,
-    updateTextCell: PropTypes.func
+    updateTextCell: PropTypes.func,
+    placeZoneOnSheet: PropTypes.func
   };
   static defaultProps = {};
 
@@ -113,6 +116,14 @@ class Sheet extends Component {
     }
   };
 
+  placeZone = (id, i, j) => {
+    const { sheet, placeZoneOnSheet } = this.props;
+    placeZoneOnSheet({
+      variables: { zoneId: id, sheetId: sheet, i, j },
+      refetchQueries: [{ query, variables: { sheet } }]
+    });
+  };
+
   handleKeyDown = async (ev) => {
     const {
       removeZone, selectedZone, selectedCells, selectedGroupCells, refreshZone, unselectZone, sheet
@@ -155,7 +166,7 @@ class Sheet extends Component {
     const { createTextCell, updateTextCell, sheet } = this.props;
     if (id) {
       if (!text) this.removeCells([{ i, j }], sheet);
-      else updateTextCell({ variables: { id, text } });
+      else updateTextCell({ variables: { id, text, sheet } });
     } else {
       createTextCell({ variables: { i, j, text, sheet } });
     }
@@ -223,6 +234,7 @@ class Sheet extends Component {
           onKeyDown={this.handleKeyDown}
           startDrag={(id, i, j) => onStartDrag(id, i, j)}
           onDrop={this.props.onDrop}
+          onPlaceZone={this.placeZone}
           onSelect={this.handleSelectCell}
           onChangeText={this.onChangeText}
         />

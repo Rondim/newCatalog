@@ -13,6 +13,7 @@ class Cell extends Component {
     style: PropTypes.object,
     onSelect: PropTypes.func,
     onChangeText: PropTypes.func,
+    onPlaceZone: PropTypes.func,
     row: PropTypes.number,
     column: PropTypes.number,
     active: PropTypes.number,
@@ -54,8 +55,10 @@ class Cell extends Component {
   };
 
   iAmHere = ev => {
-    const { row, column, onDrop, url, text } = this.props;
-    if (!url && !text) onDrop(row, column);
+    const { row, column, onDrop, url, text, onPlaceZone } = this.props;
+    const zone = ev.dataTransfer.getData('id');
+    if (zone) onPlaceZone(zone, row, column);
+    else if (!url && !text) onDrop(row, column);
   };
 
   preventDefault = (ev) => {

@@ -42,8 +42,9 @@ class Cells extends Component {
 
   onDrop = async (i, j) => {
     const { dragItem: id } = this.state;
+    const { setPosition, match: { params: { id: sheet } } } = this.props;
     if (i >=0 && j >=0) {
-      this.props.setPosition({ variables: { id, row: i, column: j }, optimisticResponse: {
+      setPosition({ variables: { id, row: i, column: j, sheet }, optimisticResponse: {
           __typename: 'Mutation',
           updateCell: {
             __typename: 'cells',

@@ -1,5 +1,5 @@
-mutation ($id: ID!, $text: String){
-  updateCell(id: $id, text: $text){
+mutation ($id: ID!, $text: String, $sheet: ID!){
+  updateCell(id: $id, text: $text, sheetId: $sheet){
     id
     i
     j

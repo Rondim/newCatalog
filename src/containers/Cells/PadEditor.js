@@ -13,6 +13,7 @@ import { compose, graphql } from 'react-apollo/index';
 import createZone from './mutations/createZone.graphql';
 import refreshZone from './mutations/refreshZone.graphql';
 import query from './queries/fetchCells.graphql';
+import PadsList from './PadsList';
 
 @connect(null, { notification })
 @compose(
@@ -90,7 +91,10 @@ class PadEditor extends Component {
         return (
           <div>
             <Jumbotron>
-              <Button onClick={this.onEdit}>Создать зону</Button>
+              <Button className='w-100' onClick={this.onEdit}>Создать зону</Button>
+              <div style={{ marginTop: '20px' }}>
+                <PadsList />
+              </div>
             </Jumbotron>
           </div>
         );
