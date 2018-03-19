@@ -6,7 +6,8 @@ class TextCell extends Component {
   static propTypes = {
     edit: PropTypes.bool,
     text: PropTypes.string,
-    changeText: PropTypes.func
+    changeText: PropTypes.func,
+    className: PropTypes.string
   };
   static defaultProps = {};
 
@@ -15,10 +16,11 @@ class TextCell extends Component {
   };
 
   render() {
-    const { edit, text } = this.props;
+    const { edit, text, className } = this.props;
     return (
       <div
         onDoubleClick={() => this.setState({ edit: true })}
+        className={className}
         style={{ height: '100%', width: '100%', overflowWrap: 'break-word' }}
       >
         {edit ?

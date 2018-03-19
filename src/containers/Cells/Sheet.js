@@ -182,6 +182,7 @@ class Sheet extends Component {
     let loaderBorders = { left: undefined, right: undefined, top: undefined, bottom: undefined };
     let padBorders = { left: undefined, right: undefined, top: undefined, bottom: undefined };
     let activeBorders = { left: undefined, right: undefined, top: undefined, bottom: undefined };
+    let inUniqueZone = false;
     let newStyle = { ...style };
     typeof allZones === 'object' && allZones.forEach(zone => {
       switch (zone.type) {
@@ -190,6 +191,12 @@ class Sheet extends Component {
           break;
         case 'Pad':
           padBorders = calcActive(zone, columnIndex, rowIndex, padBorders);
+          break;
+        case 'Unique':
+          if (zone.i0 <= rowIndex && zone.i1 >= rowIndex && zone.j0 <= columnIndex && zone.j1 >= columnIndex) {
+            inUniqueZone = true;
+          }
+          break;
       }
     });
     activeBorders = calcActive(selectedGroupCells, columnIndex, rowIndex, activeBorders);
@@ -215,7 +222,8 @@ class Sheet extends Component {
       tags: _.get(data, 'instance.tags') || [],
       quantity: getQuantity(avails),
       instId: _.get(data, 'instance.id') || null,
-      itemId: _.get(data, 'instance.item.id') || null
+      itemId: _.get(data, 'instance.item.id') || null,
+      inUniqueZone
     };
     try {
       return (

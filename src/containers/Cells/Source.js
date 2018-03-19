@@ -16,12 +16,15 @@ class Source extends Component {
     quantity: PropTypes.number,
     onSelect: PropTypes.func,
     startDrag: PropTypes.func,
-    id: PropTypes.string
+    id: PropTypes.string,
+    inUniqueZone: PropTypes.bool
   };
   static defaultProps = {};
 
   render() {
-    const { style, url, size, departments, quantity, startDrag, row, column, id, tags, urlWebp } = this.props;
+    const {
+      style, url, size, departments, quantity, startDrag, row, column, id, tags, urlWebp, inUniqueZone
+    } = this.props;
     const resStyle = {
       width: '100%',
       height: '100%'
@@ -41,6 +44,7 @@ class Source extends Component {
           onDragStart={() => startDrag(id, row, column)}
           draggable
           style={resStyle}
+          className={inUniqueZone ? 'in-zone' : ''}
         >
           <div style={{ backgroundColor: 'black', color: 'white', left: 2, position: 'absolute' }}>{size}</div>
           <div style={{ backgroundColor: 'black', color: 'white', right: 2, position: 'absolute' }}>

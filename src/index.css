@@ -1,19 +1,32 @@
-#root{
-    height: 100vh;
-    font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 0.9rem;
-    color: rgba(36, 36, 41, 0.78);
-    background-color: rgba(163, 181, 209, 0.18);
+#root {
+  height: 100vh;
+  font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 0.9rem;
+  color: rgba(36, 36, 41, 0.78);
+  background-color: rgba(163, 181, 209, 0.18);
 }
-.App{
-    height: 100%;
+
+.App {
+  height: 100%;
 }
-html{
-    height: 100%;
+
+html {
+  height: 100%;
 }
+
 .jumbotron {
-    background-color: white;
+  background-color: white;
 }
-.pad{
-    width: 100px;
+
+.pad {
+  width: 100px;
+}
+
+.in-zone::before {
+  background-color: rgba(99, 99, 105, 0.31);
+  content: '';
+  display: block;
+  height: 100%;
+  position: absolute;
+  width: 100%;
 }

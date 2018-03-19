@@ -22,7 +22,8 @@ class Cell extends Component {
     instId: PropTypes.string,
     itemId: PropTypes.string,
     tags: PropTypes.array,
-    text: PropTypes.string
+    text: PropTypes.string,
+    inUniqueZone: PropTypes.bool
   };
   static defaultProps = {};
 
@@ -37,8 +38,9 @@ class Cell extends Component {
   shouldComponentUpdate(nextProps, nextState, nextContext) {
     const tagsExp = nextProps.tags && !this.props.tags ||
       nextProps.tags && nextProps.tags.length !== this.props.tags.length;
-    return nextProps.active !== this.props.active || nextProps.aId !== this.props.aId || !!tagsExp ||
-      this.state.edit !== nextState.edit || this.state.text !== nextState.text;
+    return nextProps.active !== this.props.active || nextProps.aId !== this.props.aId ||
+      nextProps.inUniqueZone !== this.props.inUniqueZone || tagsExp || this.state.edit !== nextState.edit ||
+      this.state.text !== nextState.text;
   }
 
   componentWillReceiveProps(nextProps, nextContext) {
@@ -61,9 +63,7 @@ class Cell extends Component {
     else if (!url && !text) onDrop(row, column);
   };
 
-  preventDefault = (ev) => {
-    ev.preventDefault();
-  };
+  preventDefault = ev => ev.preventDefault();
 
   setEdit = () => {
     const { url, onChangeText, row, column, id } = this.props;
@@ -84,7 +84,8 @@ class Cell extends Component {
   render() {
     const {
       style,
-      url
+      url,
+      inUniqueZone
     } = this.props;
     const { edit, text } = this.state;
     let resStyle = { ...style };
@@ -99,7 +100,7 @@ class Cell extends Component {
       >
         {url ?
           <Instance {...this.props} />:
-          <TextCell changeText={this.changeText} edit={edit} text={text} />
+          <TextCell changeText={this.changeText} edit={edit} text={text} className={inUniqueZone ? 'in-zone' : ''} />
         }
       </div>
     );

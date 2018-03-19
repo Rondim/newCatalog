@@ -8,7 +8,8 @@ import { withStyles } from 'material-ui/styles';
 import { Paper } from 'material-ui';
 import _ from 'lodash';
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
-import { faRedo, faExpand } from '@fortawesome/fontawesome-free-solid';
+import { faRedo, faExpand, faTimes } from '@fortawesome/fontawesome-free-solid';
+import { faClone } from '@fortawesome/fontawesome-free-regular';
 
 import CatalogSidebar from '../CatalogSidebar';
 import SetterSidebar from '../SetterSidebar';
@@ -24,6 +25,7 @@ import { instanceSelect } from '../CatalogSidebar/actions';
 import query from './queries/fetchCells.graphql';
 import refreshAllZones from './mutations/refreshAllZones.graphql';
 import PadEditor from './PadEditor';
+import UniqueEditor from './UniqueEditor';
 
 const styles = theme => ({
   root: {
@@ -226,6 +228,22 @@ class Toolbar extends Component {
           </NavItem>
           <NavItem>
             <NavLink
+              className={classnames({ active: mode === 'uniqueCreator' })}
+              onClick={() => this.toggle('uniqueCreator')}
+            >
+              <FontAwesomeIcon
+                icon={faClone}
+                size="lg"
+              />
+              <FontAwesomeIcon
+                icon={faTimes}
+                size="lg"
+                style={{ marginLeft: '-15px' }}
+              />
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink
               className={classnames({ active: mode === 'setter' })}
               onClick={() => this.toggle('setter')}
             >
@@ -260,6 +278,12 @@ class Toolbar extends Component {
               classes={classes.paper}
               config={sidebarConfigData}
               filters={filtersSelected}
+            />
+          </TabPane>
+          <TabPane tabId="uniqueCreator">
+            <UniqueEditor
+              cells={selectedGroupCells}
+              sheet={sheet}
             />
           </TabPane>
           <TabPane tabId="setter">

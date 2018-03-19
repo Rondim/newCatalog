@@ -9,19 +9,19 @@ import Toolbar from './Toolbar';
 import Sheet from './Sheet';
 
 import setPosition from './mutations/setPosition.graphql';
-import createZone from './mutations/createZone.graphql';
+import loadInstances from './mutations/loadInstancesToSheet.graphql';
 import refreshZone from './mutations/refreshZone.graphql';
 import query from './queries/fetchCells.graphql';
 
 @compose(
   graphql(setPosition, { name: 'setPosition' }),
-  graphql(createZone, { name: 'createZone' }),
+  graphql(loadInstances, { name: 'loadInstances' }),
   graphql(refreshZone, { name: 'refreshZone' }),
 )
 class Cells extends Component {
   static propTypes = {
     setPosition: PropTypes.func,
-    createZone: PropTypes.func,
+    loadInstances: PropTypes.func,
     refreshZone: PropTypes.func,
     subscribeToCells: PropTypes.func,
     subscribeToZones: PropTypes.func,
@@ -76,11 +76,8 @@ class Cells extends Component {
 
   handleLoad = async filter => {
     const { id: sheet } = this.props.match.params;
-    const res = await this.props.createZone({
-      variables: { ...this.state.selectedGroupCells, filter, sheet }
-    });
-    await this.props.refreshZone({
-      variables: { zoneId: res.data.createZone.id, sheetId: sheet },
+    await this.props.loadInstances({
+      variables: { ...this.state.selectedGroupCells, filter, sheet },
       refetchQueries: [{ query, variables: { sheet } }]
     });
   };

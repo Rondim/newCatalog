@@ -6,8 +6,8 @@ import { graphql } from 'react-apollo';
 import query from './queries/allPads.graphql';
 import Loading from '../../components/Loading';
 
-@graphql(query)
-class PadsList extends Component {
+@graphql(query, { options: (({ typeUnique }) => ({ variables: { typeUnique } })) })
+class ZonesList extends Component {
   static propTypes = {
     data: PropTypes.shape({
       loading: PropTypes.bool,
@@ -48,7 +48,9 @@ class PadsList extends Component {
           <Button
             id={id}
             className='w-100'
-            style={{ backgroundColor: type === 'Pad' ? '#cd00c2' : '#00cda9', cursor: 'move' }}
+            style={{
+              backgroundColor: type === 'Pad' ? '#cd00c2' : type === 'Unique' ? '#c8dc59' : '#00cda9',
+              cursor: 'move' }}
             draggable
             onDragStart={ev => this.drag(ev, id, h, w)}
           >
@@ -69,4 +71,4 @@ class PadsList extends Component {
   }
 }
 
-export default PadsList;
+export default ZonesList;
