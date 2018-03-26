@@ -30,3 +30,7 @@ html {
   position: absolute;
   width: 100%;
 }
+
+.critical{
+  background-color: rgba(255, 0, 0, 0.38);
+}

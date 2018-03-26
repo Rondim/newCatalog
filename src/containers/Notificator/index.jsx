@@ -20,14 +20,23 @@ class NotificatorwoConnect extends Component {
 
   componentWillReceiveProps(nextProps) {
     this.setState({ visible: !!nextProps.message });
+    document.body.classList.toggle('critical', nextProps.type==='critical');
   }
 
+  componentDidMount() {
+    document.body.classList.toggle('critical', this.props.type==='critical');
+  }
+
+  componentWillUnmount() {
+    document.body.classList.remove('critical');
+  }
 
   render() {
     const { type, message } = this.props;
+    const color = type==='critical' ? 'danger' : type;
     return (
       <div style={{ position: 'fixed', zIndex: 1051, right: 10, top: 10 }}>
-        <Alert color={type} isOpen={this.state.visible} toggle={() => this.setState({ visible: false })}>
+        <Alert color={color} isOpen={this.state.visible} toggle={() => this.setState({ visible: false })}>
           <div style={{ paddingRight: '20px' }}>{message}</div>
         </Alert>
       </div>

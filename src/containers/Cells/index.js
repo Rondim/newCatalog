@@ -44,7 +44,9 @@ class Cells extends Component {
     const { dragItem: id } = this.state;
     const { setPosition, match: { params: { id: sheet } } } = this.props;
     if (i >=0 && j >=0) {
-      setPosition({ variables: { id, row: i, column: j, sheet }, optimisticResponse: {
+      setPosition({
+        variables: { id, row: i, column: j, sheet },
+        optimisticResponse: {
           __typename: 'Mutation',
           updateCell: {
             __typename: 'cells',
@@ -52,7 +54,9 @@ class Cells extends Component {
             i,
             j
           }
-        } });
+        },
+        refetchQueries: [{ query, variables: { sheet } }]
+      });
     }
   };
 

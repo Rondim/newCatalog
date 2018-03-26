@@ -13,7 +13,7 @@ import { faClone } from '@fortawesome/fontawesome-free-regular';
 
 import CatalogSidebar from '../CatalogSidebar';
 import SetterSidebar from '../SetterSidebar';
-import { fetchConfig, dataToConfig } from '../Catalog/queries/fetchConfig';
+import { fetchConfig, dataToConfig, dataToConfigWithPads } from '../Catalog/queries/fetchConfig';
 import fetchFilters from './queries/fetchFilters.graphql';
 import { instanceByFilter } from './queries/utils/fetchInstancesCount';
 import setFilter from './mutations/setFilter.graphql';
@@ -21,7 +21,7 @@ import unsetFilter from './mutations/unsetFilter.graphql';
 import createFilter from './mutations/createFilter.graphql';
 import Loading from '../../components/Loading';
 import CountInstancesForLoad from './CountInstancesForLoad';
-import { instanceSelect } from '../CatalogSidebar/actions';
+import { instanceSelect } from '../SetterSidebar/actions';
 import query from './queries/fetchCells.graphql';
 import refreshAllZones from './mutations/refreshAllZones.graphql';
 import PadEditor from './PadEditor';
@@ -39,7 +39,7 @@ const styles = theme => ({
 
 const mapStateToProps = (state) => {
   return {
-    filtersSelected: state.catalogSidebar.filtersSelected
+    filtersSelectedCatalog: state.catalogSidebar.filtersSelected
   };
 };
 
@@ -69,11 +69,12 @@ const calcFilterVariables = (selectedCells) => {
   }),
   graphql(fetchConfig, {
     name: 'config',
-    props({ config: { loading, allSidebarItems } }) {
+    props({ config: { loading, allSidebarItems, allPads } }) {
       return {
         config: {
           loading,
           sidebarConfigData: dataToConfig(allSidebarItems),
+          sidebarConfigDataWithPads: dataToConfigWithPads(allSidebarItems, allPads)
         }
       };
     }
@@ -105,7 +106,7 @@ class Toolbar extends Component {
     instanceSelect: PropTypes.func,
     createFilter: PropTypes.func,
     sheet: PropTypes.string,
-    filtersSelected: PropTypes.object,
+    filtersSelectedCatalog: PropTypes.object,
     classes: PropTypes.object,
     selectedCells: PropTypes.array,
     selectedGroupCells: PropTypes.object
@@ -132,17 +133,12 @@ class Toolbar extends Component {
         instanceSelect(filtersByInstanceIds, sidebarConfigData);
       }
     }
-
-    if (this.props.mode === 'setter' && mode === 'loader') {
-      instanceSelect({ someFilters: [], everyFilters: [] }, sidebarConfigData);
-    }
   }
 
   filterSet = async ({ filterGroupId, filterId }) => {
     const { selectedCells,
       filters: { filtersByInstanceIds: { someFilters } },
       setFilter, unsetFilter, sheet } = this.props;
-    console.log('filterSet');
     let needUncheck;
     const ids = selectedCells.map(({ instId }) => instId);
     const variables = calcFilterVariables(selectedCells);
@@ -186,14 +182,15 @@ class Toolbar extends Component {
   };
 
   handleClick = () => {
-    const { filtersSelected, onLoad, config: { sidebarConfigData } } = this.props;
-    const filters = instanceByFilter(filtersSelected, sidebarConfigData.mapTypes);
+    const { filtersSelectedCatalog, onLoad, config: { sidebarConfigDataWithPads } } = this.props;
+    const filters = instanceByFilter(filtersSelectedCatalog, sidebarConfigDataWithPads.mapTypes);
+    console.log(filters);
     onLoad(filters);
   };
 
   render() {
-    const { config: { sidebarConfigData, loading }, filtersSelected, classes, mode, selectedGroupCells, sheet,
-      filters: { loading: fLoading } } = this.props;
+    const { config: { sidebarConfigData, sidebarConfigDataWithPads, loading }, filtersSelectedCatalog, classes, mode,
+      selectedGroupCells, sheet, filters: { loading: fLoading } } = this.props;
     if (loading) return <Loading />;
     return (
       <div>
@@ -254,13 +251,13 @@ class Toolbar extends Component {
         <TabContent activeTab={mode}>
           <TabPane tabId="loader">
             <Paper className={classes.paper}>
-              <CatalogSidebar config={sidebarConfigData} />
+              <CatalogSidebar config={sidebarConfigDataWithPads} />
             </Paper>
             <Row>
               <Col>
                 <CountInstancesForLoad
-                  mapTypes={sidebarConfigData.mapTypes}
-                  filtersSelected={filtersSelected}
+                  mapTypes={sidebarConfigDataWithPads.mapTypes}
+                  filtersSelected={filtersSelectedCatalog}
                 />
               </Col>
               <Col>
@@ -276,8 +273,8 @@ class Toolbar extends Component {
               cells={selectedGroupCells}
               sheet={sheet}
               classes={classes.paper}
-              config={sidebarConfigData}
-              filters={filtersSelected}
+              config={sidebarConfigDataWithPads}
+              filters={filtersSelectedCatalog}
             />
           </TabPane>
           <TabPane tabId="uniqueCreator">

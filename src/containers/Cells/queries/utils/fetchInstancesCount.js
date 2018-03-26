@@ -27,11 +27,7 @@ export const instanceByFilter = (filters, mapType) => {
       if (mapType) type = _.filter(mapType, o => o.id === key)[0].relation;
       const subfilter = {
         OR: _.map(filter, (value, id) => {
-          return {
-            sidebarFilters_some: {
-              id
-            }
-          };
+          return key === 'pad' ? { pads: { id } } : { sidebarFilters_some: { id } };
         })
       };
       if (type === 'Item' && subfilter.OR.length) {

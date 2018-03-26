@@ -70,6 +70,9 @@ const reducers = (state, action) => {
 };
 
 const errorLink = onError(({ networkError, graphQLErrors }) => {
+  if (networkError) {
+    sendNotification(store.dispatch, 'critical', `Сетевая ошибка ${networkError.statusCode || ''}`);
+  }
   if (networkError && networkError.statusCode === 401) {
     localStorage.removeItem('token');
   }

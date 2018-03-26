@@ -9,7 +9,7 @@ import sidebarItemsSelector from './selectors';
 
 const mapStateToProps = (state) => {
   return {
-    sidebarItems: sidebarItemsSelector(state.catalogSidebar)
+    sidebarItems: sidebarItemsSelector(state.setterSidebar)
   };
 };
 

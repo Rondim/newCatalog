@@ -28,6 +28,10 @@ export const fetchConfig = gql`
         }
       }
     }
+    allPads(typeUnique: false){
+      id
+      name
+    }
   }
 `;
 
@@ -40,6 +44,33 @@ export const fetchConfigOptions = {
       }
     };
   },
+};
+
+export const dataToConfigWithPads = (data, pads) => {
+  if (data && data.length) {
+    let newData = [...data];
+    newData.push({
+      id: 'pad',
+      name: 'Планшетки',
+      order: data.length,
+      type: 'filter',
+      relation: 'Availability',
+      multiselection: true,
+      childs: [],
+      parents: [],
+      sidebarFilters: pads.map(({ id, name }, index) => {
+        return {
+          id,
+          name,
+          order: index,
+          color: '#000000',
+          property: { id: 'pad' },
+          dependentOn: []
+        };
+      })
+    });
+    return dataToConfig(newData);
+  }
 };
 
 export const dataToConfig = data => {
