@@ -1,5 +1,5 @@
-query ($typeUnique: Boolean){
-  allPads(typeUnique: $typeUnique){
+query ($typeUnique: Boolean, $search: String){
+  allPads(typeUnique: $typeUnique, search: $search){
     id
     name
     type

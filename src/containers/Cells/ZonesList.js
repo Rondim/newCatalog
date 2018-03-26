@@ -6,7 +6,11 @@ import { graphql } from 'react-apollo';
 import query from './queries/allPads.graphql';
 import Loading from '../../components/Loading';
 
-@graphql(query, { options: (({ typeUnique }) => ({ variables: { typeUnique } })) })
+@graphql(query, {
+  options: (({ typeUnique, search }) => {
+    return { variables: { typeUnique, search }, fetchPolicy: 'cache-and-network' };
+  })
+})
 class ZonesList extends Component {
   static propTypes = {
     data: PropTypes.shape({

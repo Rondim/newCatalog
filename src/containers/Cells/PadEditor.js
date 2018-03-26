@@ -14,6 +14,7 @@ import createZone from './mutations/createZone.graphql';
 import refreshZone from './mutations/refreshZone.graphql';
 import query from './queries/fetchCells.graphql';
 import ZonesList from './ZonesList';
+import fetchPads from './queries/allPads.graphql';
 
 @connect(null, { notification })
 @compose(
@@ -37,7 +38,8 @@ class PadEditor extends Component {
     edit: null,
     name: '',
     type: 'Loader',
-    filters: null
+    filters: null,
+    search: ''
   };
 
   onEdit = () => {
@@ -71,10 +73,11 @@ class PadEditor extends Component {
 
   onSave = async () => {
     const { config, sheet, cells } = this.props;
-    const { name, filters, type } = this.state;
+    const { name, filters, type, search } = this.state;
     const filter = filters && instanceByFilter(filters, config.mapTypes);
     const res = await this.props.createZone({
-      variables: { ...cells, filter, sheet, name, type }
+      variables: { ...cells, filter, sheet, name, type },
+      refetchQueries: [{ query: fetchPads, variables: { search } }]
     });
     await this.props.refreshZone({
       variables: { zoneId: res.data.createZone.id, sheetId: sheet },
@@ -84,7 +87,7 @@ class PadEditor extends Component {
   };
 
   render() {
-    const { edit, name, filters, type } = this.state;
+    const { edit, name, filters, type, search } = this.state;
     const { classes, config } = this.props;
     if (filters) config.filtersSelected = filters;
     switch (edit) {
@@ -94,7 +97,8 @@ class PadEditor extends Component {
             <Jumbotron>
               <Button className='w-100' onClick={this.onEdit}>Создать зону</Button>
               <div style={{ marginTop: '20px' }}>
-                <ZonesList />
+                <Input value={search} onChange={ev => this.setState({ search: ev.target.value })} />
+                <ZonesList search={search} />
               </div>
             </Jumbotron>
           </div>

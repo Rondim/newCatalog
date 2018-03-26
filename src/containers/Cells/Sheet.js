@@ -19,6 +19,7 @@ import updateTextCell from './mutations/updateTextCell.graphql';
 import { notification } from '../Notificator/actions';
 import { calcActive, calcStyle, checkWebpFeature, getQuantity, getDepartments } from './libs/calc';
 import placeZoneOnSheet from './mutations/placeZoneOnSheet.graphql';
+import fetchPads from './queries/allPads.graphql';
 
 // import Zone from './libs/zone';
 // import CellObj from './libs/cellObj';
@@ -106,10 +107,12 @@ class Sheet extends Component {
     const { selectSomeCells, selectOneCell, selectManyCells, selectZone } = this.props;
     if (ev.metaKey) {
       selectSomeCells(i, j, instId, itemId);
+    } else if (ev.altKey && ev.shiftKey) {
+      selectZone(_.filter(allZones, o => o.type === 'Unique'), i, j);
     } else if (ev.shiftKey) {
       selectManyCells(i, j, instId, itemId, allCells);
     } else if (ev.altKey) {
-      selectZone(allZones, i, j);
+      selectZone(_.filter(allZones, o => o.type !== 'Unique'), i, j);
     } else {
       const selectedCells = instId ? [{ i, j, instId, itemId }] : [{ i, j }];
       selectOneCell(selectedCells);
@@ -136,7 +139,14 @@ class Sheet extends Component {
       this.props.notification('success', 'Зона обновлена');
     } else if (ev.keyCode === 8 || ev.keyCode === 46) {
       if (selectedZone) {
-        await removeZone({ variables: { id: selectedZone.id }, refetchQueries: [{ query, variables: { sheet } }] });
+        await removeZone({
+          variables: { id: selectedZone.id },
+          refetchQueries: [
+            { query, variables: { sheet } },
+            { query: fetchPads, variables: { search: '' } },
+            { query: fetchPads, variables: { typeUnique: true } }
+            ]
+        });
         unselectZone();
       } else if (selectedGroupCells) {
         const cells = this.selectCellsByGroup();

@@ -10,6 +10,7 @@ import { compose, graphql } from 'react-apollo/index';
 import createZone from './mutations/createZone.graphql';
 import refreshZone from './mutations/refreshZone.graphql';
 import query from './queries/fetchCells.graphql';
+import fetchPads from './queries/allPads.graphql';
 import ZonesList from './ZonesList';
 
 @connect(null, { notification })
@@ -49,7 +50,7 @@ class UniqueEditor extends Component {
     });
     await this.props.refreshZone({
       variables: { zoneId: res.data.createZone.id, sheetId: sheet },
-      refetchQueries: [{ query, variables: { sheet } }]
+      refetchQueries: [{ query, variables: { sheet } }, { query: fetchPads, variables: { typeUnique: true } }]
     });
     this.setState({ edit: null, name: '' });
   };
