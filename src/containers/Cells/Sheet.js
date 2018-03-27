@@ -98,8 +98,16 @@ class Sheet extends Component {
     }
   }
 
+  componentDidMount() {
+    window.addEventListener('resize', () => {
+      this.setState({ height: this._container.clientHeight });
+    });
+  }
+
+
   state={
-    webp: false
+    webp: false,
+    height: document.body.clientHeight-69
   };
 
   handleSelectCell = (ev, i, j, instId, itemId) => {
@@ -266,14 +274,14 @@ class Sheet extends Component {
     const { loading } = this.props.data;
     if (loading) return <Loading />;
     return (
-      <div tabIndex="0" onKeyDown={this.handleKeyDown} style={{ flex: '1', height: '100%' }}>
-        <AutoSizer defaultHeight={600}>
-          {({ height, width }) => (
+      <div tabIndex="0" onKeyDown={this.handleKeyDown} style={{ flex: 1 }} ref={ref => this._container = ref} >
+        <AutoSizer defaultHeight={600} disableHeight >
+          {({ width }) => (
             <Grid
               cellRenderer={this.cellRenderer}
               columnCount={200}
               columnWidth={100}
-              height={height}
+              height={document.body.clientHeight-69}
               rowCount={300}
               rowHeight={100}
               width={width}

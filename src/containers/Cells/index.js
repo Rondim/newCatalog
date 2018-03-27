@@ -176,7 +176,7 @@ class Cells extends Component {
       sheet
     };
     return (
-      <Row style={{ flex: '1', height: '100%' }}>
+      <Row>
         <Col>
           <Sheet {...sheetProps} />
         </Col>
