@@ -49,6 +49,7 @@ const calcNewFiltersSelectedForSetter = ({ someFilters, everyFilters, sidebarCon
     }
     filtersSelected[property.id][id] = 'selected';
   });
+  // console.log(state.filtersSelected, filtersSelected);
   state.filtersSelected = filtersSelected;
   return state;
 };

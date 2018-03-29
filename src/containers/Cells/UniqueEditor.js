@@ -13,6 +13,8 @@ import query from './queries/fetchCells.graphql';
 import fetchPads from './queries/allPads.graphql';
 import ZonesList from './ZonesList';
 
+const className = 'MuiPaper-elevation2-7 .MuiPaper-rounded-4';
+
 @connect(null, { notification })
 @compose(
   graphql(createZone, { name: 'createZone' }),
@@ -60,7 +62,7 @@ class UniqueEditor extends Component {
     switch (edit) {
       case null:
         return (
-          <div>
+          <div className={className}>
             <Jumbotron>
               <Button className='w-100' onClick={this.onEdit}>Создать<br />уникальность</Button>
               <div style={{ marginTop: '20px' }}>
@@ -71,7 +73,7 @@ class UniqueEditor extends Component {
         );
       case 'main':
         return (
-          <Container>
+          <Container className={className}>
             <Row>
               <Col>
                 <FontAwesomeIcon icon={faAngleLeft} onClick={() => this.setState({ edit: null })} />

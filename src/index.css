@@ -22,7 +22,7 @@ html {
   width: 100px;
 }
 
-.in-zone::before {
+.in-zone {
   background-color: rgba(99, 99, 105, 0.31);
   content: '';
   display: block;

@@ -92,11 +92,11 @@ class Toolbar extends Component {
       loading: PropTypes.bool,
       sidebarConfigData: PropTypes.object
     }),
-    filters: PropTypes.shape({
+    /* filters: PropTypes.shape({
       loading: PropTypes.bool,
-      someFilters: PropTypes.array,
-      everyFilters: PropTypes.array
-    }),
+      filtersByInstanceIds: PropTypes.object
+    }),*/
+    filters: PropTypes.object,
     setFilter: PropTypes.func,
     unsetFilter: PropTypes.func,
     refreshAllZones: PropTypes.func,
@@ -129,7 +129,7 @@ class Toolbar extends Component {
     const { mode, filters: { loading, filtersByInstanceIds }, selectedCells,
       config: { sidebarConfigData, loading: configLoading }, filters, instanceSelect } = nextProps;
     if (mode === 'setter' && !loading && !configLoading && selectedCells && _.get(selectedCells, '[0].instId')) {
-      if ( !_.isEqual(filters, this.props.filters)) {
+      if ( !_.isEqual(filters.filtersByInstanceIds, this.props.filters.filtersByInstanceIds)) {
         instanceSelect(filtersByInstanceIds, sidebarConfigData);
       }
     }
@@ -184,7 +184,6 @@ class Toolbar extends Component {
   handleClick = () => {
     const { filtersSelectedCatalog, onLoad, config: { sidebarConfigDataWithPads } } = this.props;
     const filters = instanceByFilter(filtersSelectedCatalog, sidebarConfigDataWithPads.mapTypes);
-    console.log(filters);
     onLoad(filters);
   };
 
@@ -285,11 +284,12 @@ class Toolbar extends Component {
           </TabPane>
           <TabPane tabId="setter">
             <Paper className={classes.paper}>
-              { fLoading && mode === 'setter' ? <Loading /> :
-                <SetterSidebar
-                  config={sidebarConfigData}
-                  filterSet={this.filterSet}
-                  onCreateFilter={this.handleCreateFilter} />}
+              <SetterSidebar
+                loading={fLoading}
+                config={sidebarConfigData}
+                filterSet={this.filterSet}
+                onCreateFilter={this.handleCreateFilter}
+              />
             </Paper>
           </TabPane>
         </TabContent>

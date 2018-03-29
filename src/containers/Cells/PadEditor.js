@@ -15,6 +15,7 @@ import refreshZone from './mutations/refreshZone.graphql';
 import query from './queries/fetchCells.graphql';
 import ZonesList from './ZonesList';
 import fetchPads from './queries/allPads.graphql';
+const className = 'MuiPaper-elevation2-7 .MuiPaper-rounded-4';
 
 @connect(null, { notification })
 @compose(
@@ -93,7 +94,7 @@ class PadEditor extends Component {
     switch (edit) {
       case null:
         return (
-          <div>
+          <div className={className}>
             <Jumbotron>
               <Button className='w-100' onClick={this.onEdit}>Создать зону</Button>
               <div style={{ marginTop: '20px' }}>
@@ -105,33 +106,33 @@ class PadEditor extends Component {
         );
       case 'main':
         return (
-          <Container>
+          <Container className={classes} style={{ backgroundColor: 'white' }} >
             <Row>
               <Col>
                 <FontAwesomeIcon icon={faAngleLeft} onClick={() => this.setState({ edit: null })} />
               </Col>
             </Row>
             <Row>
-              <Col className='w-100'>
+              <Col className='w-100 mt-1 mb-1'>
                 <Input value={name} placeholder='Имя' onChange={ev => this.setState({ name: ev.target.value })} />
               </Col>
             </Row>
             <Row>
-              <Col className='w-100'>
+              <Col className='w-100 mt-1 mb-1'>
                 <Button className='w-100' onClick={() => this.setState({ edit: 'filtersSelector' })}>
                   {filters ? 'Изменить loader' : 'Добавить loader'}
                 </Button>
               </Col>
             </Row>
             <Row>
-              <Col className='w-100'>
+              <Col className='w-100 mt-1 mb-1'>
                 <Button className='w-100' onClick={this.switchType}>
                   {type === 'Loader' ? 'Сделать планшеткой' : 'Удалить планшетку'}
                 </Button>
               </Col>
             </Row>
             <Row>
-              <Col className='w-100'>
+              <Col className='w-100 mt-1 mb-1'>
                 <Button
                   className='w-100'
                   color='success'
@@ -153,7 +154,7 @@ class PadEditor extends Component {
               </Col>
             </Row>
             <CatalogSidebar config={config} />
-            <Button color='danger' onClick={this.resetFilterSelector}>Удалить Loader</Button>
+            <Button className='mt-1 mb-1' color='danger' onClick={this.resetFilterSelector}>Удалить Loader</Button>
           </Paper>
         );
     }

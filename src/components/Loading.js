@@ -4,7 +4,7 @@ import LoadingIndicator from 'react-loading-indicator';
 class Loading extends Component {
   render() {
     return (
-        <div style={{ paddingLeft: '50%', paddingRight: '50%' }}>
+        <div style={{ flex: 1, paddingLeft: '40%', paddingRight: '40%' }}>
           <LoadingIndicator />
         </div>
     );

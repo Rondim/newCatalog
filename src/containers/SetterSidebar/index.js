@@ -6,6 +6,7 @@ import _ from 'lodash';
 import Sidebar from '../../components/Sidebar';
 import { initSidebar } from './actions';
 import sidebarItemsSelector from './selectors';
+import Loading from '../../components/Loading';
 
 const mapStateToProps = (state) => {
   return {
@@ -20,10 +21,12 @@ class SetterSidebar extends Component {
     filterSet: PropTypes.func,
     onCreateFilter: PropTypes.func,
     sidebarItems: PropTypes.array,
-    config: PropTypes.object
+    config: PropTypes.object,
+    loading: PropTypes.bool
   };
 
   componentDidMount() {
+    console.log('cdm');
     this.props.initSidebar(this.props.config);
   }
 
@@ -33,18 +36,22 @@ class SetterSidebar extends Component {
     }
   }
 
-
   handleFilterClick = (filterGroupId, filterId) => {
     this.props.filterSet({ filterGroupId, filterId });
   };
 
   render() {
-    const { sidebarItems, onCreateFilter } = this.props;
-    return <Sidebar
-      sidebarItems={sidebarItems}
-      handleFilterClick={this.handleFilterClick}
-      onCreateFilter={onCreateFilter}
-    />;
+    const { sidebarItems, onCreateFilter, loading } = this.props;
+    return (
+      <div style={{ height: 360 }}>
+        <Sidebar
+          sidebarItems={sidebarItems}
+          handleFilterClick={this.handleFilterClick}
+          onCreateFilter={onCreateFilter}
+        />
+        {loading && <Loading />}
+      </div>
+    );
   }
 }
 

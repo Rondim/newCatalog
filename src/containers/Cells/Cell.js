@@ -97,10 +97,11 @@ class Cell extends Component {
         onDoubleClick={this.setEdit}
         onDrop={this.iAmHere}
         onDragOver={this.preventDefault}
+        className={inUniqueZone ? 'in-zone' : ''}
       >
         {url ?
           <Instance {...this.props} />:
-          <TextCell changeText={this.changeText} edit={edit} text={text} className={inUniqueZone ? 'in-zone' : ''} />
+          <TextCell changeText={this.changeText} edit={edit} text={text} />
         }
       </div>
     );
