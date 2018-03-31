@@ -251,10 +251,6 @@ class Sheet extends Component {
       itemId: _.get(data, 'instance.item.id') || null,
       inUniqueZone
     };
-    if (rowIndex === 4 && columnIndex ===10 ) {
-      newStyle.backgroundColor = '#ff0600';
-      console.log(data);
-    }
     try {
       return (
         <Cell
