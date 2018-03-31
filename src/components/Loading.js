@@ -1,10 +1,15 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import LoadingIndicator from 'react-loading-indicator';
 
 class Loading extends Component {
+  static propTypes = {
+    style: PropTypes.object
+  };
   render() {
+    const { style } = this.props;
     return (
-        <div style={{ flex: 1, paddingLeft: '40%', paddingRight: '40%' }}>
+        <div className='d-flex justify-content-center align-items-center' style={style}>
           <LoadingIndicator />
         </div>
     );

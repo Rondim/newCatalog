@@ -68,7 +68,8 @@ class Sheet extends Component {
     onStartDrag: PropTypes.func,
     createTextCell: PropTypes.func,
     updateTextCell: PropTypes.func,
-    placeZoneOnSheet: PropTypes.func
+    placeZoneOnSheet: PropTypes.func,
+    busy: PropTypes.object
   };
   static defaultProps = {};
 
@@ -183,16 +184,17 @@ class Sheet extends Component {
   onChangeText = (text, i, j, id) => {
     const { createTextCell, updateTextCell, sheet } = this.props;
     if (id) {
+      console.log(text);
       if (!text) this.removeCells([{ i, j }], sheet);
       else updateTextCell({ variables: { id, text, sheet } });
     } else {
-      createTextCell({ variables: { i, j, text, sheet } });
+      text && createTextCell({ variables: { i, j, text, sheet } });
     }
   };
 
   cellRenderer = ({ columnIndex, key, rowIndex, style }) => {
     const { allCells, allZones } = this.props.data;
-    const { selectedCells, selectedGroupCells, selectedZone, onStartDrag } = this.props;
+    const { selectedCells, selectedGroupCells, selectedZone, onStartDrag, busy } = this.props;
     const { webp } = this.state;
     const data = _.find(allCells, o => o.i===rowIndex && o.j ===columnIndex);
     const avails = _.get(data, 'instance.availabilities');
@@ -232,6 +234,12 @@ class Sheet extends Component {
     const borderBottomStyle = calcStyle(active, activeBorders.bottom, loaderBorders.bottom, padBorders.bottom);
     newStyle.borderBottomWidth = borderBottomStyle.width;
     newStyle.borderBottomColor = borderBottomStyle.color;
+    let draggable = true;
+    if (_.get(busy, `${rowIndex}.${columnIndex}`)) {
+      newStyle.borderColor = '#fff700';
+      newStyle.backgroundColor = '#fff700';
+      draggable = false;
+    }
     const itemProps = {
       url: _.get(data, 'instance.item.img.url'),
       urlWebp: webp && _.get(data, 'instance.item.imgWebP.url'),
@@ -243,6 +251,10 @@ class Sheet extends Component {
       itemId: _.get(data, 'instance.item.id') || null,
       inUniqueZone
     };
+    if (rowIndex === 4 && columnIndex ===10 ) {
+      newStyle.backgroundColor = '#ff0600';
+      console.log(data);
+    }
     try {
       return (
         <Cell
@@ -251,7 +263,7 @@ class Sheet extends Component {
           active={active && 1 || activeBorders.left && 1 || activeBorders.right && 1 || activeBorders.bottom && 1 ||
           activeBorders.top && 1 || loaderBorders.left && 2 || loaderBorders.right && 2 || loaderBorders.top && 2 ||
           loaderBorders.bottom && 2 || padBorders.left && 3 || padBorders.right && 3 || padBorders.top && 3 ||
-          padBorders.bottom && 3}
+          padBorders.bottom && 3 || _.get(busy, `${rowIndex}.${columnIndex}`) && 4 }
           { ...itemProps }
           text={data && data.text}
           style={newStyle}
@@ -263,6 +275,7 @@ class Sheet extends Component {
           onPlaceZone={this.placeZone}
           onSelect={this.handleSelectCell}
           onChangeText={this.onChangeText}
+          draggable={draggable}
         />
       );
     } catch (err) {
@@ -272,7 +285,7 @@ class Sheet extends Component {
 
   render() {
     const { loading } = this.props.data;
-    if (loading) return <Loading />;
+    if (loading) return <div style={{ height: '100vh' }}><Loading style={{ height: '100%' }} /></div>;
     return (
       <div tabIndex="0" onKeyDown={this.handleKeyDown} style={{ flex: 1 }} ref={ref => this._container = ref} >
         <AutoSizer defaultHeight={600} disableHeight >

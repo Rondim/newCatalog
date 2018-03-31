@@ -37,27 +37,48 @@ class Cells extends Component {
     selectedZone: null,
     i: undefined,
     j: undefined,
-    mode: 'loader'
+    mode: 'loader',
+    busy: {}
   };
 
   onDrop = async (i, j) => {
-    const { dragItem: id } = this.state;
-    const { setPosition, match: { params: { id: sheet } } } = this.props;
-    if (i >=0 && j >=0) {
-      setPosition({
-        variables: { id, row: i, column: j, sheet },
-        optimisticResponse: {
-          __typename: 'Mutation',
-          updateCell: {
-            __typename: 'cells',
-            id,
-            i,
-            j
-          }
-        },
-        refetchQueries: [{ query, variables: { sheet } }]
-      });
+    const { dragItem: id, i: si, j: sj } = this.state;
+    this.setState(prevState => {
+      let busy = { ...prevState.busy };
+      if (!busy[i]) busy[i] = {};
+      if (!busy[si]) busy[si] = {};
+      busy[i][j] = true;
+      busy[si][sj] = true;
+      return { busy };
+    });
+    try {
+      const { setPosition, match: { params: { id: sheet } } } = this.props;
+      if (i >= 0 && j >= 0) {
+        await setPosition({
+          variables: { id, row: i, column: j, sheet },
+          optimisticResponse: {
+            __typename: 'Mutation',
+            updateCell: {
+              __typename: 'cells',
+              id,
+              i,
+              j
+            }
+          },
+          refetchQueries: [{ query, variables: { sheet } }]
+        });
+      }
+    } catch (err) {
+      console.warn(err);
     }
+    this.setState(prevState => {
+      let busy = { ...prevState.busy };
+      if (!busy[i]) return prevState;
+      if (!busy[si]) return prevState;
+      delete busy[i][j];
+      delete busy[si][sj];
+      return { busy };
+    });
   };
 
   selectorCells = () => {
@@ -159,7 +180,8 @@ class Cells extends Component {
       mode,
       selectedCells,
       selectedGroupCells,
-      selectedZone
+      selectedZone,
+      busy
     } = this.state;
     const { id: sheet } = this.props.match.params;
     const sheetProps = {
@@ -173,7 +195,8 @@ class Cells extends Component {
       selectedCells,
       selectedGroupCells,
       selectedZone,
-      sheet
+      sheet,
+      busy
     };
     return (
       <Row>

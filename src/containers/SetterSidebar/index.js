@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import _ from 'lodash';
+// import _ from 'lodash';
 
 import Sidebar from '../../components/Sidebar';
 import { initSidebar } from './actions';
@@ -26,15 +26,14 @@ class SetterSidebar extends Component {
   };
 
   componentDidMount() {
-    console.log('cdm');
     this.props.initSidebar(this.props.config);
   }
 
-  componentDidUpdate(prevProps, prevState, prevContext) {
+  /* componentDidUpdate(prevProps, prevState, prevContext) {
     if (!_.isEqual(prevProps.config, this.props.config)) {
       this.props.initSidebar(this.props.config);
     }
-  }
+  } */
 
   handleFilterClick = (filterGroupId, filterId) => {
     this.props.filterSet({ filterGroupId, filterId });

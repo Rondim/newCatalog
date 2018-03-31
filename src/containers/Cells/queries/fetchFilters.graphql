@@ -2,6 +2,7 @@ query (
 $instIds: [ID!],
 ){
   filtersByInstanceIds(instIds: $instIds){
+    id
     someFilters{
       id
       property{

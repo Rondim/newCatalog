@@ -23,7 +23,8 @@ class Cell extends Component {
     itemId: PropTypes.string,
     tags: PropTypes.array,
     text: PropTypes.string,
-    inUniqueZone: PropTypes.bool
+    inUniqueZone: PropTypes.bool,
+    draggable: PropTypes.bool
   };
   static defaultProps = {};
 
@@ -57,10 +58,12 @@ class Cell extends Component {
   };
 
   iAmHere = ev => {
-    const { row, column, onDrop, url, text, onPlaceZone } = this.props;
-    const zone = ev.dataTransfer.getData('id');
-    if (zone) onPlaceZone(zone, row, column);
-    else if (!url && !text) onDrop(row, column);
+    const { row, column, onDrop, url, text, onPlaceZone, draggable } = this.props;
+    if (draggable) {
+      const zone = ev.dataTransfer.getData('id');
+      if (zone) onPlaceZone(zone, row, column);
+      else if (!url && !text) onDrop(row, column);
+    }
   };
 
   preventDefault = ev => ev.preventDefault();

@@ -2,13 +2,13 @@ import { createSelector } from 'reselect';
 
 export const sidebarItemsSelector = (state) => {
   if (!state.order) return [];
-  const { dependencies, filtersSelected, filters } = state;
+  const { dependencies, filtersSelected, filters, disabled } = state;
   return state.order.map(propId => {
     const parents = dependencies[propId]['parents'];
     const { type, name, filtersOrder } = state.sidebarItems[propId];
     const displayFilters = getDisplayFilters(filtersOrder, parents, filtersSelected, propId);
     const buttonDisplayText = getDisplayText(filters, filtersSelected, name, propId);
-    const isActive = displayFilters.length > 0;
+    const isActive = displayFilters.length > 0 && !disabled;
 
     return {
       type,

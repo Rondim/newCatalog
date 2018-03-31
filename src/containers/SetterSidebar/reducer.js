@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { FILTER_CLICKED, INIT_SIDEBAR, INSTANCE_SELECTED } from './constants';
+import { FILTER_CLICKED, INIT_SIDEBAR, INSTANCE_SELECTED, DISABLE_SIDEBAR } from './constants';
 
 
 function setterSidebarReducer(state = {}, action) {
@@ -12,10 +12,13 @@ function setterSidebarReducer(state = {}, action) {
       return { ...state, filtersSelected: newFiltersSelected };
     case INSTANCE_SELECTED:
       const newFiltersSelectedForSetter = calcNewFiltersSelectedForSetter(action.payload);
-      if (_.isEqual(state, newFiltersSelectedForSetter)) {
-        return state;
-      }
       return newFiltersSelectedForSetter;
+    case DISABLE_SIDEBAR:
+      let filtersSelected = {};
+      state.order.forEach(propId => {
+      filtersSelected[propId] = {};
+    });
+      return { ...state, disabled: true, filtersSelected };
     default:
       return state;
     }
@@ -51,6 +54,7 @@ const calcNewFiltersSelectedForSetter = ({ someFilters, everyFilters, sidebarCon
   });
   // console.log(state.filtersSelected, filtersSelected);
   state.filtersSelected = filtersSelected;
+  state.disabled = false;
   return state;
 };
 
@@ -79,5 +83,5 @@ function getInitialState(sidebarConfigData) {
   sidebarConfigData.order.forEach(propId => {
     filtersSelected[propId] = {};
   });
-  return { ...sidebarConfigData, filtersSelected };
+  return { ...sidebarConfigData, filtersSelected, disabled: false };
 }

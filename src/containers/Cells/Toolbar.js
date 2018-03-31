@@ -21,7 +21,7 @@ import unsetFilter from './mutations/unsetFilter.graphql';
 import createFilter from './mutations/createFilter.graphql';
 import Loading from '../../components/Loading';
 import CountInstancesForLoad from './CountInstancesForLoad';
-import { instanceSelect } from '../SetterSidebar/actions';
+import { instanceSelect, disableSidebar } from '../SetterSidebar/actions';
 import query from './queries/fetchCells.graphql';
 import refreshAllZones from './mutations/refreshAllZones.graphql';
 import PadEditor from './PadEditor';
@@ -58,14 +58,15 @@ const calcFilterVariables = (selectedCells) => {
 };
 
 @withStyles(styles)
-@connect(mapStateToProps, { instanceSelect })
+@connect(mapStateToProps, { instanceSelect, disableSidebar })
 @compose(
   graphql(fetchFilters, {
     name: 'filters',
     options: ({ selectedCells }) => {
       const variables = calcFilterVariables(selectedCells);
       return { variables, fetchPolicy: 'network-only' };
-    }
+    },
+    cachePolicy: { query: true, data: false }
   }),
   graphql(fetchConfig, {
     name: 'config',
@@ -104,6 +105,7 @@ class Toolbar extends Component {
     changeMode: PropTypes.func,
     onLoad: PropTypes.func,
     instanceSelect: PropTypes.func,
+    disableSidebar: PropTypes.func,
     createFilter: PropTypes.func,
     sheet: PropTypes.string,
     filtersSelectedCatalog: PropTypes.object,
@@ -127,9 +129,15 @@ class Toolbar extends Component {
 
   componentWillReceiveProps(nextProps, nextContext) {
     const { mode, filters: { loading, filtersByInstanceIds }, selectedCells,
-      config: { sidebarConfigData, loading: configLoading }, filters, instanceSelect } = nextProps;
-    if (mode === 'setter' && !loading && !configLoading && selectedCells && _.get(selectedCells, '[0].instId')) {
-      if ( !_.isEqual(filters.filtersByInstanceIds, this.props.filters.filtersByInstanceIds)) {
+      config: { sidebarConfigData, loading: configLoading }, instanceSelect, disableSidebar } = nextProps;
+    if (mode === 'setter' && !loading && !configLoading) {
+      let selectedInstances = [];
+      selectedCells.forEach(({ instId }) => {
+        instId && selectedInstances.push(instId);
+      });
+      if (selectedInstances.length === 0) {
+        disableSidebar();
+      } else {
         instanceSelect(filtersByInstanceIds, sidebarConfigData);
       }
     }

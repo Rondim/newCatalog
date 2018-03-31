@@ -17,13 +17,14 @@ class Source extends Component {
     onSelect: PropTypes.func,
     startDrag: PropTypes.func,
     id: PropTypes.string,
-    inUniqueZone: PropTypes.bool
+    inUniqueZone: PropTypes.bool,
+    draggable: PropTypes.bool
   };
   static defaultProps = {};
 
   render() {
     const {
-      style, url, size, departments, quantity, startDrag, row, column, id, tags, urlWebp
+      style, url, size, departments, quantity, startDrag, row, column, id, tags, urlWebp, draggable
     } = this.props;
     const resStyle = {
       width: '100%',
@@ -42,7 +43,7 @@ class Source extends Component {
       return (
         <div
           onDragStart={() => startDrag(id, row, column)}
-          draggable
+          draggable={draggable}
           style={resStyle}
         >
           <div style={{ backgroundColor: 'black', color: 'white', left: 2, position: 'absolute' }}>{size}</div>
