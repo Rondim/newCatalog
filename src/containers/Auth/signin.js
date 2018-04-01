@@ -96,7 +96,7 @@ class Signin extends Component {
             </Typography>
           )}
         </div>
-        <Button type="submit" raised color="primary" className={classes.button}>
+        <Button type="submit" variant="raised" color="primary" className={classes.button}>
           Submit
         </Button>
       </form>

@@ -131,8 +131,8 @@ class Menu extends Component {
           <FontAwesomeIcon
             size='2x'
             onClick={this.switchCache}
-            color={localStorage.getItem('cache') ==='apollo' ? 'green' : null}
-            icon={localStorage.getItem('cache') ==='apollo' ? faToggleOn : faToggleOff }
+            color={localStorage.getItem('cache') ==='hermes' ? 'green' : null}
+            icon={localStorage.getItem('cache') ==='hermes' ? faToggleOn : faToggleOff }
           />
         </div>
         <Collapse isOpen={this.state.isOpen} navbar>

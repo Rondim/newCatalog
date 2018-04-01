@@ -1,0 +1,7 @@
+mutation ($i: Int!, $j: Int!){
+  setActive(i: $i, j:$j){
+    i
+    j
+    active
+  }
+}

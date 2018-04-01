@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Row, Col } from 'reactstrap';
-import { compose, graphql } from 'react-apollo/index';
+import { withApollo, compose, graphql } from 'react-apollo/index';
 import _ from 'lodash';
 
 import 'react-virtualized/styles.css';
@@ -12,11 +12,13 @@ import setPosition from './mutations/setPosition.graphql';
 import loadInstances from './mutations/loadInstancesToSheet.graphql';
 import refreshZone from './mutations/refreshZone.graphql';
 import query from './queries/fetchCells.graphql';
+import fetchCell from './queries/fetchCell.graphql';
 
 @compose(
   graphql(setPosition, { name: 'setPosition' }),
   graphql(loadInstances, { name: 'loadInstances' }),
   graphql(refreshZone, { name: 'refreshZone' }),
+  withApollo
 )
 class Cells extends Component {
   static propTypes = {
@@ -25,7 +27,8 @@ class Cells extends Component {
     refreshZone: PropTypes.func,
     subscribeToCells: PropTypes.func,
     subscribeToZones: PropTypes.func,
-    match: PropTypes.object
+    match: PropTypes.object,
+    client: PropTypes.object
   };
   static defaultProps = {};
 
@@ -42,43 +45,67 @@ class Cells extends Component {
   };
 
   onDrop = async (i, j) => {
-    const { dragItem: id, i: si, j: sj } = this.state;
-    this.setState(prevState => {
-      let busy = { ...prevState.busy };
-      if (!busy[i]) busy[i] = {};
-      if (!busy[si]) busy[si] = {};
-      busy[i][j] = true;
-      busy[si][sj] = true;
-      return { busy };
-    });
-    try {
-      const { setPosition, match: { params: { id: sheet } } } = this.props;
-      if (i >= 0 && j >= 0) {
+    const { setPosition, match: { params: { id: sheet } }, client, } = this.props;
+    const { dragItem: id, i: si, j: sj, } = this.state;
+    if (i >= 0 && j >= 0 && !(i === si && j === sj)) {
+      this.setState(prevState => {
+        let { busy } = { ...prevState };
+        if (!busy[i]) busy[i] = {};
+        if (!busy[si]) busy[si] = {};
+        busy[i][j] = true;
+        busy[si][sj] = true;
+        return { busy };
+      });
+      try {
+        let { cell } = client.readQuery({ query: fetchCell, variables: { i: si, j: sj, sheetId: sheet } });
+        cell.i = i;
+        cell.j = j;
+        client.writeQuery({ query: fetchCell, variables: { i, j, sheetId: sheet }, data: { cell: { ...cell } } });
+        cell = {
+          i: si,
+          j: sj,
+          id: '',
+          instance: null,
+          text: null,
+          __typename: 'Cell'
+        };
+        client.writeQuery(
+          { query: fetchCell, variables: { i: si, j: sj, sheetId: sheet }, data: { cell: { ...cell } } }
+        );
         await setPosition({
-          variables: { id, row: i, column: j, sheet },
-          optimisticResponse: {
-            __typename: 'Mutation',
-            updateCell: {
-              __typename: 'cells',
-              id,
-              i,
-              j
-            }
-          },
-          refetchQueries: [{ query, variables: { sheet } }]
+          variables: { id, row: i, column: j, sheet }
         });
+      } catch (err) {
+        console.warn(err);
+        let { cell } = client.readQuery({ query: fetchCell, variables: { i, j, sheetId: sheet } });
+        cell.i = si;
+        cell.j = sj;
+        client.writeQuery({
+          query: fetchCell, variables: { i: si, j: sj, sheetId: sheet }, data: { cell: { ...cell } }
+        });
+        cell = {
+          i,
+          j,
+          id: '',
+          instance: null,
+          text: null,
+          __typename: 'Cell'
+        };
+        client.writeQuery(
+          { query: fetchCell, variables: { i, j, sheetId: sheet }, data: { cell: { ...cell } } }
+        );
       }
-    } catch (err) {
-      console.warn(err);
+      this.setState(prevState => {
+        let { busy } = { ...prevState };
+        if (!busy[i]) return prevState;
+        if (!busy[si]) return prevState;
+        delete busy[i][j];
+        delete busy[si][sj];
+        if (Object.keys(busy[i]).length === 0) delete busy[i];
+        if (busy[si] && Object.keys(busy[si]).length === 0) delete busy[si];
+        return { busy };
+      });
     }
-    this.setState(prevState => {
-      let busy = { ...prevState.busy };
-      if (!busy[i]) return prevState;
-      if (!busy[si]) return prevState;
-      delete busy[i][j];
-      delete busy[si][sj];
-      return { busy };
-    });
   };
 
   selectorCells = () => {
@@ -171,9 +198,7 @@ class Cells extends Component {
     this.setState({ selectedZone: null });
   };
 
-  onStartDrag = (dragItem, i, j) => {
-    this.setState({ dragItem, i, j });
-  };
+  onStartDrag = (dragItem, i, j) => this.setState({ dragItem, i, j });
 
   render() {
     const {
@@ -196,7 +221,8 @@ class Cells extends Component {
       selectedGroupCells,
       selectedZone,
       sheet,
-      busy
+      busy,
+      busyLength: JSON.stringify(busy)
     };
     return (
       <Row>

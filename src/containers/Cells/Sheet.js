@@ -17,9 +17,10 @@ import updateTextCell from './mutations/updateTextCell.graphql';
 // import updateCells from './subscriptions/updateCells.graphql';
 // import updateZones from './subscriptions/updateZones.graphql';
 import { notification } from '../Notificator/actions';
-import { calcActive, calcStyle, checkWebpFeature, getQuantity, getDepartments } from './libs/calc';
+import { calcActive, calcStyle, checkWebpFeature } from './libs/calc';
 import placeZoneOnSheet from './mutations/placeZoneOnSheet.graphql';
 import fetchPads from './queries/allPads.graphql';
+import './index.css';
 
 // import Zone from './libs/zone';
 // import CellObj from './libs/cellObj';
@@ -74,9 +75,7 @@ class Sheet extends Component {
   static defaultProps = {};
 
   componentWillMount() {
-    checkWebpFeature('lossy', (feature, res) => {
-      this.setState({ webp: res });
-    });
+    checkWebpFeature('lossy', (feature, res) => this.setState({ webp: res }));
   }
 
   componentWillReceiveProps(nextProps, nextContext) {
@@ -100,9 +99,7 @@ class Sheet extends Component {
   }
 
   componentDidMount() {
-    window.addEventListener('resize', () => {
-      this.setState({ height: this._container.clientHeight });
-    });
+    window.addEventListener('resize', () => this.setState({ height: this._container.clientHeight }));
   }
 
 
@@ -184,21 +181,19 @@ class Sheet extends Component {
   onChangeText = (text, i, j, id) => {
     const { createTextCell, updateTextCell, sheet } = this.props;
     if (id) {
-      console.log(text);
       if (!text) this.removeCells([{ i, j }], sheet);
       else updateTextCell({ variables: { id, text, sheet } });
     } else {
-      text && createTextCell({ variables: { i, j, text, sheet } });
+      text && createTextCell({ variables: { i, j, text, sheet }, refetchQueries: [{ query, variables: { sheet } }] });
     }
   };
 
   cellRenderer = ({ columnIndex, key, rowIndex, style }) => {
-    const { allCells, allZones } = this.props.data;
-    const { selectedCells, selectedGroupCells, selectedZone, onStartDrag, busy } = this.props;
+    const { allZones } = this.props.data;
+    const { selectedCells, selectedGroupCells, selectedZone, onStartDrag, busy, sheet } = this.props;
     const { webp } = this.state;
-    const data = _.find(allCells, o => o.i===rowIndex && o.j ===columnIndex);
-    const avails = _.get(data, 'instance.availabilities');
 
+    let className = '';
     let loaderBorders = { left: undefined, right: undefined, top: undefined, bottom: undefined };
     let padBorders = { left: undefined, right: undefined, top: undefined, bottom: undefined };
     let activeBorders = { left: undefined, right: undefined, top: undefined, bottom: undefined };
@@ -214,7 +209,7 @@ class Sheet extends Component {
           break;
         case 'Unique':
           if (zone.i0 <= rowIndex && zone.i1 >= rowIndex && zone.j0 <= columnIndex && zone.j1 >= columnIndex) {
-            inUniqueZone = true;
+            className += ' uniqueZone';
           }
           break;
       }
@@ -236,32 +231,24 @@ class Sheet extends Component {
     newStyle.borderBottomColor = borderBottomStyle.color;
     let draggable = true;
     if (_.get(busy, `${rowIndex}.${columnIndex}`)) {
-      newStyle.borderColor = '#fff700';
-      newStyle.backgroundColor = '#fff700';
+      className +=' busy';
       draggable = false;
     }
     const itemProps = {
-      url: _.get(data, 'instance.item.img.url'),
-      urlWebp: webp && _.get(data, 'instance.item.imgWebP.url'),
-      size: _.get(data, 'instance.size[0].name'),
-      departments: getDepartments(avails),
-      tags: _.get(data, 'instance.tags') || [],
-      quantity: getQuantity(avails),
-      instId: _.get(data, 'instance.id') || null,
-      itemId: _.get(data, 'instance.item.id') || null,
-      inUniqueZone
+      inUniqueZone,
+      webp,
+      draggable,
+      className
     };
     try {
       return (
         <Cell
           key={key}
-          id={data ? data.id : null}
           active={active && 1 || activeBorders.left && 1 || activeBorders.right && 1 || activeBorders.bottom && 1 ||
           activeBorders.top && 1 || loaderBorders.left && 2 || loaderBorders.right && 2 || loaderBorders.top && 2 ||
           loaderBorders.bottom && 2 || padBorders.left && 3 || padBorders.right && 3 || padBorders.top && 3 ||
-          padBorders.bottom && 3 || _.get(busy, `${rowIndex}.${columnIndex}`) && 4 }
+          padBorders.bottom && 3 }
           { ...itemProps }
-          text={data && data.text}
           style={newStyle}
           row={rowIndex}
           column={columnIndex}
@@ -271,11 +258,11 @@ class Sheet extends Component {
           onPlaceZone={this.placeZone}
           onSelect={this.handleSelectCell}
           onChangeText={this.onChangeText}
-          draggable={draggable}
+          sheetId={sheet}
         />
       );
     } catch (err) {
-      console.error(err, data && data.id);
+      console.error(err);
     }
   };
 

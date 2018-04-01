@@ -1,0 +1,40 @@
+query ($sheetId: ID!, $i: Int!, $j: Int!){
+  cell(sheetId: $sheetId, i: $i, j: $j) @client{
+    id
+    i
+    j
+    text
+    instance{
+      id
+      size: sidebarFilters(where: {property: {name: "Размер"}}){
+        id
+        name
+      }
+      tags: sidebarFilters(where: {property: {name: "Tags"}}){
+        id
+        name
+        color
+      }
+      item{
+        img{
+          id
+          url
+        }
+        imgWebP{
+          id
+          url
+        }
+        id
+      }
+      availabilities{
+        id
+        department: sidebarFilters(where: {property: {name: "Магазин"}}){
+          id
+          name
+          color
+        }
+        quantity
+      }
+    }
+  }
+}
