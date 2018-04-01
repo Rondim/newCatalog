@@ -18,13 +18,14 @@ class Source extends Component {
     startDrag: PropTypes.func,
     id: PropTypes.string,
     inUniqueZone: PropTypes.bool,
-    draggable: PropTypes.bool
+    draggable: PropTypes.bool,
+    className: PropTypes.string
   };
   static defaultProps = {};
 
   render() {
     const {
-      style, url, size, departments, quantity, startDrag, row, column, id, tags, urlWebp, draggable
+      style, url, size, departments, quantity, startDrag, row, column, id, tags, urlWebp, draggable, className
     } = this.props;
     const resStyle = {
       width: '100%',
@@ -44,6 +45,7 @@ class Source extends Component {
         <div
           onDragStart={() => startDrag(id, row, column)}
           draggable={draggable}
+          className={className}
           style={resStyle}
         >
           <div style={{ backgroundColor: 'black', color: 'white', left: 2, position: 'absolute' }}>{size}</div>

@@ -24,7 +24,8 @@ class Cell extends Component {
     tags: PropTypes.array,
     text: PropTypes.string,
     inUniqueZone: PropTypes.bool,
-    draggable: PropTypes.bool
+    draggable: PropTypes.bool,
+    className: PropTypes.string
   };
   static defaultProps = {};
 
@@ -41,7 +42,7 @@ class Cell extends Component {
       nextProps.tags && nextProps.tags.length !== this.props.tags.length;
     return nextProps.active !== this.props.active || nextProps.aId !== this.props.aId ||
       nextProps.inUniqueZone !== this.props.inUniqueZone || tagsExp || this.state.edit !== nextState.edit ||
-      this.state.text !== nextState.text;
+      this.state.text !== nextState.text || nextProps.className !== this.props.className;
   }
 
   componentWillReceiveProps(nextProps, nextContext) {
@@ -69,9 +70,7 @@ class Cell extends Component {
   preventDefault = ev => ev.preventDefault();
 
   setEdit = () => {
-    const { url, onChangeText, row, column, id } = this.props;
-    const { text } = this.state;
-    !url && this.setState(({ edit }) => {
+    !this.props.url && this.setState(({ edit, text }, { url, onChangeText, row, column, id }) => {
       if (edit) {
         const formatedText = text && text.trim() || '';
         onChangeText(formatedText, row, column, id);
@@ -80,15 +79,13 @@ class Cell extends Component {
     });
   };
 
-  changeText = (text) => {
-    this.setState({ text });
-  };
+  changeText = text => this.setState({ text });
 
   render() {
     const {
       style,
       url,
-      inUniqueZone
+      className
     } = this.props;
     const { edit, text } = this.state;
     let resStyle = { ...style };
@@ -100,7 +97,7 @@ class Cell extends Component {
         onDoubleClick={this.setEdit}
         onDrop={this.iAmHere}
         onDragOver={this.preventDefault}
-        className={inUniqueZone ? 'in-zone' : ''}
+        className={className}
       >
         {url ?
           <Instance {...this.props} />:

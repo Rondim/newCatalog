@@ -20,6 +20,7 @@ import { notification } from '../Notificator/actions';
 import { calcActive, calcStyle, checkWebpFeature, getQuantity, getDepartments } from './libs/calc';
 import placeZoneOnSheet from './mutations/placeZoneOnSheet.graphql';
 import fetchPads from './queries/allPads.graphql';
+import './index.css';
 
 // import Zone from './libs/zone';
 // import CellObj from './libs/cellObj';
@@ -74,9 +75,7 @@ class Sheet extends Component {
   static defaultProps = {};
 
   componentWillMount() {
-    checkWebpFeature('lossy', (feature, res) => {
-      this.setState({ webp: res });
-    });
+    checkWebpFeature('lossy', (feature, res) => this.setState({ webp: res }));
   }
 
   componentWillReceiveProps(nextProps, nextContext) {
@@ -100,9 +99,7 @@ class Sheet extends Component {
   }
 
   componentDidMount() {
-    window.addEventListener('resize', () => {
-      this.setState({ height: this._container.clientHeight });
-    });
+    window.addEventListener('resize', () => this.setState({ height: this._container.clientHeight }));
   }
 
 
@@ -184,11 +181,10 @@ class Sheet extends Component {
   onChangeText = (text, i, j, id) => {
     const { createTextCell, updateTextCell, sheet } = this.props;
     if (id) {
-      console.log(text);
       if (!text) this.removeCells([{ i, j }], sheet);
       else updateTextCell({ variables: { id, text, sheet } });
     } else {
-      text && createTextCell({ variables: { i, j, text, sheet } });
+      text && createTextCell({ variables: { i, j, text, sheet }, refetchQueries: [{ query, variables: { sheet } }] });
     }
   };
 
@@ -199,10 +195,10 @@ class Sheet extends Component {
     const data = _.find(allCells, o => o.i===rowIndex && o.j ===columnIndex);
     const avails = _.get(data, 'instance.availabilities');
 
+    let className = '';
     let loaderBorders = { left: undefined, right: undefined, top: undefined, bottom: undefined };
     let padBorders = { left: undefined, right: undefined, top: undefined, bottom: undefined };
     let activeBorders = { left: undefined, right: undefined, top: undefined, bottom: undefined };
-    let inUniqueZone = false;
     let newStyle = { ...style };
     typeof allZones === 'object' && allZones.forEach(zone => {
       switch (zone.type) {
@@ -214,7 +210,7 @@ class Sheet extends Component {
           break;
         case 'Unique':
           if (zone.i0 <= rowIndex && zone.i1 >= rowIndex && zone.j0 <= columnIndex && zone.j1 >= columnIndex) {
-            inUniqueZone = true;
+            className += ' uniqueZone';
           }
           break;
       }
@@ -236,8 +232,7 @@ class Sheet extends Component {
     newStyle.borderBottomColor = borderBottomStyle.color;
     let draggable = true;
     if (_.get(busy, `${rowIndex}.${columnIndex}`)) {
-      newStyle.borderColor = '#fff700';
-      newStyle.backgroundColor = '#fff700';
+      className +=' busy';
       draggable = false;
     }
     const itemProps = {
@@ -249,7 +244,8 @@ class Sheet extends Component {
       quantity: getQuantity(avails),
       instId: _.get(data, 'instance.id') || null,
       itemId: _.get(data, 'instance.item.id') || null,
-      inUniqueZone
+      draggable,
+      className
     };
     try {
       return (
@@ -271,7 +267,6 @@ class Sheet extends Component {
           onPlaceZone={this.placeZone}
           onSelect={this.handleSelectCell}
           onChangeText={this.onChangeText}
-          draggable={draggable}
         />
       );
     } catch (err) {

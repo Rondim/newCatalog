@@ -1,0 +1,13 @@
+.busy{
+  border-color: #fff700!important;
+  background-color: #fff700!important;
+}
+.uniqueZone{
+  background-color: rgba(99, 99, 105, 0.31);
+}
+.defaultCell{
+  border: 1px solid grey;
+}
+.active{
+  border: 3px #5baaff;
+}

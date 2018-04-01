@@ -42,18 +42,18 @@ class Cells extends Component {
   };
 
   onDrop = async (i, j) => {
-    const { dragItem: id, i: si, j: sj } = this.state;
-    this.setState(prevState => {
-      let busy = { ...prevState.busy };
-      if (!busy[i]) busy[i] = {};
-      if (!busy[si]) busy[si] = {};
-      busy[i][j] = true;
-      busy[si][sj] = true;
-      return { busy };
-    });
-    try {
-      const { setPosition, match: { params: { id: sheet } } } = this.props;
-      if (i >= 0 && j >= 0) {
+    const { setPosition, match: { params: { id: sheet } } } = this.props;
+    const { dragItem: id, i: si, j: sj, } = this.state;
+    if (i >= 0 && j >= 0 && !(i === si && j === sj)) {
+      this.setState(prevState => {
+        let { busy } = { ...prevState };
+        if (!busy[i]) busy[i] = {};
+        if (!busy[si]) busy[si] = {};
+        busy[i][j] = true;
+        busy[si][sj] = true;
+        return { busy };
+      });
+      try {
         await setPosition({
           variables: { id, row: i, column: j, sheet },
           optimisticResponse: {
@@ -67,18 +67,20 @@ class Cells extends Component {
           },
           refetchQueries: [{ query, variables: { sheet } }]
         });
+      } catch (err) {
+        console.warn(err);
       }
-    } catch (err) {
-      console.warn(err);
+      this.setState(prevState => {
+        let { busy } = { ...prevState };
+        if (!busy[i]) return prevState;
+        if (!busy[si]) return prevState;
+        delete busy[i][j];
+        delete busy[si][sj];
+        if (Object.keys(busy[i]).length === 0) delete busy[i];
+        if (busy[si] && Object.keys(busy[si]).length === 0) delete busy[si];
+        return { busy };
+      });
     }
-    this.setState(prevState => {
-      let busy = { ...prevState.busy };
-      if (!busy[i]) return prevState;
-      if (!busy[si]) return prevState;
-      delete busy[i][j];
-      delete busy[si][sj];
-      return { busy };
-    });
   };
 
   selectorCells = () => {
@@ -171,9 +173,7 @@ class Cells extends Component {
     this.setState({ selectedZone: null });
   };
 
-  onStartDrag = (dragItem, i, j) => {
-    this.setState({ dragItem, i, j });
-  };
+  onStartDrag = (dragItem, i, j) => this.setState({ dragItem, i, j });
 
   render() {
     const {
@@ -196,7 +196,8 @@ class Cells extends Component {
       selectedGroupCells,
       selectedZone,
       sheet,
-      busy
+      busy,
+      busyLength: JSON.stringify(busy)
     };
     return (
       <Row>
