@@ -22,15 +22,6 @@ html {
   width: 100px;
 }
 
-.in-zone {
-  background-color: rgba(99, 99, 105, 0.31);
-  content: '';
-  display: block;
-  height: 100%;
-  position: absolute;
-  width: 100%;
-}
-
 .critical{
   background-color: rgba(255, 0, 0, 0.38);
 }

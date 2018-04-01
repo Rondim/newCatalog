@@ -4,7 +4,6 @@ import TagsOnCell from './TagsOnCell';
 
 class Source extends Component {
   static propTypes = {
-    connectDragSource: PropTypes.func,
     style: PropTypes.object,
     url: PropTypes.string,
     urlWebp: PropTypes.string,

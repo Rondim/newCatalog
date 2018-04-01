@@ -1,0 +1,9 @@
+query ($id: ID!){
+  pad(id: $id){
+    id
+    i0
+    i1
+    j0
+    j1
+  }
+}

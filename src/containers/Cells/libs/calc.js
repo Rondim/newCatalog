@@ -8,17 +8,17 @@ export const calcActive = (obj, i, j, { left, right, top, bottom }) => {
   return { left, right, top, bottom };
 };
 
-export const calcStyle = (active, activeBorder, loaderBorder, padBoarder) => {
-  if (active || activeBorder && !loaderBorder && !padBoarder) {
-    return { width: '3px', color: '#5baaff' };
-  } else if (activeBorder && (loaderBorder || padBoarder)) {
-    return { width: '3px', color: '#00ff05' };
+export const calcStyle = (active, activeBorder, activeZoneBoarder, loaderBorder, padBoarder) => {
+  if (active || activeBorder) {
+    return 'active-';
+  } else if (activeZoneBoarder && (loaderBorder || padBoarder)) {
+    return 'active-zone-';
   } else if (loaderBorder) {
-    return { width: '3px', color: '#00ffd3' };
+    return 'loader-';
   } else if (padBoarder) {
-    return { width: '3px', color: '#ff00ec' };
+    return 'pad-';
   } else {
-    return { width: '1px', color: 'grey' };
+    return 'defaultCell-';
   }
 };
 
@@ -60,4 +60,14 @@ export const getDepartments = avails => {
     result = result.concat(department.map(({ name }) => name));
   });
   return result;
+};
+
+export const getEachCoordOfZone = (i0, j0, i1, j1) => {
+  let coords = [];
+  for (let i=i0; i <= i1; i++) {
+    for (let j=j0; j <= j1; j++) {
+      coords.push({ i, j });
+    }
+  }
+  return coords;
 };

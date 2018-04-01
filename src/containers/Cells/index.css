@@ -3,11 +3,69 @@
   background-color: #fff700!important;
 }
 .uniqueZone{
-  background-color: rgba(99, 99, 105, 0.31);
+  background-color: rgba(55, 55, 55, 0.2);
 }
 .defaultCell{
-  border: 1px solid grey;
+  border: 1px grey;
 }
-.active{
-  border: 3px #5baaff;
+.defaultCell-left{
+  border-left: 1px grey;
+}
+.defaultCell-right{
+  border-right: 1px grey;
+}
+.defaultCell-top{
+  border-top: 1px grey;
+}
+.defaultCell-bottom{
+  border-bottom: 1px grey;
+}
+
+.active-left{
+  border-left: 2px #5baaff;
+}
+.active-right{
+  border-right: 2px #5baaff;
+}
+.active-top{
+  border-top: 2px #5baaff;
+}
+.active-bottom{
+  border-bottom: 2px #5baaff;
+}
+.active-zone-left{
+  border-left: 2px #00ff05;
+}
+.active-zone-right{
+  border-right: 2px #00ff05;
+}
+.active-zone-top{
+  border-top: 2px #00ff05;
+}
+.active-zone-bottom{
+  border-bottom: 2px #00ff05;
+}
+.pad-left{
+  border-left: 2px #ff00ec;
+}
+.pad-right{
+  border-right: 2px #ff00ec;
+}
+.pad-top{
+  border-top: 2px #ff00ec;
+}
+.pad-bottom{
+  border-bottom: 2px #ff00ec;
+}
+.loader-left{
+  border-left: 2px #00ffd3;
+}
+.loader-right{
+  border-right: 2px #00ffd3;
+}
+.loader-top{
+  border-top: 2px #00ffd3;
+}
+.loader-bottom{
+  border-bottom: 2px #00ffd3;
 }

@@ -1,0 +1,9 @@
+query ($id: ID!){
+  pad(id: $id){
+    id
+    size{
+      w
+      h
+    }
+  }
+}

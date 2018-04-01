@@ -12,6 +12,7 @@ import setPosition from './mutations/setPosition.graphql';
 import loadInstances from './mutations/loadInstancesToSheet.graphql';
 import refreshZone from './mutations/refreshZone.graphql';
 import query from './queries/fetchCells.graphql';
+import { getEachCoordOfZone } from './libs/calc';
 
 @compose(
   graphql(setPosition, { name: 'setPosition' }),
@@ -41,46 +42,50 @@ class Cells extends Component {
     busy: {}
   };
 
+  blockingCells = async (func, coords) => {
+    this.setState(prevState => {
+      let { busy } = { ...prevState };
+      coords.forEach(({ i, j }) => {
+        if (!busy[i]) busy[i] = {};
+        busy[i][j] = true;
+      });
+      return { busy };
+    });
+    try {
+      await func;
+    } catch (err) {
+      console.warn(err);
+    }
+    this.setState(prevState => {
+      let { busy } = { ...prevState };
+      coords.forEach(({ i, j }) => {
+        if (!busy[i]) return prevState;
+        delete busy[i][j];
+        if (Object.keys(busy[i]).length === 0) delete busy[i];
+      });
+      return { busy };
+    });
+  };
+
   onDrop = async (i, j) => {
     const { setPosition, match: { params: { id: sheet } } } = this.props;
     const { dragItem: id, i: si, j: sj, } = this.state;
-    if (i >= 0 && j >= 0 && !(i === si && j === sj)) {
-      this.setState(prevState => {
-        let { busy } = { ...prevState };
-        if (!busy[i]) busy[i] = {};
-        if (!busy[si]) busy[si] = {};
-        busy[i][j] = true;
-        busy[si][sj] = true;
-        return { busy };
-      });
-      try {
-        await setPosition({
-          variables: { id, row: i, column: j, sheet },
-          optimisticResponse: {
-            __typename: 'Mutation',
-            updateCell: {
-              __typename: 'cells',
-              id,
-              i,
-              j
-            }
-          },
-          refetchQueries: [{ query, variables: { sheet } }]
-        });
-      } catch (err) {
-        console.warn(err);
-      }
-      this.setState(prevState => {
-        let { busy } = { ...prevState };
-        if (!busy[i]) return prevState;
-        if (!busy[si]) return prevState;
-        delete busy[i][j];
-        delete busy[si][sj];
-        if (Object.keys(busy[i]).length === 0) delete busy[i];
-        if (busy[si] && Object.keys(busy[si]).length === 0) delete busy[si];
-        return { busy };
-      });
-    }
+    await this.blockingCells(
+      setPosition({
+        variables: { id, row: i, column: j, sheet },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          updateCell: {
+            __typename: 'cells',
+            id,
+            i,
+            j
+          }
+        },
+        refetchQueries: [{ query, variables: { sheet } }]
+      }),
+      [{ i, j }, { i: si, j: sj }]
+    );
   };
 
   selectorCells = () => {
@@ -103,10 +108,15 @@ class Cells extends Component {
 
   handleLoad = async filter => {
     const { id: sheet } = this.props.match.params;
-    await this.props.loadInstances({
-      variables: { ...this.state.selectedGroupCells, filter, sheet },
-      refetchQueries: [{ query, variables: { sheet } }]
-    });
+    const { selectedGroupCells: { i0, i1, j0, j1 }, selectedGroupCells } = this.state;
+    const coords = getEachCoordOfZone(i0, j0, i1, j1);
+    await this.blockingCells(
+      this.props.loadInstances({
+        variables: { ...selectedGroupCells, filter, sheet },
+        refetchQueries: [{ query, variables: { sheet } }]
+      }),
+      coords
+    );
   };
 
   selectManyCells = (i, j, instId, itemId, allCells) => {
@@ -197,7 +207,8 @@ class Cells extends Component {
       selectedZone,
       sheet,
       busy,
-      busyLength: JSON.stringify(busy)
+      busyLength: JSON.stringify(busy),
+      blockingCells: this.blockingCells
     };
     return (
       <Row>

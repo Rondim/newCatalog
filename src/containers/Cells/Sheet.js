@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Grid, AutoSizer } from 'react-virtualized';
 import _ from 'lodash';
-import { graphql, compose } from 'react-apollo';
+import { withApollo, graphql, compose } from 'react-apollo';
 import { connect } from 'react-redux';
 
 import Loading from '../../components/Loading';
@@ -17,9 +17,11 @@ import updateTextCell from './mutations/updateTextCell.graphql';
 // import updateCells from './subscriptions/updateCells.graphql';
 // import updateZones from './subscriptions/updateZones.graphql';
 import { notification } from '../Notificator/actions';
-import { calcActive, calcStyle, checkWebpFeature, getQuantity, getDepartments } from './libs/calc';
+import { calcActive, calcStyle, checkWebpFeature, getQuantity, getDepartments, getEachCoordOfZone } from './libs/calc';
 import placeZoneOnSheet from './mutations/placeZoneOnSheet.graphql';
 import fetchPads from './queries/allPads.graphql';
+import getPad from './queries/getPad.graphql';
+import getZone from './queries/getZone.graphql';
 import './index.css';
 
 // import Zone from './libs/zone';
@@ -42,7 +44,8 @@ import './index.css';
   graphql(removeZone, { name: 'removeZone' }),
   graphql(createTextCell, { name: 'createTextCell' }),
   graphql(updateTextCell, { name: 'updateTextCell' }),
-  graphql(placeZoneOnSheet, { name: 'placeZoneOnSheet' })
+  graphql(placeZoneOnSheet, { name: 'placeZoneOnSheet' }),
+  withApollo
 )
 class Sheet extends Component {
   static propTypes = {
@@ -70,7 +73,9 @@ class Sheet extends Component {
     createTextCell: PropTypes.func,
     updateTextCell: PropTypes.func,
     placeZoneOnSheet: PropTypes.func,
-    busy: PropTypes.object
+    busy: PropTypes.object,
+    blockingCells: PropTypes.func,
+    client: PropTypes.object
   };
   static defaultProps = {};
 
@@ -126,22 +131,33 @@ class Sheet extends Component {
   };
 
   placeZone = (id, i, j) => {
-    const { sheet, placeZoneOnSheet } = this.props;
-    placeZoneOnSheet({
-      variables: { zoneId: id, sheetId: sheet, i, j },
-      refetchQueries: [{ query, variables: { sheet } }]
-    });
+    const { sheet, placeZoneOnSheet, blockingCells, client } = this.props;
+    const { pad } = client.readQuery({ query: getPad, variables: { id } });
+    const coords = getEachCoordOfZone(i, j, i+pad.size.h-1, j+pad.size.w-1);
+    blockingCells(
+      placeZoneOnSheet({
+        variables: { zoneId: id, sheetId: sheet, i, j },
+        refetchQueries: [{ query, variables: { sheet } }]
+      }),
+      coords
+    );
   };
 
   handleKeyDown = async (ev) => {
     const {
-      removeZone, selectedZone, selectedCells, selectedGroupCells, refreshZone, unselectZone, sheet
+      removeZone, selectedZone, selectedCells, selectedGroupCells, refreshZone, unselectZone, sheet, client,
+      blockingCells
     } = this.props;
     if (ev.keyCode===82 && ev.altKey && selectedZone) {
-      await refreshZone({
-        variables: { zoneId: selectedZone.id, sheetId: sheet },
-        refetchQueries: [{ query, variables: { sheet } }]
-      });
+      const { pad } = client.readQuery({ query: getZone, variables: { id: selectedZone.id } });
+      const coords = getEachCoordOfZone(pad.i0, pad.j0, pad.i1, pad.j1);
+      await blockingCells(
+        refreshZone({
+          variables: { zoneId: selectedZone.id, sheetId: sheet },
+          refetchQueries: [{ query, variables: { sheet } }]
+        }),
+        coords
+      );
       this.props.notification('success', 'Зона обновлена');
     } else if (ev.keyCode === 8 || ev.keyCode === 46) {
       if (selectedZone) {
@@ -196,14 +212,14 @@ class Sheet extends Component {
     const avails = _.get(data, 'instance.availabilities');
 
     let className = '';
-    let loaderBorders = { left: undefined, right: undefined, top: undefined, bottom: undefined };
+    let lBorders = { left: undefined, right: undefined, top: undefined, bottom: undefined };
     let padBorders = { left: undefined, right: undefined, top: undefined, bottom: undefined };
-    let activeBorders = { left: undefined, right: undefined, top: undefined, bottom: undefined };
-    let newStyle = { ...style };
+    let aBorders = { left: undefined, right: undefined, top: undefined, bottom: undefined };
+    let aZoneBorders = { left: undefined, right: undefined, top: undefined, bottom: undefined };
     typeof allZones === 'object' && allZones.forEach(zone => {
       switch (zone.type) {
         case 'Loader':
-          loaderBorders = calcActive(zone, columnIndex, rowIndex, loaderBorders);
+          lBorders = calcActive(zone, columnIndex, rowIndex, lBorders);
           break;
         case 'Pad':
           padBorders = calcActive(zone, columnIndex, rowIndex, padBorders);
@@ -215,21 +231,14 @@ class Sheet extends Component {
           break;
       }
     });
-    activeBorders = calcActive(selectedGroupCells, columnIndex, rowIndex, activeBorders);
+    aBorders = calcActive(selectedGroupCells, columnIndex, rowIndex, aBorders);
     const active = !!_.find(selectedCells, o => o.i ===rowIndex && o.j === columnIndex);
-    activeBorders = selectedZone ? calcActive(selectedZone, columnIndex, rowIndex, activeBorders) : activeBorders;
-    const borderLeftStyle = calcStyle(active, activeBorders.left, loaderBorders.left, padBorders.left);
-    newStyle.borderLeftWidth = borderLeftStyle.width;
-    newStyle.borderLeftColor = borderLeftStyle.color;
-    const borderRightStyle = calcStyle(active, activeBorders.right, loaderBorders.right, padBorders.right);
-    newStyle.borderRightWidth = borderRightStyle.width;
-    newStyle.borderRightColor = borderRightStyle.color;
-    const borderTopStyle = calcStyle(active, activeBorders.top, loaderBorders.top, padBorders.top);
-    newStyle.borderTopWidth = borderTopStyle.width;
-    newStyle.borderTopColor = borderTopStyle.color;
-    const borderBottomStyle = calcStyle(active, activeBorders.bottom, loaderBorders.bottom, padBorders.bottom);
-    newStyle.borderBottomWidth = borderBottomStyle.width;
-    newStyle.borderBottomColor = borderBottomStyle.color;
+    aZoneBorders = selectedZone ? calcActive(selectedZone, columnIndex, rowIndex, aZoneBorders) : aZoneBorders;
+    const borderLeft = calcStyle(active, aBorders.left, aZoneBorders.left, lBorders.left, padBorders.left);
+    const borderRight = calcStyle(active, aBorders.right, aZoneBorders.right, lBorders.right, padBorders.right);
+    const borderTop = calcStyle(active, aBorders.top, aZoneBorders.top, lBorders.top, padBorders.top);
+    const borderBottom = calcStyle(active, aBorders.bottom, aZoneBorders.bottom, lBorders.bottom, padBorders.bottom);
+    className += ` ${borderLeft}left ${borderRight}right ${borderTop}top ${borderBottom}bottom`;
     let draggable = true;
     if (_.get(busy, `${rowIndex}.${columnIndex}`)) {
       className +=' busy';
@@ -245,20 +254,16 @@ class Sheet extends Component {
       instId: _.get(data, 'instance.id') || null,
       itemId: _.get(data, 'instance.item.id') || null,
       draggable,
-      className
+      className,
+      style
     };
     try {
       return (
         <Cell
           key={key}
           id={data ? data.id : null}
-          active={active && 1 || activeBorders.left && 1 || activeBorders.right && 1 || activeBorders.bottom && 1 ||
-          activeBorders.top && 1 || loaderBorders.left && 2 || loaderBorders.right && 2 || loaderBorders.top && 2 ||
-          loaderBorders.bottom && 2 || padBorders.left && 3 || padBorders.right && 3 || padBorders.top && 3 ||
-          padBorders.bottom && 3 || _.get(busy, `${rowIndex}.${columnIndex}`) && 4 }
           { ...itemProps }
           text={data && data.text}
-          style={newStyle}
           row={rowIndex}
           column={columnIndex}
           onKeyDown={this.handleKeyDown}

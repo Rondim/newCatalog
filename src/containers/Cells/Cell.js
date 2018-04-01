@@ -7,8 +7,6 @@ import TextCell from './TextCell';
 class Cell extends Component {
   static propTypes = {
     id: PropTypes.string,
-    isOverCurrent: PropTypes.bool,
-    connectDropTarget: PropTypes.func,
     onDrop: PropTypes.func,
     style: PropTypes.object,
     onSelect: PropTypes.func,
@@ -16,7 +14,6 @@ class Cell extends Component {
     onPlaceZone: PropTypes.func,
     row: PropTypes.number,
     column: PropTypes.number,
-    active: PropTypes.number,
     url: PropTypes.string,
     aId: PropTypes.string,
     instId: PropTypes.string,
@@ -40,9 +37,9 @@ class Cell extends Component {
   shouldComponentUpdate(nextProps, nextState, nextContext) {
     const tagsExp = nextProps.tags && !this.props.tags ||
       nextProps.tags && nextProps.tags.length !== this.props.tags.length;
-    return nextProps.active !== this.props.active || nextProps.aId !== this.props.aId ||
-      nextProps.inUniqueZone !== this.props.inUniqueZone || tagsExp || this.state.edit !== nextState.edit ||
-      this.state.text !== nextState.text || nextProps.className !== this.props.className;
+    return nextProps.aId !== this.props.aId || nextProps.inUniqueZone !== this.props.inUniqueZone || tagsExp ||
+      this.state.edit !== nextState.edit || this.state.text !== nextState.text ||
+      nextProps.className !== this.props.className;
   }
 
   componentWillReceiveProps(nextProps, nextContext) {

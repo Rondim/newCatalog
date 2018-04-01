@@ -51,7 +51,8 @@ const cache = localStorage.getItem('cache') === 'hermes' ? new Hermes() :
     },
     cacheRedirects: {
       Query: {
-        cell: (__, { id }, { getCacheKey }) => getCacheKey({ __typename: 'Cell', id })
+        cell: (__, { id }, { getCacheKey }) => getCacheKey({ __typename: 'Cell', id }),
+        pad: (__, { id }, { getCacheKey }) => getCacheKey({ __typename: 'Zone', id })
       }
     },
   });
