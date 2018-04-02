@@ -42,7 +42,7 @@ class Cells extends Component {
     busy: {}
   };
 
-  blockingCells = async (func, coords) => {
+  blockingCells = async (func, coords, refetch) => {
     this.setState(prevState => {
       let { busy } = { ...prevState };
       coords.forEach(({ i, j }) => {
@@ -54,6 +54,7 @@ class Cells extends Component {
     try {
       await func;
     } catch (err) {
+      if (refetch) refetch();
       console.warn(err);
     }
     this.setState(prevState => {
@@ -81,8 +82,7 @@ class Cells extends Component {
             i,
             j
           }
-        },
-        refetchQueries: [{ query, variables: { sheet } }]
+        }
       }),
       [{ i, j }, { i: si, j: sj }]
     );

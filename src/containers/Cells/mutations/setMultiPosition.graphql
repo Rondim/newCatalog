@@ -1,0 +1,7 @@
+mutation ($data: [CellsManyInput!]!, $sheet: ID!){
+    updateCells(data: $data, sheetId: $sheet){
+        id
+        i
+        j
+    }
+}

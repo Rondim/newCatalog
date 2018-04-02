@@ -7,7 +7,8 @@ export const fetchConfig = gql`
       name
       order
       type
-      relation  
+      relation
+      settable
       multiselection
       childs{
         id
@@ -105,7 +106,8 @@ export const dataToConfig = data => {
         type: item.type,
         name: item.name,
         multiselection: item.multiselection,
-        filtersOrder
+        filtersOrder,
+        settable: item.settable
       };
     });
     return config;

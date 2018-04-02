@@ -22,6 +22,7 @@ import placeZoneOnSheet from './mutations/placeZoneOnSheet.graphql';
 import fetchPads from './queries/allPads.graphql';
 import getPad from './queries/getPad.graphql';
 import getZone from './queries/getZone.graphql';
+import setMultiPosition from './mutations/setMultiPosition.graphql';
 import './index.css';
 
 // import Zone from './libs/zone';
@@ -39,6 +40,7 @@ import './index.css';
   }
 )
 @compose(
+  graphql(setMultiPosition, { name: 'setMultiPosition' }),
   graphql(refreshZone, { name: 'refreshZone' }),
   graphql(removeCells, { name: 'removeCells' }),
   graphql(removeZone, { name: 'removeZone' }),
@@ -73,8 +75,10 @@ class Sheet extends Component {
     createTextCell: PropTypes.func,
     updateTextCell: PropTypes.func,
     placeZoneOnSheet: PropTypes.func,
+    setMultiPosition: PropTypes.func,
     busy: PropTypes.object,
     blockingCells: PropTypes.func,
+    refetch: PropTypes.func,
     client: PropTypes.object
   };
   static defaultProps = {};
@@ -110,7 +114,8 @@ class Sheet extends Component {
 
   state={
     webp: false,
-    height: document.body.clientHeight-69
+    height: document.body.clientHeight-69,
+    cutedCells: null
   };
 
   handleSelectCell = (ev, i, j, instId, itemId) => {
@@ -146,9 +151,39 @@ class Sheet extends Component {
   handleKeyDown = async (ev) => {
     const {
       removeZone, selectedZone, selectedCells, selectedGroupCells, refreshZone, unselectZone, sheet, client,
-      blockingCells
+      blockingCells, setMultiPosition, data: { refetch }
     } = this.props;
-    if (ev.keyCode===82 && ev.altKey && selectedZone) {
+    const { cutedCells } = this.state;
+    if (ev.keyCode===88 && (ev.ctrlKey || ev.metaKey) && selectedGroupCells) {
+      this.setState({ cutedCells: selectedGroupCells });
+    } else if (ev.keyCode===86 && (ev.ctrlKey || ev.metaKey) &&
+      selectedCells && selectedCells.length > 0 && cutedCells) {
+      const cells = this.selectCellsByGroup(cutedCells);
+      const { i: ti, j: tj } = selectedCells[0];
+      const di = ti - cutedCells.i0;
+      const dj = tj - cutedCells.j0;
+      const subresult = [];
+      const result = [];
+      cells.forEach(({ id, i, j }) => {
+        subresult.push({ id, i: i+di, j: j+dj, __typename: 'cells' });
+        result.push({ id, coord: { i: i+di, j: j+dj } });
+      });
+      const cellsForBlock = cells.concat(subresult);
+      console.log(refetch);
+      blockingCells(
+        setMultiPosition({
+          variables: { data: result, sheet },
+          optimisticResponse: {
+            __typename: 'Mutation',
+            updateCells: subresult
+          },
+          refetchQueries: [{ query, variables: { sheet } }]
+        }),
+        cellsForBlock,
+        refetch
+      );
+      this.setState({ cutedCells: null });
+    } else if (ev.keyCode===82 && ev.altKey && selectedZone) {
       const { pad } = client.readQuery({ query: getZone, variables: { id: selectedZone.id } });
       const coords = getEachCoordOfZone(pad.i0, pad.j0, pad.i1, pad.j1);
       await blockingCells(
@@ -171,7 +206,7 @@ class Sheet extends Component {
         });
         unselectZone();
       } else if (selectedGroupCells) {
-        const cells = this.selectCellsByGroup();
+        const cells = this.selectCellsByGroup(selectedGroupCells);
         await this.removeCells(cells.map(({ i, j }) => ({ i, j })), sheet);
       } else if (selectedCells) {
         await this.removeCells(selectedCells.map(({ i, j }) => ({ i, j })), sheet);
@@ -186,8 +221,7 @@ class Sheet extends Component {
     });
   };
 
-  selectCellsByGroup = () => {
-    const { selectedGroupCells: { i0, i1, j0, j1 } } = this.props;
+  selectCellsByGroup = ({ i0, i1, j0, j1 }) => {
     const { allCells } = this.props.data;
     return _.filter(allCells, ({ i, j })=> {
       return i>=i0 && i<=i1 && j>=j0 && j<=j1;
@@ -301,7 +335,7 @@ class Sheet extends Component {
             />
           )}
         </AutoSizer>
-      </div>
+        </div>
     );
   }
 }
