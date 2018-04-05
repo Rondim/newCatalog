@@ -54,7 +54,7 @@ class Cells extends Component {
     try {
       await func;
     } catch (err) {
-      if (refetch) refetch();
+      if (refetch) await refetch();
       console.warn(err);
     }
     this.setState(prevState => {
@@ -82,7 +82,8 @@ class Cells extends Component {
             i,
             j
           }
-        }
+        },
+        refetchQueries: [{ query, variables: { sheet } }]
       }),
       [{ i, j }, { i: si, j: sj }]
     );
