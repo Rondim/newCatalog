@@ -82,8 +82,7 @@ class Cells extends Component {
             i,
             j
           }
-        },
-        refetchQueries: [{ query, variables: { sheet } }]
+        }
       }),
       [{ i, j }, { i: si, j: sj }]
     );
