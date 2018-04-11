@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import TagsOnCell from './TagsOnCell';
+// import { checkUrl } from './libs/calc';
 
 class Source extends Component {
   static propTypes = {
@@ -36,8 +37,16 @@ class Source extends Component {
         departmentsString += department ? `${department[0]}, `: '';
       });
       departmentsString = departmentsString.substring(0, departmentsString.length - 2);
-      const link = urlWebp ? `${urlWebp.replace('files.graph.cool', 'images.graph.cool/v1')}/img.webp` :
-        `${url.replace('files.graph.cool', 'images.graph.cool/v1')}/200x`;
+      let link = '';
+      if (urlWebp && ~urlWebp.search('files.graph.cool')) {
+        link = `${urlWebp.replace('files.graph.cool', 'images.graph.cool/v1')}/img.webp`;
+      } else if (urlWebp) {
+        link = `${urlWebp}`;
+      } else if (~url.search('files.graph.cool')) {
+        link = `${url.replace('files.graph.cool', 'images.graph.cool/v1')}/200x`;
+      } else {
+        link = url;
+      }
       resStyle.backgroundImage = `url(${link})`;
       resStyle.backgroundSize = style.width;
       return (

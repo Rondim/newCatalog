@@ -7,7 +7,7 @@ import {
   Nav, Navbar, NavbarBrand, NavItem, NavLink as NavLinkStrap, NavbarToggler, Collapse,
 } from 'reactstrap';
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
-import { faHome, faSignInAlt, faSignOutAlt, faToggleOff, faToggleOn } from '@fortawesome/fontawesome-free-solid';
+import { faHome, faSignInAlt, faSignOutAlt } from '@fortawesome/fontawesome-free-solid';
 import { LinkContainer } from 'react-router-bootstrap';
 import {
   withRouter
@@ -48,23 +48,6 @@ class Menu extends Component {
     const { history, signoutUser } = this.props;
     history.push('/signin');
     signoutUser();
-  };
-
-  switchCache = () => {
-    const current = localStorage.getItem('cache');
-    console.log(current);
-    switch (current) {
-      case 'apollo':
-        localStorage.setItem('cache', 'hermes');
-        break;
-      case 'hermes':
-        localStorage.setItem('cache', 'apollo');
-        break;
-      case null:
-        localStorage.setItem('cache', 'hermes');
-        break;
-    }
-    location.reload(true);
   };
 
   renderLinks() {
@@ -126,15 +109,6 @@ class Menu extends Component {
         <NavbarBrand onClick={() => history.push('/')}>
           <FontAwesomeIcon style={{ color: '#A3B5D1' }} icon={faHome} size='2x' />
         </NavbarBrand>
-        <div style={{ color: 'white' }}>
-          Hermes
-          <FontAwesomeIcon
-            size='2x'
-            onClick={this.switchCache}
-            color={localStorage.getItem('cache') ==='hermes' ? 'green' : null}
-            icon={localStorage.getItem('cache') ==='hermes' ? faToggleOn : faToggleOff }
-          />
-        </div>
         <Collapse isOpen={this.state.isOpen} navbar>
           {this.renderLinks()}
         </Collapse>

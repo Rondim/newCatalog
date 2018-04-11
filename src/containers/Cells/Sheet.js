@@ -17,7 +17,14 @@ import updateTextCell from './mutations/updateTextCell.graphql';
 // import updateCells from './subscriptions/updateCells.graphql';
 // import updateZones from './subscriptions/updateZones.graphql';
 import { notification } from '../Notificator/actions';
-import { calcActive, calcStyle, checkWebpFeature, getQuantity, getDepartments, getEachCoordOfZone } from './libs/calc';
+import {
+  calcActive,
+  calcStyle,
+  checkWebpFeature,
+  getQuantity,
+  getDepartments,
+  getEachCoordOfZone,
+} from './libs/calc';
 import placeZoneOnSheet from './mutations/placeZoneOnSheet.graphql';
 import fetchPads from './queries/allPads.graphql';
 import getPad from './queries/getPad.graphql';
@@ -110,7 +117,6 @@ class Sheet extends Component {
   componentDidMount() {
     window.addEventListener('resize', () => this.setState({ height: this._container.clientHeight }));
   }
-
 
   state={
     webp: false,

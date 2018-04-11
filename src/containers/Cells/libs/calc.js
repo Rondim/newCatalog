@@ -38,6 +38,20 @@ export const checkWebpFeature = (feature, callback) => {
   img.src = 'data:image/webp;base64,' + kTestImages[feature];
 };
 
+export const checkUrl = url => {
+  let img = new global.Image();
+  return new Promise((resolve, reject) => {
+    img.onload = () => {
+      const result = (img.width > 0) && (img.height > 0);
+      resolve(true, result);
+    };
+    img.onerror = () => {
+      resolve(false);
+    };
+    img.src = url;
+  });
+};
+
 export const getQuantity = (avails) => {
   let sum = 0;
   avails && avails.forEach(({ quantity }) => {
