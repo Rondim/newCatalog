@@ -24,6 +24,11 @@ query ($sheet: ID!, $skip: Int){
           id
           url
         }
+        tags: sidebarFilters(where: {property: {name: "ItemTags"}}){
+          id
+          name
+          color
+        }
         id
       }
       availabilities{

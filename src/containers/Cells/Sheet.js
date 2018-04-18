@@ -284,12 +284,14 @@ class Sheet extends Component {
       className +=' busy';
       draggable = false;
     }
+    const tags = (_.get(data, 'instance.tags')|| [] ).concat(_.get(data, 'instance.item.tags') || []);
+    if (data && data.instance) console.log(tags, _.get(data, 'instance.item'));
     const itemProps = {
       url: _.get(data, 'instance.item.img.url'),
       urlWebp: webp && _.get(data, 'instance.item.imgWebP.url'),
       size: _.get(data, 'instance.size[0].name'),
       departments: getDepartments(avails),
-      tags: _.get(data, 'instance.tags') || [],
+      tags,
       quantity: getQuantity(avails),
       instId: _.get(data, 'instance.id') || null,
       itemId: _.get(data, 'instance.item.id') || null,
