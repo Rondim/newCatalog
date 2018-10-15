@@ -29,12 +29,6 @@ class SetterSidebar extends Component {
     this.props.initSidebar(this.props.config);
   }
 
-  /* componentDidUpdate(prevProps, prevState, prevContext) {
-    if (!_.isEqual(prevProps.config, this.props.config)) {
-      this.props.initSidebar(this.props.config);
-    }
-  } */
-
   handleFilterClick = (filterGroupId, filterId) => {
     this.props.filterSet({ filterGroupId, filterId });
   };
@@ -42,13 +36,13 @@ class SetterSidebar extends Component {
   render() {
     const { sidebarItems, onCreateFilter, loading } = this.props;
     return (
-      <div style={{ height: 360 }}>
+      <div>
         <Sidebar
           sidebarItems={sidebarItems}
           handleFilterClick={this.handleFilterClick}
           onCreateFilter={onCreateFilter}
         />
-        {loading && <Loading />}
+        {loading ? <Loading /> : <div style={{ height: 20 }} />}
       </div>
     );
   }

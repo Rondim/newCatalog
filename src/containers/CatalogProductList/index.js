@@ -38,6 +38,4 @@ CatalogProductList.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default graphql(fetchInstances, fetchInstancesOptions)(
-  withStyles(styles)(CatalogProductList)
-);
+export default graphql(fetchInstances, fetchInstancesOptions)(withStyles(styles)(CatalogProductList));

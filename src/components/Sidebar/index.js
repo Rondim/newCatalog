@@ -6,10 +6,10 @@ import styles from './styles';
 import SidebarFilter from '../SidebarFilter';
 
 const Sidebar = (props) => {
-  const { sidebarItems, handleFilterClick, onCreateFilter } = props;
+  const { sidebarItems, handleFilterClick, onCreateFilter, ref } = props;
   if (sidebarItems.length === 0) return null;
   return (
-    <div>
+    <div ref={ref}>
       {sidebarItems.map(item => {
         return <SidebarFilter {...item}
           key={item.filterGroupId}
@@ -25,7 +25,8 @@ Sidebar.propTypes = {
   handleFilterClick: PropTypes.func.isRequired,
   onCreateFilter: PropTypes.func,
   // from styles
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  ref: PropTypes.func
 };
 
 export default withStyles(styles)(Sidebar);

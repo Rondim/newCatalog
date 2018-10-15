@@ -119,7 +119,10 @@ class ProductList extends Component {
                 active={active}
                 complited={complited}
                 key={id}
-                img={item.img.url || 'https://hyperallergic.com/wp-content/uploads/2015/11/Allais_blacksquare-HOME.jpg'}
+                img={
+                  _.get(item, 'img.url') ||
+                  'https://hyperallergic.com/wp-content/uploads/2015/11/Allais_blacksquare-HOME.jpg'
+                }
                 handleSelect={this.onSelect}
                 disabled={!setActive}
               />

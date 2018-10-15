@@ -175,7 +175,6 @@ class Sheet extends Component {
         result.push({ id, coord: { i: i+di, j: j+dj } });
       });
       const cellsForBlock = cells.concat(subresult);
-      console.log(refetch);
       blockingCells(
         setMultiPosition({
           variables: { data: result, sheet },
@@ -285,7 +284,6 @@ class Sheet extends Component {
       draggable = false;
     }
     const tags = (_.get(data, 'instance.tags')|| [] ).concat(_.get(data, 'instance.item.tags') || []);
-    if (data && data.instance) console.log(tags, _.get(data, 'instance.item'));
     const itemProps = {
       url: _.get(data, 'instance.item.img.url'),
       urlWebp: webp && _.get(data, 'instance.item.imgWebP.url'),
