@@ -1,29 +1,22 @@
 import React, { Component } from 'react';
-import { withStyles } from 'material-ui/styles';
-import { Button, IconButton } from 'material-ui';
-import Grid from 'material-ui/Grid';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import { KeyboardArrowLeft, KeyboardArrowRight } from 'material-ui-icons';
+import { Button, Container, Jumbotron, Row } from 'reactstrap';
+import { faArrowLeft, faArrowRight } from '@fortawesome/fontawesome-free-solid';
 
+
+import './index.css';
 
 import ProductListItem from './ProductListItem';
-import Loading from '../Loading';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-const styles = theme => ({
-  root: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    overflow: 'hidden',
-    background: theme.palette.background.paper,
-  },
-  gridList: {
-  },
-  subheader: {
-    width: '100%',
-  },
-});
+const emptyArray = (n) => {
+  const arr = [];
+  for (let i = 0; i < n; i++) {
+    arr.push(null);
+  }
+  return arr;
+};
 
 class ProductList extends Component {
   static propTypes = {
@@ -31,7 +24,6 @@ class ProductList extends Component {
     setActive: PropTypes.func,
     fetchMore: PropTypes.func,
     count: PropTypes.number,
-    classes: PropTypes.object.isRequired
   };
 
   state = {
@@ -73,9 +65,9 @@ class ProductList extends Component {
       }
       if (forward) {
         fetchMore(prevState.page + 1);
-        if (prevState.page < count/24) return { page: prevState.page + 1 };
+        if (prevState.page < count / 24) return { page: prevState.page + 1 };
       } else if (prevState.page > 1) {
-        !instances[(prevState.page-2)*24] && fetchMore(prevState.page - 1);
+        !instances[(prevState.page - 2) * 24] && fetchMore(prevState.page - 1);
         return { page: prevState.page - 1 };
       }
       return { page: prevState.page };
@@ -84,78 +76,107 @@ class ProductList extends Component {
 
   renderPages() {
     const { count } = this.props;
-    const max = count/24;
-    let pages = [];
+    let max = count / 24;
+    if (max > 20) max = 20;
+    const pages = [];
     for (let i = 0; i < max; i++) {
       pages.push(i + 1);
     }
     return pages.map(n => {
       return (
         <Button
-          raised
-          color={this.state.page === n ? 'primary' : 'default' }
+          color={this.state.page === n ? 'primary' : 'default'}
           key={n}
-          onClick={() => this.handleChangePage(null, n) }
+          onClick={() => this.handleChangePage(null, n)}
         >{n}
         </Button>
       );
     });
   }
 
-  renderList() {
-    const { instances, setActive } = this.props;
-    const { page } = this.state;
-    let i = 0;
-    if (!instances || instances.length === 0) return <Loading />;
-    return _.map(instances, instance => {
-      if (instance) {
-        const { active, complited, item, id } = instance;
-        i++;
-        if (i <= page * 24 && i > (page - 1) * 24) {
-          return (
-            <Grid item xs={2} key={id}>
-              <ProductListItem
-                id={id}
-                active={active}
-                complited={complited}
-                key={id}
-                img={
-                  _.get(item, 'img.url') ||
-                  'https://hyperallergic.com/wp-content/uploads/2015/11/Allais_blacksquare-HOME.jpg'
-                }
-                handleSelect={this.onSelect}
-                disabled={!setActive}
-              />
-            </Grid>
-        );
+  renderRow(row) {
+    const { setActive } = this.props;
+    console.log(row);
+    return row.map((instance, i) => (
+      <ProductListItem
+        id={instance ? instance.id : ''}
+        loading={!instance}
+        active={instance ? instance.active : false}
+        complited={instance ? instance.complited : false}
+        key={i}
+        img={
+          _.get(instance, 'item.img.url') ||
+          'https://i.imgur.com/ujJv4Jw.png'
         }
-      } else i++;
-    });
+        handleSelect={this.onSelect}
+        disabled={!setActive}
+      />
+    ));
+  }
+
+  renderList() {
+    const { instances } = this.props;
+    const workingArr = instances && instances.length > 0 ? instances : emptyArray(24);
+    const { page } = this.state;
+    let arr = workingArr.slice(((page - 1) * 24), page * 24);
+    if (arr.length === 0) arr = emptyArray(24);
+    const rows = [];
+    rows[0] = arr.slice(0, 7);
+    rows[1] = arr.slice(8, 15);
+    rows[2] = arr.slice(16, 23);
+    return rows.map((row, index) => (
+      <Row key={index} className='py-3'>
+        {this.renderRow(row)}
+      </Row>
+    ));
   }
 
   render() {
-    const { classes } = this.props;
     return (
-      <div
-        className={classes.root}
-        style={{ border: 'var(--border-default)' }}
+      <Container
         tabIndex="1"
         onKeyDown={this.handleKeyDown}
       >
-        <IconButton onClick={() => this.handleChangePage(false)}>
-          <KeyboardArrowLeft />
-        </IconButton>
-        <IconButton onClick={() => this.handleChangePage(true)}>
-          <KeyboardArrowRight />
-        </IconButton>
-        <Grid container spacing={24}>
+        <div className='d-flex justify-content-center align-items-center'>
+          <Button onClick={() => this.handleChangePage(false)}>
+            <FontAwesomeIcon
+              icon={faArrowLeft}
+              size="lg"
+            />
+          </Button>
+          <div className='d-flex justify-content-end w-100'>
+            <Button onClick={() => this.handleChangePage(true)}>
+              <FontAwesomeIcon
+                icon={faArrowRight}
+                size="lg"
+              />
+            </Button>
+          </div>
+        </div>
+        <Jumbotron>
           {this.renderList()}
-        </Grid>
+        </Jumbotron>
+        <div className='d-flex flex-fill'>
+          <Button onClick={() => this.handleChangePage(false)} className='justify-content-sm-start'>
+            <FontAwesomeIcon
+              icon={faArrowLeft}
+              size="lg"
+            />
+          </Button>
+          <div className='d-flex justify-content-end w-100'>
+            <Button onClick={() => this.handleChangePage(true)}>
+              <FontAwesomeIcon
+                icon={faArrowRight}
+                size="lg"
+              />
+            </Button>
+          </div>
+        </div>
         {this.renderPages()}
-      </div>
+      </Container>
     );
   }
 }
 
 
-export default withStyles(styles)(ProductList);
+export default ProductList;

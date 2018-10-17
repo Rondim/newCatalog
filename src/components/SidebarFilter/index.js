@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import compose from 'recompose/compose';
-import { withStyles } from 'material-ui/styles';
+import { withStyles } from '@material-ui/core/styles';
 import styles from './styles';
-import Button from 'material-ui/Button';
+import Button from '@material-ui/core/Button';
 import Popover from './Popover';
 
 

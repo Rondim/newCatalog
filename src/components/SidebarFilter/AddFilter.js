@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import FontAwesomeIcon from '@fortawesome/react-fontawesome';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/fontawesome-free-solid';
-import Button from 'material-ui/Button';
+import Button from '@material-ui/core/Button';
 import { Input } from 'reactstrap';
 import { CirclePicker } from 'react-color';
 

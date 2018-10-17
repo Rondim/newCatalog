@@ -1,19 +1,19 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { TabContent, TabPane, Nav, NavItem, NavLink, Button, Row, Col } from 'reactstrap';
+import { Button, Col, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import classnames from 'classnames';
-import { graphql, compose } from 'react-apollo';
+import { compose, graphql } from 'react-apollo';
 import { connect } from 'react-redux';
-import { withStyles } from 'material-ui/styles';
-import { Paper } from 'material-ui';
+import { withStyles } from '@material-ui/core/styles';
+import { Paper } from '@material-ui/core';
 import _ from 'lodash';
-import FontAwesomeIcon from '@fortawesome/react-fontawesome';
-import { faRedo, faExpand, faTimes } from '@fortawesome/fontawesome-free-solid';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faExpand, faRedo, faTimes } from '@fortawesome/fontawesome-free-solid';
 import { faClone } from '@fortawesome/fontawesome-free-regular';
 
 import CatalogSidebar from '../CatalogSidebar';
 import SetterSidebar from '../SetterSidebar';
-import { fetchConfig, dataToConfig, dataToConfigWithPads } from '../Catalog/queries/fetchConfig';
+import { dataToConfig, dataToConfigWithPads, fetchConfig } from '../Catalog/queries/fetchConfig';
 import fetchFilters from './queries/fetchFilters.graphql';
 import { instanceByFilter } from './queries/utils/fetchInstancesCount';
 import setFilter from './mutations/setFilter.graphql';
@@ -21,7 +21,7 @@ import unsetFilter from './mutations/unsetFilter.graphql';
 import createFilter from './mutations/createFilter.graphql';
 import Loading from '../../components/Loading';
 import CountInstancesForLoad from './CountInstancesForLoad';
-import { instanceSelect, disableSidebar } from '../SetterSidebar/actions';
+import { disableSidebar, instanceSelect } from '../SetterSidebar/actions';
 import query from './queries/fetchCells.graphql';
 import refreshAllZones from './mutations/refreshAllZones.graphql';
 import PadEditor from './PadEditor';
@@ -44,9 +44,9 @@ const mapStateToProps = (state) => {
 };
 
 const calcFilterVariables = (selectedCells) => {
-  let instIds = [];
-  let instancesEvery = [];
-  let itemsEvery = [];
+  const instIds = [];
+  const instancesEvery = [];
+  const itemsEvery = [];
   selectedCells && selectedCells.forEach(({ instId }) => {
     if (instId) {
       instIds.push(instId);
@@ -81,12 +81,12 @@ const calcFilterVariables = (selectedCells) => {
     }
   })
 )
-  @compose(
-    graphql(refreshAllZones, { name: 'refreshAllZones' }),
-    graphql(setFilter, { name: 'setFilter' }),
-    graphql(unsetFilter, { name: 'unsetFilter' }),
-    graphql(createFilter, { name: 'createFilter' })
-  )
+@compose(
+  graphql(refreshAllZones, { name: 'refreshAllZones' }),
+  graphql(setFilter, { name: 'setFilter' }),
+  graphql(unsetFilter, { name: 'unsetFilter' }),
+  graphql(createFilter, { name: 'createFilter' })
+)
 class Toolbar extends Component {
   static propTypes = {
     config: PropTypes.shape({
@@ -115,7 +115,7 @@ class Toolbar extends Component {
   };
   static defaultProps = {};
 
-  state={
+  state = {
     redo: false,
     expand: false
   };
@@ -128,10 +128,12 @@ class Toolbar extends Component {
   };
 
   componentWillReceiveProps(nextProps, nextContext) {
-    const { mode, filters: { loading, filtersByInstanceIds }, selectedCells,
-      config: { sidebarConfigData, loading: configLoading }, instanceSelect, disableSidebar } = nextProps;
+    const {
+      mode, filters: { loading, filtersByInstanceIds }, selectedCells,
+      config: { sidebarConfigData, loading: configLoading }, instanceSelect, disableSidebar
+    } = nextProps;
     if (mode === 'setter' && !loading && !configLoading) {
-      let selectedInstances = [];
+      const selectedInstances = [];
       selectedCells.forEach(({ instId }) => {
         instId && selectedInstances.push(instId);
       });
@@ -144,9 +146,11 @@ class Toolbar extends Component {
   }
 
   filterSet = async ({ filterGroupId, filterId }) => {
-    const { selectedCells,
+    const {
+      selectedCells,
       filters: { filtersByInstanceIds: { someFilters } },
-      setFilter, unsetFilter, sheet } = this.props;
+      setFilter, unsetFilter, sheet
+    } = this.props;
     let needUncheck;
     const ids = selectedCells.map(({ instId }) => instId);
     const variables = calcFilterVariables(selectedCells);
@@ -182,7 +186,8 @@ class Toolbar extends Component {
   };
 
   handleCreateFilter = (name, color, propertyId, order) => {
-    this.props.createFilter({ variables: { name, propertyId, order, color },
+    this.props.createFilter({
+      variables: { name, propertyId, order, color },
       refetchQueries: [{
         query: fetchConfig
       }]
@@ -196,8 +201,10 @@ class Toolbar extends Component {
   };
 
   render() {
-    const { config: { sidebarConfigData, sidebarConfigDataWithPads, loading }, filtersSelectedCatalog, classes, mode,
-      selectedGroupCells, sheet, filters: { loading: fLoading } } = this.props;
+    const {
+      config: { sidebarConfigData, sidebarConfigDataWithPads, loading }, filtersSelectedCatalog, classes, mode,
+      selectedGroupCells, sheet, filters: { loading: fLoading }
+    } = this.props;
     if (loading) return <Loading />;
     return (
       <div>

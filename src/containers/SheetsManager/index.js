@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Table, Button, Input } from 'reactstrap';
-import FontAwesomeIcon from '@fortawesome/react-fontawesome';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShare, faEdit, faPlus, faTrash } from '@fortawesome/fontawesome-free-solid';
 import { graphql, compose } from 'react-apollo';
 import { connect } from 'react-redux';

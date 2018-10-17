@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import {
   Nav, Navbar, NavbarBrand, NavItem, NavLink as NavLinkStrap, NavbarToggler, Collapse,
 } from 'reactstrap';
-import FontAwesomeIcon from '@fortawesome/react-fontawesome';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faSignInAlt, faSignOutAlt } from '@fortawesome/fontawesome-free-solid';
 import { LinkContainer } from 'react-router-bootstrap';
 import {

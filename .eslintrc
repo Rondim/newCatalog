@@ -9,6 +9,7 @@
     "no-console": 0,
     "async-await/space-after-async": 2,
     "async-await/space-after-await": 2,
+    "indent": ["error", 2],
     "require-jsdoc": 0,
     "react/jsx-uses-react": "error",
     "react/jsx-uses-vars": "error",

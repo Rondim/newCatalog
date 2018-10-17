@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Button, Jumbotron, Container, Row, Col, Input } from 'reactstrap';
-import FontAwesomeIcon from '@fortawesome/react-fontawesome';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleLeft } from '@fortawesome/fontawesome-free-solid';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';

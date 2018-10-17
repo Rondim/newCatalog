@@ -3,14 +3,14 @@ import { FILTER_CLICKED, INIT_SIDEBAR } from './constants';
 
 function catalogSidebarReducer(state = {}, action) {
   switch (action.type) {
-    case INIT_SIDEBAR:
-      return getInitialState(action.payload);
-    case FILTER_CLICKED:
-      const newFiltersSelected = calcNewFiltersSelected(state, action.payload);
-      return { ...state, filtersSelected: newFiltersSelected };
-    default:
-      return state;
-    }
+  case INIT_SIDEBAR:
+    return getInitialState(action.payload);
+  case FILTER_CLICKED:
+    const newFiltersSelected = calcNewFiltersSelected(state, action.payload);
+    return { ...state, filtersSelected: newFiltersSelected };
+  default:
+    return state;
+  }
 }
 
 export default catalogSidebarReducer;

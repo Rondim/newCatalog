@@ -1,8 +1,8 @@
 import React from 'react';
 import { graphql } from 'react-apollo';
 import PropTypes from 'prop-types';
-import { withStyles } from 'material-ui/styles';
-import { Paper, Grid } from 'material-ui';
+import { withStyles } from '@material-ui/core/styles';
+import { Grid, Paper } from '@material-ui/core';
 import { connect } from 'react-redux';
 
 import { fetchConfig, fetchConfigOptions } from './queries/fetchConfig';
@@ -48,5 +48,5 @@ const mapStateToProps = (state) => {
 
 export default connect(mapStateToProps)(
   graphql(fetchConfig, fetchConfigOptions)(
-  withStyles(styles)(Catalog)
-));
+    withStyles(styles)(Catalog)
+  ));

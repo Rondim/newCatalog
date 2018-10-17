@@ -1,4 +1,4 @@
-import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
+import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
 import { HttpLink } from 'apollo-link-http';
 import { ApolloClient } from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
@@ -18,7 +18,7 @@ import notifyReducer from './containers/Notificator/reducer';
 import { UNAUTH_USER } from './containers/Auth/actions/types';
 import { sendNotification } from './containers/Notificator/actions';
 import popupReducer from './containers/Popup/reducer';
-import { ROOT_URL, /* WS_URL */ } from './constants';
+import { ROOT_URL, } from './constants';
 
 const httpLink = new HttpLink({ uri: ROOT_URL });
 
@@ -46,7 +46,8 @@ const cache = localStorage.getItem('cache') === 'hermes' ? new Hermes() :
   new InMemoryCache({
     dataIdFromObject: object => {
       switch (object.__typename) {
-        default: return object.id || object._id; // fall back to `id` and `_id` for all other types
+      default:
+        return object.id || object._id; // fall back to `id` and `_id` for all other types
       }
     },
     cacheRedirects: {

@@ -10,21 +10,7 @@ import Loading from '../../components/Loading';
 import {
   withRouter
 } from 'react-router-dom';
-import { withStyles } from 'material-ui/styles';
-import { InputLabel } from 'material-ui/Input';
-import { FormControl } from 'material-ui/Form';
-import { Button, Typography, Input } from 'material-ui';
-
-
-const styles = theme => ({
-  container: {
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
-  formControl: {
-    margin: theme.spacing.unit,
-  },
-});
+import { Button, Alert, Input, Form, FormGroup, Label } from 'reactstrap';
 
 class Signin extends Component {
   static propTypes = {
@@ -63,47 +49,46 @@ class Signin extends Component {
   };
 
   render() {
-    const { classes, data: { loading } } = this.props;
+    const { data: { loading } } = this.props;
     if (loading) {
       return (<Loading />);
     }
     return (
-      <form
-        className={classes.container}
+      <Form
         onSubmit={this.signinUser}
       >
-        <FormControl className={classes.formControl}>
-          <InputLabel htmlFor="email">Email</InputLabel>
+        <FormGroup>
+          <Label htmlFor="email">Email</Label>
           <Input
             id="email"
             value={this.state.email}
             onChange={ev => this.setState({ email: ev.target.value })}
           />
-        </FormControl>
-        <FormControl className={classes.formControl}>
-          <InputLabel htmlFor="password">Password</InputLabel>
+        </FormGroup>
+        <FormGroup>
+          <Label htmlFor="password">Password</Label>
           <Input
             id="password"
             type="password"
             value={this.state.password}
             onChange={ev => this.setState({ password: ev.target.value })}
           />
-        </FormControl>
+        </FormGroup>
         <div>
           {this.state.errors.map(err =>
-            <Typography color='accent' key={err}>
+            <Alert color='danger' key={err}>
               {err}
-            </Typography>
+            </Alert>
           )}
         </div>
-        <Button type="submit" raised color="primary" className={classes.button}>
+        <Button type="submit" raised color="success">
           Submit
         </Button>
-      </form>
+      </Form>
     );
   }
 }
 
-export default withRouter(withStyles(styles)(graphql(query)(
-  graphql(mutation)(Signin)))
+export default withRouter(graphql(query)(
+  graphql(mutation)(Signin))
 );

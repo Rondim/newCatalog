@@ -1,22 +1,23 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from 'material-ui/styles';
+import { withStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
 import styles from './styles';
 import compose from 'recompose/compose';
 import pure from 'recompose/pure';
-import Button from 'material-ui/Button';
 import { Row } from 'reactstrap';
 
 class PopoverButton extends Component {
   onClick = () => {
     this.props.onClick(this.props.filter.filterId);
   };
+
   render() {
     const { filter: { filterName, filterColor, selection }, classes } = this.props;
     // Сделать лучше switch
     const buttonStyle = selection === 'selected' ?
       classes.buttonSelected : selection === 'selectedNotByAll' ?
-      classes.buttonSelectedNotByAll : classes.buttonNotSelected;
+        classes.buttonSelectedNotByAll : classes.buttonNotSelected;
     return (
       <Row style={{ width: '80%', margin: 'auto' }}>
         <Button
@@ -24,13 +25,13 @@ class PopoverButton extends Component {
           disableRipple
           className={`${buttonStyle} col`}
           onClick={this.onClick}
-          >
+        >
           {filterName}
         </Button>
-        { filterColor && <div
+        {filterColor && <div
           key='color'
           className='col-xs-1'
-          style={ { backgroundColor: filterColor, width: '20px', height: '20px', display: 'inline-block' } }
+          style={{ backgroundColor: filterColor, width: '20px', height: '20px', display: 'inline-block' }}
         />}
       </Row>
     );

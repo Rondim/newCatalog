@@ -1,8 +1,8 @@
 import React from 'react';
 import { graphql } from 'react-apollo';
 import PropTypes from 'prop-types';
-import { withStyles } from 'material-ui/styles';
-import { Paper, Grid } from 'material-ui';
+import { withStyles } from '@material-ui/core/styles';
+import { Paper, Grid } from '@material-ui/core';
 
 import ProductList from '../../components/ProductList';
 import { fetchInstances, fetchInstancesOptions } from './queries/fetchInstances';
@@ -19,15 +19,15 @@ const styles = theme => ({
 });
 
 const CatalogProductList = ({ loading, allInstances, loadMoreItems, _allInstancesMeta, classes }) => (
-    <Grid item xs={9}>
-      <Paper className={classes.paper}>
-        <ProductList
-          count={(_allInstancesMeta && _allInstancesMeta.count) || 0}
-          instances={loading ? [] : allInstances }
-          fetchMore={loadMoreItems}
-        />
-      </Paper>
-    </Grid>
+  <Grid item xs={9}>
+    <Paper className={classes.paper}>
+      <ProductList
+        count={(_allInstancesMeta && _allInstancesMeta.count) || 0}
+        instances={loading ? [] : allInstances }
+        fetchMore={loadMoreItems}
+      />
+    </Paper>
+  </Grid>
 );
 
 CatalogProductList.propTypes = {
@@ -38,4 +38,6 @@ CatalogProductList.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default graphql(fetchInstances, fetchInstancesOptions)(withStyles(styles)(CatalogProductList));
+export default graphql(fetchInstances, fetchInstancesOptions)(
+  withStyles(styles)(CatalogProductList)
+);

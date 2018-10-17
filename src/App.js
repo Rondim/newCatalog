@@ -11,19 +11,19 @@ import Navigation from './containers/Navigation';
 import Popup from './containers/Popup';
 
 const App = () => (
-    <div className="App">
-      <div>
-        <Navigation authenticated={!!localStorage.getItem('token')} />
-      </div>
-      <Popup />
-      <Notificator />
-      <Switch>
-        <Route exact path="/" component={requireAuth(Catalog)} />
-        <Route exact path="/sheets" component={requireAuth(SheetsManager)} />
-          <Route exact path="/sheet/:id" component={requireAuth(Cells)} />
-        <Route path="/signin" component={Signin} />
-      </Switch>
+  <div className="App">
+    <div>
+      <Navigation authenticated={!!localStorage.getItem('token')} />
     </div>
+    <Popup />
+    <Notificator />
+    <Switch>
+      <Route exact path="/" component={requireAuth(Catalog)} />
+      <Route exact path="/sheets" component={requireAuth(SheetsManager)} />
+      <Route exact path="/sheet/:id" component={requireAuth(Cells)} />
+      <Route path="/signin" component={Signin} />
+    </Switch>
+  </div>
 );
 
 export default App;
