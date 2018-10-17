@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Grid, AutoSizer } from 'react-virtualized';
+import { AutoSizer, Grid } from 'react-virtualized';
 import _ from 'lodash';
-import { withApollo, graphql, compose } from 'react-apollo';
+import { compose, graphql, withApollo } from 'react-apollo';
 import { connect } from 'react-redux';
 
 import Loading from '../../components/Loading';
@@ -17,14 +17,7 @@ import updateTextCell from './mutations/updateTextCell.graphql';
 // import updateCells from './subscriptions/updateCells.graphql';
 // import updateZones from './subscriptions/updateZones.graphql';
 import { notification } from '../Notificator/actions';
-import {
-  calcActive,
-  calcStyle,
-  checkWebpFeature,
-  getQuantity,
-  getDepartments,
-  getEachCoordOfZone,
-} from './libs/calc';
+import { calcActive, calcStyle, checkWebpFeature, getDepartments, getEachCoordOfZone, getQuantity, } from './libs/calc';
 import placeZoneOnSheet from './mutations/placeZoneOnSheet.graphql';
 import fetchPads from './queries/allPads.graphql';
 import getPad from './queries/getPad.graphql';
@@ -37,14 +30,14 @@ import './index.css';
 
 @connect(null, { notification })
 @graphql(query, {
-    options: (({ sheet }) => {
-      return {
-        variables: {
-          sheet
-        }
-      };
-    })
-  }
+  options: (({ sheet }) => {
+    return {
+      variables: {
+        sheet
+      }
+    };
+  })
+}
 )
 @compose(
   graphql(setMultiPosition, { name: 'setMultiPosition' }),
@@ -118,9 +111,9 @@ class Sheet extends Component {
     window.addEventListener('resize', () => this.setState({ height: this._container.clientHeight }));
   }
 
-  state={
+  state = {
     webp: false,
-    height: document.body.clientHeight-69,
+    height: document.body.clientHeight - 69,
     cutedCells: null
   };
 
@@ -144,7 +137,7 @@ class Sheet extends Component {
   placeZone = (id, i, j) => {
     const { sheet, placeZoneOnSheet, blockingCells, client } = this.props;
     const { pad } = client.readQuery({ query: getPad, variables: { id } });
-    const coords = getEachCoordOfZone(i, j, i+pad.size.h-1, j+pad.size.w-1);
+    const coords = getEachCoordOfZone(i, j, i + pad.size.h - 1, j + pad.size.w - 1);
     blockingCells(
       placeZoneOnSheet({
         variables: { zoneId: id, sheetId: sheet, i, j },
@@ -160,9 +153,9 @@ class Sheet extends Component {
       blockingCells, setMultiPosition, data: { refetch }
     } = this.props;
     const { cutedCells } = this.state;
-    if (ev.keyCode===88 && (ev.ctrlKey || ev.metaKey) && selectedGroupCells) {
+    if (ev.keyCode === 88 && (ev.ctrlKey || ev.metaKey) && selectedGroupCells) {
       this.setState({ cutedCells: selectedGroupCells });
-    } else if (ev.keyCode===86 && (ev.ctrlKey || ev.metaKey) &&
+    } else if (ev.keyCode === 86 && (ev.ctrlKey || ev.metaKey) &&
       selectedCells && selectedCells.length > 0 && cutedCells) {
       const cells = this.selectCellsByGroup(cutedCells);
       const { i: ti, j: tj } = selectedCells[0];
@@ -171,8 +164,8 @@ class Sheet extends Component {
       const subresult = [];
       const result = [];
       cells.forEach(({ id, i, j }) => {
-        subresult.push({ id, i: i+di, j: j+dj, __typename: 'cells' });
-        result.push({ id, coord: { i: i+di, j: j+dj } });
+        subresult.push({ id, i: i + di, j: j + dj, __typename: 'cells' });
+        result.push({ id, coord: { i: i + di, j: j + dj } });
       });
       const cellsForBlock = cells.concat(subresult);
       blockingCells(
@@ -188,7 +181,7 @@ class Sheet extends Component {
         refetch
       );
       this.setState({ cutedCells: null });
-    } else if (ev.keyCode===82 && ev.altKey && selectedZone) {
+    } else if (ev.keyCode === 82 && ev.altKey && selectedZone) {
       const { pad } = client.readQuery({ query: getZone, variables: { id: selectedZone.id } });
       const coords = getEachCoordOfZone(pad.i0, pad.j0, pad.i1, pad.j1);
       await blockingCells(
@@ -207,7 +200,7 @@ class Sheet extends Component {
             { query, variables: { sheet } },
             { query: fetchPads, variables: { search: '' } },
             { query: fetchPads, variables: { typeUnique: true } }
-            ]
+          ]
         });
         unselectZone();
       } else if (selectedGroupCells) {
@@ -228,8 +221,8 @@ class Sheet extends Component {
 
   selectCellsByGroup = ({ i0, i1, j0, j1 }) => {
     const { allCells } = this.props.data;
-    return _.filter(allCells, ({ i, j })=> {
-      return i>=i0 && i<=i1 && j>=j0 && j<=j1;
+    return _.filter(allCells, ({ i, j }) => {
+      return i >= i0 && i <= i1 && j >= j0 && j <= j1;
     });
   };
 
@@ -247,7 +240,7 @@ class Sheet extends Component {
     const { allCells, allZones } = this.props.data;
     const { selectedCells, selectedGroupCells, selectedZone, onStartDrag, busy } = this.props;
     const { webp } = this.state;
-    const data = _.find(allCells, o => o.i===rowIndex && o.j ===columnIndex);
+    const data = _.find(allCells, o => o.i === rowIndex && o.j === columnIndex);
     const avails = _.get(data, 'instance.availabilities');
 
     let className = '';
@@ -257,21 +250,21 @@ class Sheet extends Component {
     let aZoneBorders = { left: undefined, right: undefined, top: undefined, bottom: undefined };
     typeof allZones === 'object' && allZones.forEach(zone => {
       switch (zone.type) {
-        case 'Loader':
-          lBorders = calcActive(zone, columnIndex, rowIndex, lBorders);
-          break;
-        case 'Pad':
-          padBorders = calcActive(zone, columnIndex, rowIndex, padBorders);
-          break;
-        case 'Unique':
-          if (zone.i0 <= rowIndex && zone.i1 >= rowIndex && zone.j0 <= columnIndex && zone.j1 >= columnIndex) {
-            className += ' uniqueZone';
-          }
-          break;
+      case 'Loader':
+        lBorders = calcActive(zone, columnIndex, rowIndex, lBorders);
+        break;
+      case 'Pad':
+        padBorders = calcActive(zone, columnIndex, rowIndex, padBorders);
+        break;
+      case 'Unique':
+        if (zone.i0 <= rowIndex && zone.i1 >= rowIndex && zone.j0 <= columnIndex && zone.j1 >= columnIndex) {
+          className += ' uniqueZone';
+        }
+        break;
       }
     });
     aBorders = calcActive(selectedGroupCells, columnIndex, rowIndex, aBorders);
-    const active = !!_.find(selectedCells, o => o.i ===rowIndex && o.j === columnIndex);
+    const active = !!_.find(selectedCells, o => o.i === rowIndex && o.j === columnIndex);
     aZoneBorders = selectedZone ? calcActive(selectedZone, columnIndex, rowIndex, aZoneBorders) : aZoneBorders;
     const borderLeft = calcStyle(active, aBorders.left, aZoneBorders.left, lBorders.left, padBorders.left);
     const borderRight = calcStyle(active, aBorders.right, aZoneBorders.right, lBorders.right, padBorders.right);
@@ -280,13 +273,13 @@ class Sheet extends Component {
     className += ` ${borderLeft}left ${borderRight}right ${borderTop}top ${borderBottom}bottom`;
     let draggable = true;
     if (_.get(busy, `${rowIndex}.${columnIndex}`)) {
-      className +=' busy';
+      className += ' busy';
       draggable = false;
     }
-    const tags = (_.get(data, 'instance.tags')|| [] ).concat(_.get(data, 'instance.item.tags') || []);
+    const tags = (_.get(data, 'instance.tags') || []).concat(_.get(data, 'instance.item.tags') || []);
     const itemProps = {
-      url: _.get(data, 'instance.item.img.url'),
-      urlWebp: webp && _.get(data, 'instance.item.imgWebP.url'),
+      url: _.get(data, 'instance.item') && (_.get(data, 'instance.item.img.url') || 'https://i.imgur.com/ujJv4Jw.png'),
+      urlWebp: webp && _.get(data, 'instance.item.imgWebP.url') || '',
       size: _.get(data, 'instance.size[0].name'),
       departments: getDepartments(avails),
       tags,
@@ -302,7 +295,7 @@ class Sheet extends Component {
         <Cell
           key={key}
           id={data ? data.id : null}
-          { ...itemProps }
+          {...itemProps}
           text={data && data.text}
           row={rowIndex}
           column={columnIndex}
@@ -323,14 +316,14 @@ class Sheet extends Component {
     const { loading } = this.props.data;
     if (loading) return <div style={{ height: '100vh' }}><Loading style={{ height: '100%' }} /></div>;
     return (
-      <div tabIndex="0" onKeyDown={this.handleKeyDown} style={{ flex: 1 }} ref={ref => this._container = ref} >
-        <AutoSizer defaultHeight={600} disableHeight >
+      <div tabIndex="0" onKeyDown={this.handleKeyDown} style={{ flex: 1 }} ref={ref => this._container = ref}>
+        <AutoSizer defaultHeight={600} disableHeight>
           {({ width }) => (
             <Grid
               cellRenderer={this.cellRenderer}
               columnCount={200}
               columnWidth={100}
-              height={document.body.clientHeight-69}
+              height={document.body.clientHeight - 69}
               rowCount={300}
               rowHeight={100}
               width={width}
@@ -341,7 +334,7 @@ class Sheet extends Component {
             />
           )}
         </AutoSizer>
-        </div>
+      </div>
     );
   }
 }

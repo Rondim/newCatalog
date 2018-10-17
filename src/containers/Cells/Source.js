@@ -44,8 +44,10 @@ class Source extends Component {
         link = `${urlWebp}`;
       } else if (~url.search('files.graph.cool')) {
         link = `${url.replace('files.graph.cool', 'images.graph.cool/v1')}/200x`;
-      } else {
+      } else if (url) {
         link = url;
+      } else {
+        link = 'https://i.imgur.com/ujJv4Jw.png';
       }
       resStyle.backgroundImage = `url(${link})`;
       resStyle.backgroundSize = style.width;
